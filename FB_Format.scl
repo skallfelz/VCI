@@ -1,0 +1,159 @@
+﻿FUNCTION_BLOCK "FB_Format"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_ScreenNumber : Int;
+      i_MaxNumberOfData : Int := 20;
+      i_SaveData : Bool;
+      i_LoadData : Bool;
+      i_CopyData : Bool;
+      i_Reload : Bool;
+      i_LockDataChange : Bool;
+      i_EnableSaveOnScreenChange : Bool;
+      i_SourceNumber : Int := 1;
+      i_TargetNumber : Int := 1;
+      i_PrefixForCopyData : String := 'Kopie von Format ';
+   END_VAR
+
+   VAR_OUTPUT 
+      q_CopyLocked : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_FormatData : Array[0..30] of "UDT_Formatdata";
+      iq_CurrentFormatNumber : Int;
+      iq_SetFormatNumber : Int;
+   END_VAR
+
+   VAR 
+      stat_SaveData : Bool;
+      stat_CopyLocked : Bool;
+      stat_Reload : Bool;
+      stat_CopyDone : Bool;
+      stat_TONCopy {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_ScreenNumberOld : Int;
+      stat_SourceNumberToString : String;
+   END_VAR
+
+   VAR_TEMP 
+      temp_ScreenNumber : Int;
+      temp_MaxNumberOfData : Int;
+      temp_SaveData : Bool;
+      temp_LoadData : Bool;
+      temp_CopyData : Bool;
+      temp_Reload : Bool;
+      temp_LockDataChange : Bool;
+      temp_EnableSaveOnScreenChange : Bool;
+      temp_SourceNumber : Int;
+      temp_TargetNumber : Int;
+      temp_PrefixForCopyData : String;
+   END_VAR
+
+
+BEGIN
+	REGION MAP INPUTS
+	    #temp_ScreenNumber := #i_ScreenNumber;
+	    #temp_MaxNumberOfData := #i_MaxNumberOfData;
+	    #temp_SaveData := #i_SaveData;
+	    #temp_LoadData := #i_LoadData;
+	    #temp_CopyData := #i_CopyData;
+	    #temp_Reload := #i_Reload;
+	    #temp_LockDataChange := #i_LockDataChange;
+	    #temp_EnableSaveOnScreenChange := #i_EnableSaveOnScreenChange;
+	    #temp_SourceNumber := #i_SourceNumber;
+	    #temp_TargetNumber := #i_TargetNumber;
+	    #temp_PrefixForCopyData := #i_PrefixForCopyData;
+	END_REGION
+	
+	REGION CHANGE FORMATDATA
+	    IF #temp_LoadData
+	        AND #iq_CurrentFormatNumber > 0 AND #iq_CurrentFormatNumber <= #temp_MaxNumberOfData
+	        AND #iq_SetFormatNumber > 0 AND #iq_SetFormatNumber <= #temp_MaxNumberOfData
+	    THEN
+	        //Save current Data
+	        #iq_FormatData[#iq_CurrentFormatNumber] := #iq_FormatData[0];
+	        
+	        //load new Data
+	        #iq_FormatData[0] := #iq_FormatData[#iq_SetFormatNumber];
+	        #iq_CurrentFormatNumber := #iq_SetFormatNumber;
+	    END_IF;
+	END_REGION
+	
+	REGION RELOAD DATA
+	    IF #temp_Reload
+	        AND #iq_CurrentFormatNumber > 0 AND #iq_CurrentFormatNumber <= #temp_MaxNumberOfData
+	        AND NOT #temp_LockDataChange
+	    THEN
+	        //Reload Current Data
+	        #iq_FormatData[0] := #iq_FormatData[#iq_CurrentFormatNumber];
+	        #iq_SetFormatNumber := #iq_CurrentFormatNumber;
+	    END_IF;
+	END_REGION
+	
+	REGION SAVE DATA ON SCREEN CHANGE
+	    IF #temp_ScreenNumber <> #stat_ScreenNumberOld
+	        AND #temp_EnableSaveOnScreenChange
+	    THEN
+	        #stat_SaveData := TRUE;
+	        #stat_ScreenNumberOld :=#temp_ScreenNumber;
+	    ELSE
+	        #stat_SaveData := FALSE;
+	    END_IF;
+	END_REGION
+	
+	REGION SAVE DATA
+	    IF (#stat_SaveData OR #temp_SaveData)
+	        AND (#iq_CurrentFormatNumber > 0 AND #iq_CurrentFormatNumber <= #temp_MaxNumberOfData)
+	        AND (#iq_SetFormatNumber > 0 AND #iq_SetFormatNumber <= #temp_MaxNumberOfData)
+	    THEN
+	        #iq_FormatData[#iq_CurrentFormatNumber] := #iq_FormatData[0];
+	    END_IF;
+	END_REGION
+	
+	REGION COPY DATA
+	    //Lock copy data
+	    #stat_CopyLocked := #temp_SourceNumber = #temp_TargetNumber;
+	    
+	    #stat_TONCopy(IN := #temp_CopyData,
+	                   PT := t#2s);
+	    
+	    
+	    //Copy Data and Set Name to
+	    IF #stat_TONCopy.Q AND #temp_SourceNumber > 0 AND #temp_SourceNumber <= #temp_MaxNumberOfData AND
+	        #temp_TargetNumber > 0 AND #temp_TargetNumber <= #temp_MaxNumberOfData
+	        AND NOT #stat_CopyLocked
+	    THEN
+	        
+	        #iq_FormatData[#iq_CurrentFormatNumber] := #iq_FormatData[0];
+	        #iq_FormatData[#temp_TargetNumber] := #iq_FormatData[#temp_SourceNumber];
+	        
+	        VAL_STRG(IN := #temp_SourceNumber,
+	                 SIZE := 0,
+	                 PREC := 0,
+	                 FORMAT := 0,
+	                 P := 1,
+	                 OUT => #stat_SourceNumberToString);
+	        
+	        #iq_FormatData[#temp_TargetNumber].Formatname := CONCAT(IN1 := #temp_PrefixForCopyData, IN2 := #stat_SourceNumberToString);
+	        
+	        #stat_CopyDone := TRUE;
+	        
+	    ELSE
+	        #stat_SourceNumberToString := '';
+	        #stat_CopyDone := FALSE;
+	    END_IF;
+	END_REGION
+	
+	REGION CHANGE NAME OF CURRENT FORMAT
+	    //Change Name of format and write it back du current data
+	    IF #iq_FormatData[0].Formatname <> #iq_FormatData[#iq_CurrentFormatNumber].Formatname
+	    THEN
+	        #iq_FormatData[0].Formatname := #iq_FormatData[#iq_CurrentFormatNumber].Formatname;
+	    END_IF;
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_CopyLocked := #stat_CopyLocked;
+	END_REGION
+END_FUNCTION_BLOCK
+
