@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T10:17:02.5462407Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.InstanceDB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <DBAccessibleFromWebserver>true</DBAccessibleFromWebserver>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <InstanceOfName>FB_SIKO</InstanceOfName>
+      <InstanceOfType>FB</InstanceOfType>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Input">
+    <Member Name="i_nodes" Datatype="Array[0..31] of HW_IO" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_enable" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_reset" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_NodeUp" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_NodeDown" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_CurrentPictureNumber" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_PictureNumber" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_UpperLimitNode" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="Output">
+    <Member Name="q_NodeNumbersNotInRange" Datatype="String" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="q_AllNodesInRange" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="q_ActiveNodeNumber" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="iq_HMISIKO" Datatype="&quot;UDT_SIKO&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="active" Datatype="Bool" />
+          <Member Name="SetPoint" Datatype="DInt" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_HMIData" Datatype="&quot;UDT_SIKODATA&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="Value" Datatype="DInt" />
+          <Member Name="SetParameter" Datatype="Bool" />
+          <Member Name="Parameter" Datatype="&quot;UDT_SIKOPARAMETER&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="DecimalPlaces" Datatype="Byte" />
+                <Member Name="DirectionIndicators" Datatype="Byte" />
+                <Member Name="DisplayOrientation" Datatype="Byte" />
+                <Member Name="CountingDirection" Datatype="Byte" />
+                <Member Name="ResolutionPerRevolution" Datatype="Int" />
+                <Member Name="OffsetValue" Datatype="Int" />
+                <Member Name="CalibrationValue" Datatype="DInt" />
+                <Member Name="TargetWindow1" Datatype="Int" />
+                <Member Name="PositioningType" Datatype="Byte" />
+                <Member Name="LoopLength" Datatype="Int" />
+                <Member Name="OperatingMode" Datatype="Byte" />
+              </Section>
+            </Sections>
+          </Member>
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_SIKO" Datatype="Array[0..31] of &quot;UDT_SIKO&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="active" Datatype="Bool" />
+          <Member Name="SetPoint" Datatype="DInt" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_SIKOData" Datatype="Array[0..31] of &quot;UDT_SIKODATA&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="Value" Datatype="DInt" />
+          <Member Name="SetParameter" Datatype="Bool" />
+          <Member Name="Parameter" Datatype="&quot;UDT_SIKOPARAMETER&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="DecimalPlaces" Datatype="Byte" />
+                <Member Name="DirectionIndicators" Datatype="Byte" />
+                <Member Name="DisplayOrientation" Datatype="Byte" />
+                <Member Name="CountingDirection" Datatype="Byte" />
+                <Member Name="ResolutionPerRevolution" Datatype="Int" />
+                <Member Name="OffsetValue" Datatype="Int" />
+                <Member Name="CalibrationValue" Datatype="DInt" />
+                <Member Name="TargetWindow1" Datatype="Int" />
+                <Member Name="PositioningType" Datatype="Byte" />
+                <Member Name="LoopLength" Datatype="Int" />
+                <Member Name="OperatingMode" Datatype="Byte" />
+              </Section>
+            </Sections>
+          </Member>
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="stat_FirstCycle" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_NodeNumber" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_NodeNumberOld" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_NodeNumbersNotInRange" Datatype="String" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_TONEnable" Datatype="TON_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_RTRIGReadOnce" Datatype="R_TRIG" Version="1.0" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="CLK" Datatype="Bool" /></Section><Section Name="Output"><Member Name="Q" Datatype="Bool" /></Section><Section Name="InOut" /><Section Name="Static"><Member Name="Stat_Bit" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_RTRIGNodeUp" Datatype="R_TRIG" Version="1.0" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="CLK" Datatype="Bool" /></Section><Section Name="Output"><Member Name="Q" Datatype="Bool" /></Section><Section Name="InOut" /><Section Name="Static"><Member Name="Stat_Bit" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_RTRIGNodeDown" Datatype="R_TRIG" Version="1.0" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="CLK" Datatype="Bool" /></Section><Section Name="Output"><Member Name="Q" Datatype="Bool" /></Section><Section Name="InOut" /><Section Name="Static"><Member Name="Stat_Bit" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_SIKO_POS_AP10vPN" Datatype="Array[0..31] of &quot;SIKO_POS_AP10vPN&quot;" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="DC_StartByteOut" Datatype="HW_IO" /><Member Name="DC_StartByteIn" Datatype="HW_IO" /><Member Name="vnSetValue" Datatype="DInt" /><Member Name="vnNodeId" Datatype="Byte" /><Member Name="bc02_ValidityOfSetpoint1" Datatype="Bool" /><Member Name="bc03_DisplayRange" Datatype="Bool" /><Member Name="bc04_AcknowledgmentTarge" Datatype="Bool" /><Member Name="bc05_ErrorAcknowledgment" Datatype="Bool" /><Member Name="bc06_AcknowledgementSP2" Datatype="Bool" /><Member Name="bc07_DataIdentifier" Datatype="Bool" /><Member Name="bc09_ValidityOfSetpoint2" Datatype="Bool" /><Member Name="bc10_AcknowledgementSP1" Datatype="Bool" /><Member Name="bc11_Led1GreenLeft" Datatype="Bool" /><Member Name="bc12_Led3GreenRight" Datatype="Bool" /><Member Name="bc13_Led4RedRight" Datatype="Bool" /><Member Name="bc14_Led2RedLeft" Datatype="Bool" /><Member Name="bc15_LedBlinking" Datatype="Bool" /><Member Name="bcStartRead" Datatype="Bool" /><Member Name="bcStartWrite" Datatype="Bool" /><Member Name="bcStartCopy" Datatype="Bool" /><Member Name="bcResetCounterActivity" Datatype="Bool" /><Member Name="vnParameterAdrRead1" Datatype="Byte" /><Member Name="vnParameterAdrRead2" Datatype="Byte" /><Member Name="vnParameterAdrRead3" Datatype="Byte" /></Section><Section Name="Output"><Member Name="vnActualValue" Datatype="DInt" /><Member Name="bs00_DirectionIndic_Cw" Datatype="Bool" /><Member Name="bs01_DirectionIndic_Ccw" Datatype="Bool" /><Member Name="bs02_ValiditySetpoint1" Datatype="Bool" /><Member Name="bs03_TargetWindow2Dynami" Datatype="Bool" /><Member Name="bs04_TargetWindow1Static" Datatype="Bool" /><Member Name="bs05_TargetWindow1Dynami" Datatype="Bool" /><Member Name="bs06_Deviation" Datatype="Bool" /><Member Name="bs07_DeviceError" Datatype="Bool" /><Member Name="bs08_OutputOfPositionVal" Datatype="Bool" /><Member Name="bs09_PositionValueIncrem" Datatype="Bool" /><Member Name="bs10_ValiditySetpoint2" Datatype="Bool" /><Member Name="bs11_BatteryStatus" Datatype="Bool" /><Member Name="bs12_SensorError" Datatype="Bool" /><Member Name="bs13_ButtonLeft" Datatype="Bool" /><Member Name="bs14_ButtonStar" Datatype="Bool" /><Member Name="bs15_ButtonUp" Datatype="Bool" /><Member Name="bsDone" Datatype="Bool" /><Member Name="bsBusy" Datatype="Bool" /><Member Name="bsFaultDataReceive" Datatype="Bool" /><Member Name="bsComTimeout" Datatype="Bool" /><Member Name="bsGeneralError" Datatype="Bool" /><Member Name="vnErrorCode1" Datatype="Byte" /><Member Name="vnErrorCode2" Datatype="Byte" /><Member Name="vnErrorSFC14" Datatype="Int" /><Member Name="vnErrorSFC15" Datatype="Int" /></Section><Section Name="InOut" /><Section Name="Static"><Member Name="p00_NodeAddress_r" Datatype="Byte" /><Member Name="p00_NodeAddress_w" Datatype="Byte" /><Member Name="p01_Baudrate_r" Datatype="Byte" /><Member Name="p01_Baudrate_w" Datatype="Byte" /><Member Name="p02_BusTimeout_r" Datatype="Byte" /><Member Name="p02_BusTimeout_w" Datatype="Byte" /><Member Name="p03_ReplyWriteSetPoint_r" Datatype="Byte" /><Member Name="p03_ReplyWriteSetPoint_w" Datatype="Byte" /><Member Name="p04_EnableKeysTime_r" Datatype="Byte" /><Member Name="p04_EnableKeysTime_w" Datatype="Byte" /><Member Name="p05_KeyFunctionEnableC_r" Datatype="Byte" /><Member Name="p05_KeyFunctionEnableC_w" Datatype="Byte" /><Member Name="p06_LedFlashing_r" Datatype="Byte" /><Member Name="p06_LedFlashing_w" Datatype="Byte" /><Member Name="p07_Led3Green_r" Datatype="Byte" /><Member Name="p07_Led3Green_w" Datatype="Byte" /><Member Name="p08_Led2Red_r" Datatype="Byte" /><Member Name="p08_Led2Red_w" Datatype="Byte" /><Member Name="p09_Led1Green_r" Datatype="Byte" /><Member Name="p09_Led1Green_w" Datatype="Byte" /><Member Name="p0A_DecimalPlaces_r" Datatype="Byte" /><Member Name="p0A_DecimalPlaces_w" Datatype="Byte" /><Member Name="p0B_DisplayDivisor_r" Datatype="Byte" /><Member Name="p0B_DisplayDivisor_w" Datatype="Byte" /><Member Name="p0C_DirectionIndicatio_r" Datatype="Byte" /><Member Name="p0C_DirectionIndicatio_w" Datatype="Byte" /><Member Name="p0D_DisplayOrientation_r" Datatype="Byte" /><Member Name="p0D_DisplayOrientation_w" Datatype="Byte" /><Member Name="p0E_ProgrammingMode_r" Datatype="Byte" /><Member Name="p0E_ProgrammingMode_w" Datatype="Byte" /><Member Name="p1B_CountingDirection_r" Datatype="Byte" /><Member Name="p1B_CountingDirection_w" Datatype="Byte" /><Member Name="p1C_ResolutionPerRevol_r" Datatype="DInt" /><Member Name="p1C_ResolutionPerRevol_w" Datatype="DInt" /><Member Name="p1E_Offset_r" Datatype="Int" /><Member Name="p1E_Offset_w" Datatype="Int" /><Member Name="p1F_CalibrationValue_r" Datatype="DInt" /><Member Name="p1F_CalibrationValue_w" Datatype="DInt" /><Member Name="p20_TargetWindow1_r" Datatype="Int" /><Member Name="p20_TargetWindow1_w" Datatype="Int" /><Member Name="p21_PosType_r" Datatype="Byte" /><Member Name="p21_PosType_w" Datatype="Byte" /><Member Name="p22_LoopLength_r" Datatype="Int" /><Member Name="p22_LoopLength_w" Datatype="Int" /><Member Name="p28_OperatingMode_r" Datatype="Byte" /><Member Name="p28_OperatingMode_w" Datatype="Byte" /><Member Name="p30_Display2Line_r" Datatype="Byte" /><Member Name="p30_Display2Line_w" Datatype="Byte" /><Member Name="p31_TargetWindow2_r" Datatype="Int" /><Member Name="p31_TargetWindow2_w" Datatype="Int" /><Member Name="p32_PosWindow2Visual_r" Datatype="Byte" /><Member Name="p32_PosWindow2Visual_w" Datatype="Byte" /><Member Name="p33_DisplayDivisorUse_r" Datatype="Byte" /><Member Name="p33_DisplayDivisorUse_w" Datatype="Byte" /><Member Name="p34_DifferenceValueCal_r" Datatype="Byte" /><Member Name="p34_DifferenceValueCal_w" Datatype="Byte" /><Member Name="p35_KeyFunctionEnable2_r" Datatype="Byte" /><Member Name="p35_KeyFunctionEnable2_w" Datatype="Byte" /><Member Name="p39_Led4Red_r" Datatype="Byte" /><Member Name="p39_Led4Red_w" Datatype="Byte" /><Member Name="p3A_LcdBacklightFlash_r" Datatype="Byte" /><Member Name="p3A_LcdBacklightFlash_w" Datatype="Byte" /><Member Name="p3B_LcdBacklightWhite_r" Datatype="Byte" /><Member Name="p3B_LcdBacklightWhite_w" Datatype="Byte" /><Member Name="p3C_LcdBacklightRed_r" Datatype="Byte" /><Member Name="p3C_LcdBacklightRed_w" Datatype="Byte" /><Member Name="p3D_KeyFunctionEnable3_r" Datatype="Byte" /><Member Name="p3D_KeyFunctionEnable3_w" Datatype="Byte" /><Member Name="p3E_AcknowledgementSet_r" Datatype="Byte" /><Member Name="p3E_AcknowledgementSet_w" Datatype="Byte" /><Member Name="p3F_IndicationFactor_r" Datatype="Byte" /><Member Name="p3F_IndicationFactor_w" Datatype="Byte" /><Member Name="p63_VoltageBattery_r" Datatype="Int" /><Member Name="p65_DeviceCode_r" Datatype="Int" /><Member Name="p67_SoftwareVersion_r" Datatype="Int" /><Member Name="p80_NumberOfErrorsRec_r" Datatype="Byte" /><Member Name="p81_Error01_r" Datatype="Byte" /><Member Name="p82_Error02_r" Datatype="Byte" /><Member Name="p83_Error03_r" Datatype="Byte" /><Member Name="p84_Error04_r" Datatype="Byte" /><Member Name="p85_Error05_r" Datatype="Byte" /><Member Name="p86_Error06_r" Datatype="Byte" /><Member Name="p87_Error07_r" Datatype="Byte" /><Member Name="p88_Error08_r" Datatype="Byte" /><Member Name="p89_Error09_r" Datatype="Byte" /><Member Name="p8A_Error10_r" Datatype="Byte" /><Member Name="p96_InputErrors_00_r" Datatype="Word" /><Member Name="p96_InputErrors_01_r" Datatype="Word" /><Member Name="p96_InputErrors_02_r" Datatype="Word" /><Member Name="p96_InputErrors_03_r" Datatype="Word" /><Member Name="p96_InputErrors_04_r" Datatype="Word" /><Member Name="p96_InputErrors_05_r" Datatype="Word" /><Member Name="p96_InputErrors_06_r" Datatype="Word" /><Member Name="p96_InputErrors_07_r" Datatype="Word" /><Member Name="p96_InputErrors_08_r" Datatype="Word" /><Member Name="p96_InputErrors_09_r" Datatype="Word" /><Member Name="p96_InputErrors_10_r" Datatype="Word" /><Member Name="pA0_SystemCommand_w" Datatype="Int" /><Member Name="pA7_ExecuteCalibration_w" Datatype="Byte" /><Member Name="pA8_ProgrammingMOnOff_w" Datatype="Byte" /><Member Name="pAA_FreezeAV_w" Datatype="Byte" /><Member Name="pC5_AdcValuesSensor_r" Datatype="DInt" /><Member Name="pCF_PeriodCounter_r" Datatype="DInt" /><Member Name="pD0_ResponseDelay_r" Datatype="Byte" /><Member Name="pD0_ResponseDelay_w" Datatype="Byte" /><Member Name="pD2_AutoIdAssignment_w" Datatype="Int" /><Member Name="pFA_SystemStatusword_r" Datatype="Word" /><Member Name="pFB_SetPoint1_r" Datatype="DInt" /><Member Name="pFB_SetPoint1_w" Datatype="DInt" /><Member Name="pFC_DifferentialValue_r" Datatype="DInt" /><Member Name="pFE_ActualPosition_r" Datatype="DInt" /><Member Name="pFF_SetPoint2_r" Datatype="DInt" /><Member Name="pFF_SetPoint2_w" Datatype="DInt" /><Member Name="vnCounterRead" Datatype="Int" /><Member Name="vnCounterWrite" Datatype="Int" /><Member Name="vnCounterCopy" Datatype="Int" /><Member Name="vnTriggerRx" Datatype="Int" /><Member Name="vnTriggerTx" Datatype="Int" /><Member Name="vbRefresh" Datatype="Bool" /><Member Name="vbOsrRead" Datatype="Bool" /><Member Name="vbOsrWrite" Datatype="Bool" /><Member Name="vbOsrCopy" Datatype="Bool" /><Member Name="vnCounterToggle" Datatype="Int" /><Member Name="vnParameterAdrReceive" Datatype="Int" /><Member Name="vnParameterAdrSend" Datatype="Int" /><Member Name="vnParameterDataReceive" Datatype="DInt" /><Member Name="vnParameterDataSend" Datatype="DInt" /><Member Name="SFB4_1" Datatype="TON_TIME" Version="1.0"><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member></Section></Sections></Member>
+  </Section>
+</Sections></Interface>
+      <Name>DB_SIKO</Name>
+      <Number>16</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="5" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="6" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="7" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="8" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.InstanceDB>
+</Document>

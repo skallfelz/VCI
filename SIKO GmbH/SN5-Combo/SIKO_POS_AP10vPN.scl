@@ -1,0 +1,1192 @@
+﻿FUNCTION_BLOCK "SIKO_POS_AP10vPN"
+TITLE = SIKO_POS_AP10
+{ S7_Optimized_Access := 'FALSE' }
+AUTHOR : SIKO_mk
+FAMILY : PosDis
+NAME : 'V5.03'
+VERSION : 5.03
+//KNOW_HOW_PROTECT
+/////////////////////////////////////////////////////////////
+// Version history
+/////////////////////////////////////////////////////////////
+// Date       | Vers. | created    | Author          | Remark
+// dd.mm.yyyy |       | with       |                 |   
+// ----------------------------------------------------------
+// 29.10.2015 | 0.01  | S7 5.5 SP3 | SIKO GmbH / SC  | alpha 
+/////////////////////////////////////////////////////////////
+//
+   VAR_INPUT 
+      DC_StartByteOut : HW_IO;
+      DC_StartByteIn : HW_IO;
+      vnSetValue : DInt;
+      vnNodeId : Byte := B#16#1F;
+      bc02_ValidityOfSetpoint1 : Bool;
+      bc03_DisplayRange : Bool;
+      bc04_AcknowledgmentTarge : Bool;
+      bc05_ErrorAcknowledgment : Bool;
+      bc06_AcknowledgementSP2 : Bool;
+      bc07_DataIdentifier : Bool;
+      bc09_ValidityOfSetpoint2 : Bool;
+      bc10_AcknowledgementSP1 : Bool;
+      bc11_Led1GreenLeft : Bool;
+      bc12_Led3GreenRight : Bool;
+      bc13_Led4RedRight : Bool;
+      bc14_Led2RedLeft : Bool;
+      bc15_LedBlinking : Bool;
+      bcStartRead : Bool;
+      bcStartWrite : Bool;
+      bcStartCopy : Bool;
+      bcResetCounterActivity : Bool;
+      vnParameterAdrRead1 : Byte := B#16#FF;
+      vnParameterAdrRead2 : Byte := B#16#FF;
+      vnParameterAdrRead3 : Byte := B#16#FF;
+   END_VAR
+
+   VAR_OUTPUT 
+      vnActualValue : DInt;
+      bs00_DirectionIndic_Cw : Bool;
+      bs01_DirectionIndic_Ccw : Bool;
+      bs02_ValiditySetpoint1 : Bool;
+      bs03_TargetWindow2Dynami : Bool;
+      bs04_TargetWindow1Static : Bool;
+      bs05_TargetWindow1Dynami : Bool;
+      bs06_Deviation : Bool;
+      bs07_DeviceError : Bool;
+      bs08_OutputOfPositionVal : Bool;
+      bs09_PositionValueIncrem : Bool;
+      bs10_ValiditySetpoint2 : Bool;
+      bs11_BatteryStatus : Bool;
+      bs12_SensorError : Bool;
+      bs13_ButtonLeft : Bool;
+      bs14_ButtonStar : Bool;
+      bs15_ButtonUp : Bool;
+      bsDone : Bool;
+      bsBusy : Bool;
+      bsFaultDataReceive : Bool;
+      bsComTimeout : Bool;
+      bsGeneralError : Bool;
+      vnErrorCode1 : Byte;
+      vnErrorCode2 : Byte;
+      vnErrorSFC14 : Int;
+      vnErrorSFC15 : Int;
+   END_VAR
+
+   VAR 
+      p00_NodeAddress_r : Byte := B#16#1F;
+      p00_NodeAddress_w : Byte := B#16#1F;
+      p01_Baudrate_r : Byte := B#16#1;
+      p01_Baudrate_w : Byte := B#16#1;
+      p02_BusTimeout_r : Byte := B#16#14;
+      p02_BusTimeout_w : Byte := B#16#14;
+      p03_ReplyWriteSetPoint_r : Byte;
+      p03_ReplyWriteSetPoint_w : Byte;
+      p04_EnableKeysTime_r : Byte := B#16#5;
+      p04_EnableKeysTime_w : Byte := B#16#5;
+      p05_KeyFunctionEnableC_r : Byte := B#16#1;
+      p05_KeyFunctionEnableC_w : Byte := B#16#1;
+      p06_LedFlashing_r : Byte;
+      p06_LedFlashing_w : Byte;
+      p07_Led3Green_r : Byte := B#16#1;
+      p07_Led3Green_w : Byte := B#16#1;
+      p08_Led2Red_r : Byte := B#16#1;
+      p08_Led2Red_w : Byte := B#16#1;
+      p09_Led1Green_r : Byte := B#16#1;
+      p09_Led1Green_w : Byte := B#16#1;
+      p0A_DecimalPlaces_r : Byte;
+      p0A_DecimalPlaces_w : Byte;
+      p0B_DisplayDivisor_r : Byte;
+      p0B_DisplayDivisor_w : Byte;
+      p0C_DirectionIndicatio_r : Byte;
+      p0C_DirectionIndicatio_w : Byte;
+      p0D_DisplayOrientation_r : Byte;
+      p0D_DisplayOrientation_w : Byte;
+      p0E_ProgrammingMode_r : Byte;
+      p0E_ProgrammingMode_w : Byte;
+      p1B_CountingDirection_r : Byte;
+      p1B_CountingDirection_w : Byte;
+      p1C_ResolutionPerRevol_r : DInt := L#880;
+      p1C_ResolutionPerRevol_w : DInt := L#880;
+      p1E_Offset_r : Int;
+      p1E_Offset_w : Int;
+      p1F_CalibrationValue_r : DInt;
+      p1F_CalibrationValue_w : DInt;
+      p20_TargetWindow1_r : Int := 5;
+      p20_TargetWindow1_w : Int := 5;
+      p21_PosType_r : Byte;
+      p21_PosType_w : Byte;
+      p22_LoopLength_r : Int;
+      p22_LoopLength_w : Int;
+      p28_OperatingMode_r : Byte;
+      p28_OperatingMode_w : Byte;
+      p30_Display2Line_r : Byte;
+      p30_Display2Line_w : Byte;
+      p31_TargetWindow2_r : Int;
+      p31_TargetWindow2_w : Int;
+      p32_PosWindow2Visual_r : Byte;
+      p32_PosWindow2Visual_w : Byte;
+      p33_DisplayDivisorUse_r : Byte;
+      p33_DisplayDivisorUse_w : Byte;
+      p34_DifferenceValueCal_r : Byte;
+      p34_DifferenceValueCal_w : Byte;
+      p35_KeyFunctionEnable2_r : Byte := B#16#1;
+      p35_KeyFunctionEnable2_w : Byte := B#16#1;
+      p39_Led4Red_r : Byte := B#16#1;
+      p39_Led4Red_w : Byte := B#16#1;
+      p3A_LcdBacklightFlash_r : Byte;
+      p3A_LcdBacklightFlash_w : Byte;
+      p3B_LcdBacklightWhite_r : Byte := B#16#1;
+      p3B_LcdBacklightWhite_w : Byte := B#16#1;
+      p3C_LcdBacklightRed_r : Byte := B#16#1;
+      p3C_LcdBacklightRed_w : Byte := B#16#1;
+      p3D_KeyFunctionEnable3_r : Byte := B#16#1;
+      p3D_KeyFunctionEnable3_w : Byte := B#16#1;
+      p3E_AcknowledgementSet_r : Byte;
+      p3E_AcknowledgementSet_w : Byte;
+      p3F_IndicationFactor_r : Byte;
+      p3F_IndicationFactor_w : Byte;
+      p63_VoltageBattery_r : Int;
+      p65_DeviceCode_r : Int;
+      p67_SoftwareVersion_r : Int;
+      p80_NumberOfErrorsRec_r : Byte;
+      p81_Error01_r : Byte;
+      p82_Error02_r : Byte;
+      p83_Error03_r : Byte;
+      p84_Error04_r : Byte;
+      p85_Error05_r : Byte;
+      p86_Error06_r : Byte;
+      p87_Error07_r : Byte;
+      p88_Error08_r : Byte;
+      p89_Error09_r : Byte;
+      p8A_Error10_r : Byte;
+      p96_InputErrors_00_r : Word;
+      p96_InputErrors_01_r : Word;
+      p96_InputErrors_02_r : Word;
+      p96_InputErrors_03_r : Word;
+      p96_InputErrors_04_r : Word;
+      p96_InputErrors_05_r : Word;
+      p96_InputErrors_06_r : Word;
+      p96_InputErrors_07_r : Word;
+      p96_InputErrors_08_r : Word;
+      p96_InputErrors_09_r : Word;
+      p96_InputErrors_10_r : Word;
+      pA0_SystemCommand_w : Int;
+      pA7_ExecuteCalibration_w : Byte;
+      pA8_ProgrammingMOnOff_w : Byte;
+      pAA_FreezeAV_w : Byte;
+      pC5_AdcValuesSensor_r : DInt;
+      pCF_PeriodCounter_r : DInt;
+      pD0_ResponseDelay_r : Byte;
+      pD0_ResponseDelay_w : Byte;
+      pD2_AutoIdAssignment_w : Int;
+      pFA_SystemStatusword_r : Word;
+      pFB_SetPoint1_r : DInt;
+      pFB_SetPoint1_w : DInt;
+      pFC_DifferentialValue_r : DInt;
+      pFE_ActualPosition_r : DInt;
+      pFF_SetPoint2_r : DInt;
+      pFF_SetPoint2_w : DInt;
+      vnCounterRead : Int;
+      vnCounterWrite : Int;
+      vnCounterCopy : Int;
+      vnTriggerRx : Int;
+      vnTriggerTx : Int;
+      vbRefresh : Bool;
+      vbOsrRead : Bool;
+      vbOsrWrite : Bool;
+      vbOsrCopy : Bool;
+      vnCounterToggle : Int;
+      vnParameterAdrReceive : Int;
+      vnParameterAdrSend : Int;
+      vnParameterDataReceive { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      vnParaDataRecBytes { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} AT vnParameterDataReceive : Array[0..3] of Byte;
+      vnParameterDataSend { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      vnParaDataSendBytes { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} AT vnParameterDataSend : Array[0..3] of Byte;
+      "SFB4_1" {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+   END_VAR
+
+   VAR_TEMP 
+      DC_InputBuffer : Array[1..16] of Byte;
+      DC_OutputBuffer : Array[1..16] of Byte;
+      vnSWord : Word;
+      vbSWbits AT vnSWord : Array[0..15] of Bool;
+      vnCWord : Word;
+      vbCWbits AT vnCWord : Array[0..15] of Bool;
+   END_VAR
+
+
+BEGIN
+	/////////////////////////////////////////////////////////////
+	// Version history
+	/////////////////////////////////////////////////////////////
+	// Date       | Vers. | created          | Author          | Remark
+	// dd.mm.yyyy |       | with             |                 |   
+	// --------------------------------------------------------------------------------
+	// 02.02.2016 | 5.00  | TIA V13 SP1      | SIKO GmbH / SC  | release
+	// 13.07.2017 | 5.02  | TIA V14 SP1      | SIKO GmbH / mk  | #bsComTimeout bug fix
+	// 30.04.2018 | 5.03  | TIA V14 SP1 Upd5 | SIKO GmbH / mk  | Optimization subindex address 96h, #p02_BusTimeout
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// read inputs synchonous
+	//
+	#vnErrorSFC14 := DPRD_DAT(LADDR := #DC_StartByteIn, RECORD => #DC_InputBuffer);
+	
+	#vnParameterAdrReceive := BYTE_TO_INT(#DC_InputBuffer[3]);
+	
+	#vnSWord:=SHL(IN:=BYTE_TO_WORD(#DC_InputBuffer[5]), N:=8) OR #DC_InputBuffer[4];
+	
+	#vnParaDataRecBytes[0] := #DC_InputBuffer[6];
+	#vnParaDataRecBytes[1] := #DC_InputBuffer[7];
+	#vnParaDataRecBytes[2] := #DC_InputBuffer[8];
+	#vnParaDataRecBytes[3] := #DC_InputBuffer[9];
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// New telegram arrived in time
+	//
+	IF (BYTE_TO_INT(#p02_BusTimeout_r) > 0)
+	THEN
+	#SFB4_1 (IN:=(#DC_InputBuffer[10] = INT_TO_BYTE(#vnTriggerRx)),PT:=DINT_TO_TIME(INT_TO_DINT((BYTE_TO_INT(#p02_BusTimeout_r))) * 100 + 500)); // Span 500 - 2500 ms, equal 0,5 - 2,5s
+	#bsComTimeout := #SFB4_1.Q; // Trigger value unchanged for time span
+	
+	#vnTriggerRx := BYTE_TO_INT(#DC_InputBuffer[10]); // Trigger received
+	ELSE
+	    #bsComTimeout := 0;
+	END_IF;
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Telegram acknowledge checked for bad reply
+	//
+	IF (#vnParameterAdrReceive = 16#FD) 
+	THEN
+	  #bsFaultDataReceive := 1;
+	  #vnErrorCode1 := #DC_InputBuffer[9];
+	  #vnErrorCode2 := #DC_InputBuffer[8];
+	  
+	ELSE 
+	  #bsFaultDataReceive := 0;
+	  #vnErrorCode1 := 0;
+	  #vnErrorCode2 := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Request (Read/Write) successful
+	//
+	IF (#vnParameterAdrSend = #vnParameterAdrReceive) AND NOT #bsFaultDataReceive
+	THEN
+	  IF (#vnCounterRead <> 0)
+	  THEN
+	    IF (#vnParameterAdrReceive = 150)                // check for Input Errors and Indexrutine
+	    THEN 
+	        IF (#vnParaDataSendBytes[0] = #vnParaDataRecBytes[0])   // check for Index: DataSend = DataReceive
+	      THEN
+	        #vnCounterRead := #vnCounterRead + 1;
+	      END_IF;    
+	    ELSE
+	      #vnCounterRead := #vnCounterRead + 1;
+	    END_IF;
+	  END_IF;
+	  IF (#vnCounterWrite <> 0)
+	  THEN
+	    #vnCounterWrite := #vnCounterWrite + 1;
+	  END_IF;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Control word
+	//
+	#vbCWbits[0] := False;
+	#vbCWbits[1] := False;
+	#vbCWbits[2] := #bc02_ValidityOfSetpoint1;                // Validity of setpoint1; 0=invalid; 1=valid
+	#vbCWbits[3] := #bc03_DisplayRange;                       // Display range full
+	#vbCWbits[4] := #bc04_AcknowledgmentTarge;                // Acknowledgment target window1 static
+	#vbCWbits[5] := #bc05_ErrorAcknowledgment;                // Acknowledged
+	#vbCWbits[6] := #bc06_AcknowledgementSP2;                 // Acknowledgment Set Value2
+	#vbCWbits[7] := #bc07_DataIdentifier;                     // Data format, Number / ASCII-String
+	#vbCWbits[8] := False;
+	#vbCWbits[9] := #bc09_ValidityOfSetpoint2;                // Validity of setpoint2
+	#vbCWbits[10] := #bc10_AcknowledgementSP1;                 // Acknowledgment Set Value2
+	#vbCWbits[11] := #bc11_Led1GreenLeft;                      // LED1 green left
+	#vbCWbits[12] := #bc12_Led3GreenRight;                     // LED3 green right
+	#vbCWbits[13] := #bc13_Led4RedRight;                       // LED4 red right
+	#vbCWbits[14] := #bc14_Led2RedLeft;                        // LED2 red left
+	#vbCWbits[15] := #bc15_LedBlinking;                        // LED blinking
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Start Read
+	//
+	IF (#bcStartRead OR #vbRefresh) AND (#vnCounterRead = 0) AND (#vnCounterWrite = 0) AND (#vnCounterCopy = 0)  AND NOT #vbOsrRead
+	THEN
+	  #vnCounterRead := 1;
+	  #vnCounterWrite := 0;
+	  #vnCounterCopy := 0;
+	  #vbRefresh := 0;
+	  #vbOsrRead := 1;
+	END_IF;
+	IF NOT #bcStartRead AND #vbOsrRead
+	THEN
+	  #vbOsrRead := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Start Write
+	//
+	IF #bcStartWrite AND (#vnCounterRead = 0) AND (#vnCounterWrite = 0) AND (#vnCounterCopy = 0) AND NOT #vbOsrWrite
+	THEN
+	  #vnCounterWrite := 1;
+	  #vnCounterRead := 0;
+	  #vnCounterCopy := 0;
+	  #vbOsrWrite := 1;
+	END_IF;
+	IF NOT #bcStartWrite AND #vbOsrWrite
+	THEN
+	  #vbOsrWrite := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// copy read to write parameters
+	//
+	IF #bcStartCopy AND (#vnCounterRead = 0) AND (#vnCounterWrite = 0) AND (#vnCounterCopy = 0) AND NOT #vbOsrCopy
+	THEN
+	  #vnCounterCopy := 1;
+	  #vnCounterWrite := 0;
+	  #vnCounterRead := 0;
+	  #vbOsrCopy := 1;
+	END_IF;
+	IF NOT #bcStartCopy AND #vbOsrCopy
+	THEN
+	  #vbOsrCopy := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// reset counter (nCounter...) and activity (bcStart...)
+	//
+	IF #bcResetCounterActivity
+	THEN
+	  #bcStartRead :=0;
+	  #bcStartWrite :=0;
+	  #bcStartCopy :=0;
+	  #vnCounterCopy := 0;
+	  #vnCounterWrite := 0;
+	  #vnCounterRead := 0;
+	  #vnCounterToggle := 0;
+	  #bcResetCounterActivity := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Parameter request
+	//
+	IF #vnCounterRead > 0
+	  THEN
+	  #DC_OutputBuffer[1] := 0;
+	  #vnParameterDataSend := 0;
+	  CASE #vnCounterRead OF
+	  1: //0x00 Note address
+	      #vnParameterAdrSend := 0;
+	  2: //0x01 Baud rate
+	    #vnParameterAdrSend := 1;
+	  3: //0x02 Bus Timeout
+	        #vnParameterAdrSend := 2;
+	  4: //0x03 Response parameter to a setpoint write access
+	        #vnParameterAdrSend := 3;
+	  5: //0x04 Keys enable time: Configuration start delay
+	        #vnParameterAdrSend := 4;
+	  6: //0x05 Key function enable1: Calibration enable
+	        #vnParameterAdrSend := 5;
+	  7: //0x06 LED flashing
+	        #vnParameterAdrSend := 6;
+	  8: //0x07 LED3 (green right)
+	        #vnParameterAdrSend := 7;
+	  9: //0x08 LED2 (red left)
+	        #vnParameterAdrSend := 8;
+	  10: //0x09 LED1 (green left)
+	        #vnParameterAdrSend := 9;
+	  11: //0x0A Decimal places
+	        #vnParameterAdrSend := 10;
+	  12: //0x0B Display divisor (ADI)
+	        #vnParameterAdrSend := 11;
+	  13: //0x0C Direction indicators (CW, CCW)
+	        #vnParameterAdrSend := 12;
+	  14: //0x0D Display orientation
+	        #vnParameterAdrSend := 13;
+	  15: //0x0E Configuration programming mode
+	        #vnParameterAdrSend := 14;
+	  16: //0x1B Counting direction
+	        #vnParameterAdrSend := 27;
+	  17: //0x1C Resolution per revolution
+	        #vnParameterAdrSend := 28;
+	  18: //0x1E Offset value
+	        #vnParameterAdrSend := 30;
+	  19: //0x1F Calibration value
+	        #vnParameterAdrSend := 31;
+	  20: //0x20 Target window1 (near field)
+	        #vnParameterAdrSend := 32;
+	  21: //0x21 Positioning type (loop type)
+	        #vnParameterAdrSend := 33;
+	  22: //0x22 Loop length
+	        #vnParameterAdrSend := 34;
+	  23: //0x28 Operating mode
+	        #vnParameterAdrSend := 40;
+	  24: //0x30 Display in the 2nd row
+	        #vnParameterAdrSend := 48;
+	  25: //0x31 Target window2 (extended)
+	        #vnParameterAdrSend := 49;
+	  26: //0x32 Target window2 visualization
+	        #vnParameterAdrSend := 50;
+	  27: //0x33 Application of the display divisor (ADI application)
+	        #vnParameterAdrSend := 51;
+	  28: //0x34 Formation of the differential value
+	        #vnParameterAdrSend := 52;
+	  29: //0x35 Key function enable2: Incremental measurement enable
+	        #vnParameterAdrSend := 53;
+	  30: //0x39 LED4 (red right)
+	        #vnParameterAdrSend := 57;
+	  31: //0x3A LCD backlight flashing
+	        #vnParameterAdrSend := 58;
+	  32: //0x3B LCD backlight white
+	        #vnParameterAdrSend := 59;
+	  33: //0x3C LCD backlight red
+	        #vnParameterAdrSend := 60;
+	  34: //0x3D Key function enable3: Configuration enable via keyboard
+	        #vnParameterAdrSend := 61;
+	  35: //0x3E Acknowledgement settings
+	        #vnParameterAdrSend := 62;
+	  36: //0x3F Indication factor
+	        #vnParameterAdrSend := 63;
+	  37: //0x63 Battery voltage
+	        #vnParameterAdrSend := 99;
+	  38: //0x65 Device identification
+	        #vnParameterAdrSend := 101;
+	  39: //0x67 Software version
+	        #vnParameterAdrSend := 103;
+	  40: //0x80 Number of errors
+	        #vnParameterAdrSend := 128;
+	  41: //0x81 Error 01
+	        #vnParameterAdrSend := 129;
+	  42: //0x82 Error 02
+	        #vnParameterAdrSend := 130;
+	  43: //0x83 Error 03
+	        #vnParameterAdrSend := 131;
+	  44: //0x84 Error 04
+	        #vnParameterAdrSend := 132;
+	  45: //0x85 Error 05
+	        #vnParameterAdrSend := 133;
+	  46: //0x86 Error 06
+	        #vnParameterAdrSend := 134;
+	  47: //0x87 Error 07
+	        #vnParameterAdrSend := 135;
+	  48: //0x88 Error 08
+	        #vnParameterAdrSend := 136;
+	  49: //0x89 Error 09
+	        #vnParameterAdrSend := 137;
+	  50: //0x8A Error 10
+	        #vnParameterAdrSend := 138;
+	  51: //0x96 Input Errors
+	        #vnParameterAdrSend := 150;
+	  52: //0x96_1 Input Errors Index 1
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#01000000;
+	  53: //0x96_2 Input Errors Index 2
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#02000000;
+	  54: //0x96_3 Input Errors Index 3
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#03000000;
+	  55: //0x96_4 Input Errors Index 4
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#04000000;
+	  56: //0x96_5 Input Errors Index 5
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#05000000;
+	  57: //0x96_6 Input Errors Index 6
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#06000000;
+	  58: //0x96_7 Input Errors Index 7
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#07000000;
+	  59: //0x96_8 Input Errors Index 8
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#08000000;
+	  60: //0x96_9 Input Errors Index 9
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#09000000;
+	  61: //0x96_10 Input Errors Index 10
+	        #vnParameterAdrSend := 150;
+	        #vnParameterDataSend := 16#0A000000;
+	  62: //0xC5 ADC values of the sensor
+	        #vnParameterAdrSend := 197;
+	  63: //0xCF Period counter
+	        #vnParameterAdrSend := 207;
+	  64: //0xD0 Response delay
+	        #vnParameterAdrSend := 208;
+	  65: //0xFA System Status word
+	        #vnParameterAdrSend := 250;
+	  66: //0xFB Setpoint1
+	        #vnParameterAdrSend := 251;
+	  67: //0xFC Differential value
+	        #vnParameterAdrSend := 252;
+	  68: //0xFE Position value
+	        #vnParameterAdrSend := 254;
+	  69: //0xFF Setpoint2
+	        #vnParameterAdrSend := 255;
+	  70: //Parameter read completed
+	    #vnCounterRead := 0;
+	    END_CASE;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Parameter Settings
+	//
+	IF #vnCounterWrite > 0
+	  THEN
+	  #DC_OutputBuffer[1] := 1;
+	  CASE #vnCounterWrite OF
+	  1: //Programming mode
+	    IF #pA8_ProgrammingMOnOff_w = 0 OR #pA8_ProgrammingMOnOff_w = 1
+	    THEN
+	        #vnParameterAdrSend := 168;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#pA8_ProgrammingMOnOff_w);
+	    END_IF;
+	  2: //Note address
+	    IF #p00_NodeAddress_w <> #p00_NodeAddress_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 0;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p00_NodeAddress_w);
+	    END_IF;
+	  3: //Baudrate
+	    IF #p01_Baudrate_w <> #p01_Baudrate_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 1;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p01_Baudrate_w);
+	    END_IF;
+	  4: //Bus Timeout
+	    IF #p02_BusTimeout_w <> #p02_BusTimeout_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 2;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p02_BusTimeout_w);
+	    END_IF;
+	  5: //Response parameter to a setpoint write access
+	    IF #p03_ReplyWriteSetPoint_w <> #p03_ReplyWriteSetPoint_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 3;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p03_ReplyWriteSetPoint_w);
+	    END_IF;
+	  6: ///Keys enable time: Configuration start delay
+	    IF #p04_EnableKeysTime_w <> #p04_EnableKeysTime_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 4;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p04_EnableKeysTime_w);
+	    END_IF;
+	  7: //Key function enable1: Calibration enable
+	    IF #p05_KeyFunctionEnableC_w <> #p05_KeyFunctionEnableC_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 5;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p05_KeyFunctionEnableC_w);
+	    END_IF;
+	  8: //LED flashing
+	    IF #p06_LedFlashing_w <> #p06_LedFlashing_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 6;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p06_LedFlashing_w);
+	    END_IF;
+	  9: //LED3 (green right)
+	    IF #p07_Led3Green_w <> #p07_Led3Green_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 7;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p07_Led3Green_w);
+	    END_IF;
+	  10: //LED2 (red left)
+	    IF #p08_Led2Red_w <> #p08_Led2Red_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 8;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p08_Led2Red_w);
+	    END_IF;
+	  11: //LED1 (green left)
+	    IF #p09_Led1Green_w <> #p09_Led1Green_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 9;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p09_Led1Green_w);
+	    END_IF;
+	  12: //Decimal places
+	    IF #p0A_DecimalPlaces_w <> #p0A_DecimalPlaces_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 10;
+	        #vnParameterDataSend := BYTE_TO_DINT(#p0A_DecimalPlaces_w);
+	    END_IF;
+	  13: //Display divisor (ADI)
+	    IF #p0B_DisplayDivisor_w <> #p0B_DisplayDivisor_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 11;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p0B_DisplayDivisor_w);
+	    END_IF;
+	  14: //Direction indicators (CW, CCW)
+	    IF #p0C_DirectionIndicatio_w <> #p0C_DirectionIndicatio_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 12;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p0C_DirectionIndicatio_w);
+	    END_IF;
+	  15: //Display orientation
+	    IF #p0D_DisplayOrientation_w <> #p0D_DisplayOrientation_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 13;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p0D_DisplayOrientation_w);
+	    END_IF;
+	  16: //Configuration programming mode
+	    IF #p0E_ProgrammingMode_w <> #p0E_ProgrammingMode_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 14;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p0E_ProgrammingMode_w);
+	    END_IF;  
+	  17: //Counting direction
+	    IF #p1B_CountingDirection_w <> #p1B_CountingDirection_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 27;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p1B_CountingDirection_w);
+	    END_IF;
+	  18: //Resolution per revolution
+	    IF #p1C_ResolutionPerRevol_w <> #p1C_ResolutionPerRevol_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 28;
+	        #vnParameterDataSend:= #p1C_ResolutionPerRevol_w;
+	    END_IF;
+	  19: //Offset value
+	    IF #p1E_Offset_w <> #p1E_Offset_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 30;
+	        #vnParameterDataSend:= #p1E_Offset_w;
+	    END_IF;
+	  20: //Calibration value
+	    IF #p1F_CalibrationValue_w <> #p1F_CalibrationValue_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 31;
+	        #vnParameterDataSend:= #p1F_CalibrationValue_w;
+	    END_IF;
+	  21: //Target window1 (near field)
+	    IF #p20_TargetWindow1_w <> #p20_TargetWindow1_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 32;
+	        #vnParameterDataSend:= INT_TO_DINT(#p20_TargetWindow1_w);
+	    END_IF;
+	  22: //Positioning type (loop type)
+	    IF #p21_PosType_w <> #p21_PosType_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 33;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p21_PosType_w);
+	    END_IF;
+	  23: //Loop length
+	    IF #p22_LoopLength_w <> #p22_LoopLength_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 34;
+	        #vnParameterDataSend:= INT_TO_DINT(#p22_LoopLength_w);
+	    END_IF;
+	  24: //Operating mode
+	    IF #p28_OperatingMode_w <> #p28_OperatingMode_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 40;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p28_OperatingMode_w);
+	    END_IF;
+	  25: //Display in the 2nd row
+	    IF #p30_Display2Line_w <> #p30_Display2Line_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 48;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p30_Display2Line_w);
+	    END_IF;  
+	  26: //Target window2 (extended)
+	    IF #p31_TargetWindow2_w <> #p31_TargetWindow2_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 49;
+	        #vnParameterDataSend:= INT_TO_DINT(#p31_TargetWindow2_w);
+	    END_IF;
+	  27: //Target window2 visualization
+	    IF #p32_PosWindow2Visual_w <> #p32_PosWindow2Visual_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 50;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p32_PosWindow2Visual_w);
+	    END_IF;
+	  28: //Application of the display divisor (ADI application)
+	    IF #p33_DisplayDivisorUse_w <> #p33_DisplayDivisorUse_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 51;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p33_DisplayDivisorUse_w);
+	    END_IF;
+	  29: //Formation of the differential value
+	    IF #p34_DifferenceValueCal_w <> #p34_DifferenceValueCal_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 52;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p34_DifferenceValueCal_w);
+	    END_IF;
+	  30: //Key function enable2: Incremental measurement enable
+	    IF #p35_KeyFunctionEnable2_w <> #p35_KeyFunctionEnable2_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 53;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p35_KeyFunctionEnable2_w);
+	    END_IF;
+	  31: //LED4 (red right)
+	    IF #p39_Led4Red_w <> #p39_Led4Red_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 57;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p39_Led4Red_w);
+	    END_IF;
+	  32: //LCD backlight flashing
+	    IF #p3A_LcdBacklightFlash_w <> #p3A_LcdBacklightFlash_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 58;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p3A_LcdBacklightFlash_w);
+	    END_IF;
+	  33: //LCD backlight white
+	    IF #p3B_LcdBacklightWhite_w <> #p3B_LcdBacklightWhite_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 59;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p3B_LcdBacklightWhite_w);
+	    END_IF;
+	  34: //LCD backlight red
+	    IF #p3C_LcdBacklightRed_w <> #p3C_LcdBacklightRed_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 60;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p3C_LcdBacklightRed_w);
+	    END_IF;
+	  35: //Key function enable3: Configuration enable via keyboard
+	    IF #p3D_KeyFunctionEnable3_w <> #p3D_KeyFunctionEnable3_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 61;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p3D_KeyFunctionEnable3_w);
+	    END_IF;
+	  36: //Acknowledgement settings
+	    IF #p3E_AcknowledgementSet_w <> #p3E_AcknowledgementSet_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 62;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p3E_AcknowledgementSet_w);
+	    END_IF;
+	  37: //Indication factor
+	    IF #p3F_IndicationFactor_w <> #p3F_IndicationFactor_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 63;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#p3F_IndicationFactor_w);
+	    END_IF;    
+	  38: //Calibration travel
+	    IF #pA7_ExecuteCalibration_w = 0 OR #pA7_ExecuteCalibration_w = 1
+	    THEN
+	        #vnParameterAdrSend := 167;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#pA7_ExecuteCalibration_w);
+	    END_IF;
+	  39: //Freeze actual value
+	    IF #pAA_FreezeAV_w = 1
+	    THEN
+	        #vnParameterAdrSend := 170;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#pAA_FreezeAV_w);
+	    END_IF;
+	  40: //Response delay
+	    IF #pD0_ResponseDelay_w <> #pD0_ResponseDelay_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 208;
+	        #vnParameterDataSend:= BYTE_TO_DINT(#pD0_ResponseDelay_w);
+	    END_IF;
+	  41: //Auto-ID assignment
+	    IF #pD2_AutoIdAssignment_w >= 1 AND #pD2_AutoIdAssignment_w <= 31 AND #vnNodeId = 31
+	    THEN
+	        #vnParameterAdrSend := 210;
+	        #vnParameterDataSend:= INT_TO_DINT(#pD2_AutoIdAssignment_w);
+	    END_IF;
+	  42: //Setpoint1
+	    IF #pFB_SetPoint1_w <> #pFB_SetPoint1_r OR #bsFaultDataReceive
+	    THEN
+	        #vnParameterAdrSend := 251;
+	        #vnParameterDataSend:= #pFB_SetPoint1_w;
+	    END_IF;
+	  43: //S-Befehl
+	    IF #pA0_SystemCommand_w >= 1 AND #pA0_SystemCommand_w <= 9 // check, if value is between 1 and 9
+	    THEN
+	        #vnParameterAdrSend := 160;
+	        #vnParameterDataSend:= INT_TO_DINT(#pA0_SystemCommand_w);
+	      IF NOT (#pA0_SystemCommand_w = 7 OR #pA0_SystemCommand_w = 9) 
+	        THEN
+	          #vbRefresh := 1;
+	      END_IF;
+	    END_IF;      
+	  44:  //Write complete start refresh if S-Command
+	    #vnCounterWrite := 0;  
+	  END_CASE;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Read/Write standard values and three free parameters if parameter read/write inactive
+	// 
+	IF (#vnCounterRead = 0) AND (#vnCounterWrite = 0)
+	THEN
+	  IF (#vnCounterToggle < 1) OR (#vnCounterToggle > 5)
+	  THEN
+	      #vnCounterToggle := 1;
+	  END_IF;
+	
+	  CASE #vnCounterToggle OF  
+	  1:  //check SetValue and transmit
+	    #DC_OutputBuffer[1] := 1;
+	    #vnParameterAdrSend := 255;
+	    #vnParameterDataSend := #vnSetValue;
+	
+	    IF ((#vnParameterAdrReceive = 255) OR (#vnParameterAdrReceive > 251)) AND (#DC_InputBuffer[1] = 1)
+	    THEN
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	    
+	  2:  //vnParameterAdrRead1
+	    IF (BYTE_TO_INT(#vnParameterAdrRead1) < 253)
+	    THEN  
+	        #DC_OutputBuffer[1] := 0;
+	        #vnParameterAdrSend := BYTE_TO_INT(#vnParameterAdrRead1);
+	        #vnParameterDataSend := 0;
+	    ELSE  
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	
+	    IF (#vnParameterAdrReceive = BYTE_TO_INT(#vnParameterAdrRead1)) AND (#DC_InputBuffer[1] = 0) 
+	    THEN  
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	    
+	  3:  //vnParameterAdrRead2
+	    IF (BYTE_TO_INT(#vnParameterAdrRead2) < 253)
+	    THEN  
+	        #DC_OutputBuffer[1] := 0;
+	        #vnParameterAdrSend := BYTE_TO_INT(#vnParameterAdrRead2);
+	        #vnParameterDataSend := 0;    
+	    ELSE  
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	
+	    IF (#vnParameterAdrReceive = BYTE_TO_INT(#vnParameterAdrRead2)) AND (#DC_InputBuffer[1] = 0) 
+	    THEN  
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	
+	  4:  //vnParameterAdrRead3 
+	    IF (BYTE_TO_INT(#vnParameterAdrRead3) < 253) 
+	    THEN
+	        #DC_OutputBuffer[1] := 0;
+	        #vnParameterAdrSend := BYTE_TO_INT(#vnParameterAdrRead3);
+	        #vnParameterDataSend := 0;
+	    ELSE  
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	
+	    IF (#vnParameterAdrReceive = BYTE_TO_INT(#vnParameterAdrRead3)) AND (#DC_InputBuffer[1] = 0)
+	    THEN
+	      #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	
+	  5:  //read position value
+	    IF (#pAA_FreezeAV_w = 0)
+	    THEN  
+	        #DC_OutputBuffer[1] := 0;
+	        #vnParameterAdrSend := 254;
+	        #vnParameterDataSend := 0;
+	    ELSE  
+	        #vnCounterToggle := #vnCounterToggle + 1;
+	    END_IF;
+	
+	    IF (#vnParameterAdrReceive = 254) AND (#DC_InputBuffer[1] = 0)
+	    THEN
+	        #vnCounterToggle := 1;
+	    END_IF;
+	  END_CASE;
+	ELSE  
+	    #vnCounterToggle := 0;
+	END_IF;
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Because of Arthmetic overflow
+	//
+	IF (#vnTriggerTx >= 127)
+	THEN
+	    #vnTriggerTx := 0;
+	END_IF;
+	#vnTriggerTx := #vnTriggerTx + 1; // ABC Update mode: Change of state on trigger
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Telegram will be completed
+	//
+	#DC_OutputBuffer[2] := #vnNodeId;
+	#DC_OutputBuffer[10] := INT_TO_BYTE(#vnTriggerTx); // Trigger transmit
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Confirmation of Parameter request / Parameter Settings
+	//
+	IF (#DC_InputBuffer[2] = #vnNodeId) //Check node address 
+	THEN
+	  CASE #vnParameterAdrReceive OF
+	    254: //Position value
+	        #pFE_ActualPosition_r := #vnParameterDataReceive;
+	        #vnActualValue := #vnParameterDataReceive;
+	    255: //Setpoint2
+	        #pFF_SetPoint2_r := #vnParameterDataReceive;
+	    0: //Note address
+	        #p00_NodeAddress_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    1: //Baudrate
+	        #p01_Baudrate_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    2: //Bus Timeout
+	        #p02_BusTimeout_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    3: //Response parameter to a setpoint write access
+	        #p03_ReplyWriteSetPoint_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    4: //Keys enable time: Configuration start delay
+	        #p04_EnableKeysTime_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    5: //Key function enable1: Calibration enable
+	        #p05_KeyFunctionEnableC_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    6: //LED flashing
+	        #p06_LedFlashing_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    7: //LED3 (green right)
+	        #p07_Led3Green_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    8: //LED2 (red left)
+	        #p08_Led2Red_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    9: //LED1 (green left)
+	        #p09_Led1Green_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    10: //Decimal places
+	        #p0A_DecimalPlaces_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    11: //Display divisor (ADI)
+	        #p0B_DisplayDivisor_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    12: //Direction indicators (CW, CCW)
+	        #p0C_DirectionIndicatio_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    13: //Display orientation
+	        #p0D_DisplayOrientation_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    14: //Configuration programming mode
+	        #p0E_ProgrammingMode_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    27: //Counting direction
+	        #p1B_CountingDirection_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    28: //Resolution per revolution
+	        #p1C_ResolutionPerRevol_r := #vnParameterDataReceive;
+	    30: //Offset value
+	        #p1E_Offset_r := DINT_TO_INT(#vnParameterDataReceive);
+	    31: //Calibration value
+	        #p1F_CalibrationValue_r := #vnParameterDataReceive;
+	    32: //Target window1 (near field)
+	        #p20_TargetWindow1_r := DINT_TO_INT(#vnParameterDataReceive);
+	    33: //Positioning type (loop type)
+	        #p21_PosType_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    34: //Loop length
+	        #p22_LoopLength_r := DINT_TO_INT(#vnParameterDataReceive);
+	    40: //Operating mode
+	        #p28_OperatingMode_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    48: //Display in the 2nd row
+	        #p30_Display2Line_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    49: //Target window2 (extended) 
+	        #p31_TargetWindow2_r := DINT_TO_INT(#vnParameterDataReceive);
+	    50: //Target window2 visualization
+	        #p32_PosWindow2Visual_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    51: //Application of the display divisor (ADI application)
+	        #p33_DisplayDivisorUse_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    52: //Formation of the differential value
+	        #p34_DifferenceValueCal_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    53: //Key function enable2: Incremental measurement enable
+	        #p35_KeyFunctionEnable2_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    57:  //LED4 (red right)
+	        #p39_Led4Red_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    58:  //LCD backlight flashing
+	        #p3A_LcdBacklightFlash_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    59:  //LCD backlight white
+	        #p3B_LcdBacklightWhite_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    60:  //LCD backlight red
+	        #p3C_LcdBacklightRed_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    61: //Key function enable3: Configuration enable via keyboard
+	        #p3D_KeyFunctionEnable3_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    62:  //Acknowledgement settings
+	        #p3E_AcknowledgementSet_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    63: //Indication factor
+	        #p3F_IndicationFactor_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    99: //Battery voltage
+	        #p63_VoltageBattery_r := DINT_TO_INT(#vnParameterDataReceive);
+	    101: //Device identification
+	        #p65_DeviceCode_r := DINT_TO_INT(#vnParameterDataReceive);
+	    103: //Software version
+	        #p67_SoftwareVersion_r := DINT_TO_INT(#vnParameterDataReceive);
+	    128: //Number of errors
+	        #p80_NumberOfErrorsRec_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    129: //Error01
+	        #p81_Error01_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    130: //Error02
+	        #p82_Error02_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    131: //Error03
+	        #p83_Error03_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    132: //Error04
+	        #p84_Error04_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    133: //Error05
+	        #p85_Error05_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    134: //Error06
+	        #p86_Error06_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    135: //Error07
+	        #p87_Error07_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    136: //Error08
+	        #p88_Error08_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    137: //Error09
+	        #p89_Error09_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    138: //Error10
+	        #p8A_Error10_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    150: //Input errors
+	        IF #vnParameterDataSend = 0
+	        THEN 
+	            #p96_InputErrors_00_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	        IF #vnParameterDataSend = 16#01000000
+	        THEN 
+	            #p96_InputErrors_01_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#02000000
+	        THEN   
+	            #p96_InputErrors_02_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#03000000
+	        THEN   
+	            #p96_InputErrors_03_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#04000000
+	        THEN   
+	            #p96_InputErrors_04_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#05000000
+	        THEN   
+	            #p96_InputErrors_05_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#06000000
+	        THEN   
+	            #p96_InputErrors_06_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#07000000
+	        THEN   
+	            #p96_InputErrors_07_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#08000000
+	        THEN   
+	            #p96_InputErrors_08_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#09000000
+	        THEN   
+	            #p96_InputErrors_09_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	      IF #vnParameterDataSend = 16#0A000000
+	        THEN   
+	            #p96_InputErrors_10_r := DINT_TO_WORD(#vnParameterDataReceive);
+	        END_IF;
+	        
+	    197: //ADC values of the sensor
+	        #pC5_AdcValuesSensor_r := #vnParameterDataReceive;
+	    207: //Period counter
+	        #pCF_PeriodCounter_r := #vnParameterDataReceive;
+	    208: //Response delay
+	        #pD0_ResponseDelay_r := DINT_TO_BYTE(#vnParameterDataReceive);
+	    250: //System Status word
+	        #pFA_SystemStatusword_r := DINT_TO_WORD(#vnParameterDataReceive);
+	    251: //Setpoint1
+	        #pFB_SetPoint1_r := #vnParameterDataReceive;
+	    252: //Differential value
+	        #pFC_DifferentialValue_r := #vnParameterDataReceive;
+	    END_CASE;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// handle copy instruction
+	//
+	IF (#vnCounterCopy > 0) 
+	THEN
+	  #p00_NodeAddress_w := #p00_NodeAddress_r;
+	  #p01_Baudrate_w := #p01_Baudrate_r;
+	  #p02_BusTimeout_w := #p02_BusTimeout_r;
+	  #p03_ReplyWriteSetPoint_w := #p03_ReplyWriteSetPoint_r;
+	  #p04_EnableKeysTime_w := #p04_EnableKeysTime_r;
+	  #p05_KeyFunctionEnableC_w := #p05_KeyFunctionEnableC_r;
+	  #p06_LedFlashing_w := #p06_LedFlashing_r;
+	  #p07_Led3Green_w := #p07_Led3Green_r;
+	  #p08_Led2Red_w := #p08_Led2Red_r;
+	  #p09_Led1Green_w := #p09_Led1Green_r;
+	  #p0A_DecimalPlaces_w := #p0A_DecimalPlaces_r;
+	  #p0B_DisplayDivisor_w := #p0B_DisplayDivisor_r;
+	  #p0C_DirectionIndicatio_w := #p0C_DirectionIndicatio_r;
+	  #p0D_DisplayOrientation_w := #p0D_DisplayOrientation_r;
+	  #p0E_ProgrammingMode_w := #p0E_ProgrammingMode_r;
+	  #p1B_CountingDirection_w := #p1B_CountingDirection_r;
+	  #p1C_ResolutionPerRevol_w := #p1C_ResolutionPerRevol_r;
+	  #p1E_Offset_w := #p1E_Offset_r;
+	  #p1F_CalibrationValue_w := #p1F_CalibrationValue_r;
+	  #p20_TargetWindow1_w := #p20_TargetWindow1_r;
+	  #p21_PosType_w := #p21_PosType_r;
+	  #p22_LoopLength_w := #p22_LoopLength_r;
+	  #p28_OperatingMode_w := #p28_OperatingMode_r;
+	  #p30_Display2Line_w := #p30_Display2Line_r;
+	  #p31_TargetWindow2_w := #p31_TargetWindow2_r;
+	  #p32_PosWindow2Visual_w := #p32_PosWindow2Visual_r;
+	  #p33_DisplayDivisorUse_w := #p33_DisplayDivisorUse_r;
+	  #p34_DifferenceValueCal_w := #p34_DifferenceValueCal_r;
+	  #p35_KeyFunctionEnable2_w := #p35_KeyFunctionEnable2_r;
+	  #p39_Led4Red_w := #p39_Led4Red_r;
+	  #p3A_LcdBacklightFlash_w := #p3A_LcdBacklightFlash_r;
+	  #p3B_LcdBacklightWhite_w := #p3B_LcdBacklightWhite_r;
+	  #p3C_LcdBacklightRed_w := #p3C_LcdBacklightRed_r;
+	  #p3D_KeyFunctionEnable3_w := #p3D_KeyFunctionEnable3_r;
+	  #p3E_AcknowledgementSet_w := #p3E_AcknowledgementSet_r;
+	  #p3F_IndicationFactor_w := #p3F_IndicationFactor_r;
+	  #pD0_ResponseDelay_w := #pD0_ResponseDelay_r;
+	  #pFB_SetPoint1_w := #pFB_SetPoint1_r;
+	  
+	  #vnCounterCopy := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Status word
+	//
+	#bs00_DirectionIndic_Cw                     := #vbSWbits [0]; //direction_display >
+	#bs01_DirectionIndic_Ccw                    := #vbSWbits [1]; //direction_display <
+	#bs02_ValiditySetpoint1                     := #vbSWbits [2]; //set_value1_ack
+	#bs03_TargetWindow2Dynami                   := #vbSWbits [3]; //targetWindow2_dynamic 
+	#bs04_TargetWindow1Static                   := #vbSWbits [4]; //targetWindow1_static
+	#bs05_TargetWindow1Dynami                   := #vbSWbits [5]; //targetWindow1_dynamic
+	#bs06_Deviation                             := #vbSWbits [6]; //deviation
+	#bs07_DeviceError                           := #vbSWbits [7]; //error_ZSW
+	#bs08_OutputOfPositionVal                   := #vbSWbits [8]; //AV_position 
+	#bs09_PositionValueIncrem                   := #vbSWbits [9]; //incremental_measure
+	#bs10_ValiditySetpoint2                     := #vbSWbits [10]; //set_value2_ack
+	#bs11_BatteryStatus                         := #vbSWbits [11]; //Low_Battery
+	#bs12_SensorError                           := #vbSWbits [12]; //Sensor_Error
+	#bs13_ButtonLeft                            := #vbSWbits [13]; //button_left
+	#bs14_ButtonStar                            := #vbSWbits [14]; //button_star
+	#bs15_ButtonUp                              := #vbSWbits [15]; //button_up
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Read and Write cycle completed or inactive
+	//
+	IF (#vnCounterRead = 0) AND (#vnCounterWrite = 0) AND (#vnCounterCopy = 0)
+	THEN
+	    #bsDone := 1;
+	    #bsBusy := 0;
+	ELSE
+	    #bsDone := 0;
+	    #bsBusy := 1;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Dievice or transmit error occured
+	//
+	IF #bsFaultDataReceive OR #bs07_DeviceError OR #bsComTimeout
+	THEN
+	    #bsGeneralError := 1;
+	    #bsDone := 0;
+	ELSE
+	    #bsGeneralError := 0;
+	END_IF;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Write outputs synchonous
+	//
+	
+	
+	#DC_OutputBuffer[3] := INT_TO_BYTE(#vnParameterAdrSend);
+	
+	#DC_OutputBuffer[5] := WORD_TO_BYTE(SHR(IN:=#vnCWord, N:=8))  ;
+	#DC_OutputBuffer[4] := WORD_TO_BYTE(#vnCWord);
+	
+	#DC_OutputBuffer[6] := #vnParaDataSendBytes[0];
+	#DC_OutputBuffer[7] := #vnParaDataSendBytes[1];
+	#DC_OutputBuffer[8] := #vnParaDataSendBytes[2];
+	#DC_OutputBuffer[9] := #vnParaDataSendBytes[3];
+	
+	#vnErrorSFC15 := DPWR_DAT(LADDR := #DC_StartByteOut, RECORD := #DC_OutputBuffer);
+	
+	
+END_FUNCTION_BLOCK
+

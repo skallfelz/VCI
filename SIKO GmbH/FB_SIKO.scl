@@ -1,0 +1,264 @@
+﻿FUNCTION_BLOCK "FB_SIKO"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 1.00
+   VAR_INPUT 
+      i_nodes : Array[0..31] of HW_IO;
+      i_enable : Bool;
+      i_reset : Bool;
+      i_NodeUp : Bool;
+      i_NodeDown : Bool;
+      i_CurrentPictureNumber : Int;
+      i_PictureNumber : Int;
+      i_UpperLimitNode : Int := 31;
+   END_VAR
+
+   VAR_OUTPUT 
+      q_NodeNumbersNotInRange : String;
+      q_AllNodesInRange : Bool;
+      q_ActiveNodeNumber : Int;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_HMISIKO : "UDT_SIKO";
+      iq_HMIData : "UDT_SIKODATA";
+      iq_SIKO : Array[0..31] of "UDT_SIKO";
+      iq_SIKOData : Array[0..31] of "UDT_SIKODATA";
+   END_VAR
+
+   VAR 
+      stat_FirstCycle : Bool := TRUE;
+      stat_NodeNumber : Int := 1;
+      stat_NodeNumberOld : Int := 0;
+      stat_NodeNumbersNotInRange : String;
+      stat_TONEnable {InstructionName := 'TON_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TON_TIME;
+      stat_RTRIGReadOnce {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      stat_RTRIGNodeUp {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      stat_RTRIGNodeDown {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      stat_SIKO_POS_AP10vPN : Array[0..31] of "SIKO_POS_AP10vPN";
+   END_VAR
+
+   VAR_TEMP 
+      temp_counter : Int;
+      temp_nodes : Array[0..31] of HW_IO;
+      temp_enable : Bool;
+      temp_reset : Bool;
+      temp_writeParameter : Bool;
+      temp_AllNodesInRange : Bool;
+      temp_NodeUp : Bool;
+      temp_NodeDown : Bool;
+      temp_CurrentPictureNumber : Int;
+      temp_PictureNumber : Int;
+      temp_UpperLimitNode : Int;
+   END_VAR
+
+
+BEGIN
+	//=======================================================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------------------------------
+	// The FB communicats with SIKO Devices (Anybus) and has an internal Multiplexer to arrange
+	// the Data for the HMI
+	//-----------------------------------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   28.02.2022    SK                  First release version v1.0
+	// 01.00.01   01.03.2022    SK                  Implement Multiplexer function / Outputs
+	// 01.00.02   04.03.2022    SK                  Delete Input i_writeParameter and use instead current SetParameter
+	//=======================================================================================================================
+	
+	REGION MAP INPUTS
+	    #temp_nodes := #i_nodes;
+	    #temp_enable := #i_enable;
+	    #temp_reset := #i_reset;
+	    //#temp_writeParameter := #i_writeParameter;
+	    #temp_NodeUp := #i_NodeUp;
+	    #temp_NodeDown := #i_NodeDown;
+	    #temp_CurrentPictureNumber := #i_CurrentPictureNumber;
+	    #temp_PictureNumber := #i_PictureNumber;
+	    
+	    IF #i_UpperLimitNode > 31 THEN
+	        #temp_UpperLimitNode := 31;
+	    ELSIF #i_UpperLimitNode < 1 THEN
+	        #temp_UpperLimitNode := 1;
+	    ELSE
+	        #temp_UpperLimitNode := #i_UpperLimitNode;
+	    END_IF;
+	    
+	    FOR #temp_counter := 0 TO 31 BY 1 DO
+	        IF #iq_SIKO[#temp_counter].active
+	            AND #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartCopy
+	        THEN
+	            #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartCopy := FALSE;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION ENABLE
+	    #stat_TONEnable(IN := #temp_enable,
+	                    PT := t#5s);
+	    
+	    //EXIT Functionblock to save ressources if Enable is FALSE
+	    IF NOT #stat_TONEnable.Q
+	    THEN
+	        RETURN;
+	    END_IF;
+	END_REGION
+	
+	REGION READ ALL PARAMETER ON STARTUP
+	    IF #stat_FirstCycle
+	    THEN
+	        FOR #temp_counter := 0 TO 31 BY 1 DO
+	            IF #iq_SIKO[#temp_counter].active THEN
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartRead := true;
+	            END_IF;
+	        END_FOR;
+	        #stat_FirstCycle := FALSE;
+	    END_IF;
+	    
+	    IF NOT #stat_FirstCycle
+	    THEN
+	        FOR #temp_counter := 0 TO 31 BY 1 DO
+	            IF #iq_SIKO[#temp_counter].active
+	                AND #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartRead
+	                AND #stat_SIKO_POS_AP10vPN[#temp_counter].bsDone
+	            THEN
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartRead := FALSE;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartCopy := TRUE;
+	            END_IF;
+	        END_FOR;
+	    END_IF;
+	END_REGION
+	
+	REGION MULTIPLEX DATA TO HMI
+	    #stat_RTRIGReadOnce(CLK := #temp_CurrentPictureNumber = #temp_PictureNumber);
+	    #stat_RTRIGNodeUp(CLK := #temp_NodeUp);
+	    #stat_RTRIGNodeDown(CLK := #temp_NodeDown);
+	    
+	    IF (#temp_CurrentPictureNumber = #temp_PictureNumber)
+	        AND #stat_RTRIGNodeUp.Q
+	    THEN
+	        #stat_NodeNumber += 1;
+	        IF #stat_NodeNumber > #temp_UpperLimitNode THEN
+	            #stat_NodeNumber := #temp_UpperLimitNode;
+	        END_IF;
+	    END_IF;
+	    
+	    IF (#temp_CurrentPictureNumber = #temp_PictureNumber)
+	        AND #stat_RTRIGNodeDown.Q
+	    THEN
+	        #stat_NodeNumber -= 1;
+	        IF #stat_NodeNumber < 1 THEN
+	            #stat_NodeNumber := 1;
+	        END_IF;
+	    END_IF;
+	    
+	    IF (#temp_CurrentPictureNumber <> #temp_PictureNumber)
+	    THEN
+	        #stat_NodeNumberOld := 0;
+	    END_IF;
+	    
+	    IF #stat_RTRIGReadOnce.Q
+	        OR ((#temp_CurrentPictureNumber = #temp_PictureNumber)
+	        AND (#stat_RTRIGNodeUp.Q OR #stat_RTRIGNodeDown.Q)
+	        AND #stat_NodeNumber <> #stat_NodeNumberOld)
+	    THEN
+	        #iq_HMISIKO := #iq_SIKO[#stat_NodeNumber];
+	        #iq_HMIData := #iq_SIKOData[#stat_NodeNumber];
+	        #stat_NodeNumberOld := #stat_NodeNumber;
+	    END_IF;
+	    
+	    IF (#temp_CurrentPictureNumber = #temp_PictureNumber)
+	        AND (#stat_NodeNumber = #stat_NodeNumberOld)
+	    THEN
+	        #iq_SIKO[#stat_NodeNumber] := #iq_HMISIKO;
+	        #iq_SIKOData[#stat_NodeNumber].Parameter.CalibrationValue := #iq_HMIData.Parameter.CalibrationValue;
+	        #iq_SIKOData[#stat_NodeNumber].SetParameter := #iq_HMIData.SetParameter;
+	        #iq_HMIData.Value := #iq_SIKOData[#stat_NodeNumber].Value;
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION SET PARAMETERS
+	    IF NOT #stat_FirstCycle
+	    THEN
+	        FOR #temp_counter := 0 TO 31 BY 1 DO
+	            IF #iq_SIKO[#temp_counter].active
+	                AND NOT #stat_SIKO_POS_AP10vPN[#temp_counter].bcStartCopy
+	            THEN
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p00_NodeAddress_w := INT_TO_BYTE(#temp_counter);
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p0A_DecimalPlaces_w := #iq_SIKOData[#temp_counter].Parameter.DecimalPlaces;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p0D_DisplayOrientation_w := #iq_SIKOData[#temp_counter].Parameter.DisplayOrientation;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p1B_CountingDirection_w := #iq_SIKOData[#temp_counter].Parameter.CountingDirection;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p1C_ResolutionPerRevol_w := #iq_SIKOData[#temp_counter].Parameter.ResolutionPerRevolution;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p1E_Offset_w := #iq_SIKOData[#temp_counter].Parameter.OffsetValue;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p1F_CalibrationValue_w := #iq_SIKOData[#temp_counter].Parameter.CalibrationValue;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p20_TargetWindow1_w := #iq_SIKOData[#temp_counter].Parameter.TargetWindow1;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].p31_TargetWindow2_w := #iq_SIKOData[#temp_counter].Parameter.TargetWindow1;
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].pA8_ProgrammingMOnOff_w := BOOL_TO_BYTE(#iq_SIKOData[#temp_counter].SetParameter);
+	                #stat_SIKO_POS_AP10vPN[#temp_counter].pA7_ExecuteCalibration_w := BOOL_TO_BYTE(#iq_SIKOData[#temp_counter].SetParameter);
+	                
+	                CASE #iq_SIKOData[#temp_counter].Parameter.DecimalPlaces OF
+	                    0:
+	                        #stat_SIKO_POS_AP10vPN[#temp_counter].p1F_CalibrationValue_w := #iq_SIKOData[#temp_counter].Parameter.CalibrationValue * 1;
+	                    1:
+	                        #stat_SIKO_POS_AP10vPN[#temp_counter].p1F_CalibrationValue_w := #iq_SIKOData[#temp_counter].Parameter.CalibrationValue * 10;
+	                    2:
+	                        #stat_SIKO_POS_AP10vPN[#temp_counter].p1F_CalibrationValue_w := #iq_SIKOData[#temp_counter].Parameter.CalibrationValue * 100;
+	                    3:
+	                        #stat_SIKO_POS_AP10vPN[#temp_counter].p1F_CalibrationValue_w := #iq_SIKOData[#temp_counter].Parameter.CalibrationValue * 1000;
+	                    ELSE
+	                        #stat_SIKO_POS_AP10vPN[#temp_counter].p1F_CalibrationValue_w := #iq_SIKOData[#temp_counter].Parameter.CalibrationValue;
+	                END_CASE;
+	            END_IF;
+	        END_FOR;
+	        
+	        
+	    END_IF;
+	END_REGION
+	
+	REGION CALL FUNCTIONS
+	    FOR #temp_counter := 0 TO 31 BY 1 DO
+	        IF #temp_nodes[#temp_counter] <> 0
+	        THEN
+	            #stat_SIKO_POS_AP10vPN[#temp_counter](DC_StartByteOut := #temp_nodes[#temp_counter],
+	                                                  DC_StartByteIn := #temp_nodes[#temp_counter],
+	                                                  vnSetValue := #iq_SIKO[#temp_counter].SetPoint,
+	                                                  vnNodeId := INT_TO_BYTE(#temp_counter),
+	                                                  bc02_ValidityOfSetpoint1 := TRUE,
+	                                                  bc05_ErrorAcknowledgment := #temp_reset,
+	                                                  bcResetCounterActivity := #temp_reset,
+	                                                  bcStartWrite := #iq_SIKOData[#stat_NodeNumber].SetParameter,
+	                                                  vnActualValue => #iq_SIKOData[#temp_counter].Value);
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION NODE NUMBERS NOT IN RANGE
+	    //Preset
+	    #stat_NodeNumbersNotInRange := '';
+	    #temp_AllNodesInRange := TRUE;
+	    
+	    //Generate String if one or more nodes are not in range
+	    FOR #temp_counter := 0 TO 31 BY 1 DO
+	        IF #iq_SIKO[#temp_counter].active
+	            AND #temp_nodes[#temp_counter] <> 0
+	        THEN
+	            IF NOT #stat_SIKO_POS_AP10vPN[#temp_counter].bs05_TargetWindow1Dynami
+	            THEN
+	                #stat_NodeNumbersNotInRange := CONCAT_STRING(IN1 := #stat_NodeNumbersNotInRange, IN2 := UINT_TO_STRING(INT_TO_UINT(#temp_counter)));
+	                #stat_NodeNumbersNotInRange := REPLACE(IN1 := #stat_NodeNumbersNotInRange, IN2 := '', L := 1, P := FIND(IN1 := #stat_NodeNumbersNotInRange, IN2 := '+'));
+	                #stat_NodeNumbersNotInRange := CONCAT_STRING(IN1 := #stat_NodeNumbersNotInRange, IN2 := ', ');
+	                #temp_AllNodesInRange := FALSE;
+	            END_IF;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_NodeNumbersNotInRange := #stat_NodeNumbersNotInRange;
+	    #q_AllNodesInRange := #temp_AllNodesInRange;
+	    #q_ActiveNodeNumber := #stat_NodeNumber;
+	END_REGION
+	
+END_FUNCTION_BLOCK
+
