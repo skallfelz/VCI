@@ -1,0 +1,221 @@
+﻿FUNCTION_BLOCK "FB_Glueing"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Axis : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of DB_ANY;
+      i_ActualData : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of "UDT_ServoActualData";
+      i_Reset : Bool;
+      i_GlueingEnable : Bool;
+      i_AxesEnabled : Bool;
+      i_DetectKarton_1 : Bool;
+      i_DetectKarton_2 : Bool;
+      i_DetectKarton_3 : Bool;
+      i_DetectKarton_4 : Bool;
+      i_DetectKarton_5 : Bool;
+      i_DetectKarton_6 : Bool;
+      i_DetectKarton_7 : Bool;
+      i_DetectKarton_8 : Bool;
+      i_MasterAxisForGlueing : Int;
+      i_MaxNumberOfGlueing : Int := 3;
+   END_VAR
+
+   VAR_OUTPUT 
+      q_TrackOutput_1 : Bool;
+      q_TrackOutput_2 : Bool;
+      q_TrackOutput_3 : Bool;
+      q_TrackOutput_4 : Bool;
+      q_TrackOutput_5 : Bool;
+      q_TrackOutput_6 : Bool;
+      q_TrackOutput_7 : Bool;
+      q_TrackOutput_8 : Bool;
+      q_SensorPermanentlyOccupied_1 : Bool;
+      q_SensorPermanentlyOccupied_2 : Bool;
+      q_SensorPermanentlyOccupied_3 : Bool;
+      q_SensorPermanentlyOccupied_4 : Bool;
+      q_SensorPermanentlyOccupied_5 : Bool;
+      q_SensorPermanentlyOccupied_6 : Bool;
+      q_SensorPermanentlyOccupied_7 : Bool;
+      q_SensorPermanentlyOccupied_8 : Bool;
+      q_ErrorTechnologyObject : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Camtracks : Array[1..8] of DB_ANY;
+      iq_CamData : Array[1..8] of "UDT_Glueing";
+      iq_OMAC : Array[0.."UPPEROMACMODE"] of "UDT_OMAC_States";
+      iq_HMIButtons : "UDT_HMI_Buttons";
+   END_VAR
+
+   VAR 
+      stat_CamValues { S7_SetPoint := 'False'} : Array[1..8] of "FB_Value_CamTrack";
+      stat_CamCartonDetection : Array[1..8] of "UDT_CamState";
+      stat_CartonDetectionState { S7_SetPoint := 'True'} : Array[1..8] of Bool;
+      stat_MCCamTrack {InstructionName := 'MC_CAMTRACK'; LibVersion := '6.0'} : Array[1..8] of MC_CAMTRACK;
+      stat_ResetCamTrack {InstructionName := 'MC_RESET'; LibVersion := '6.0'} : Array[1..8] of MC_RESET;
+      stat_TONSensorPermanentlyOccupied {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : Array[1..8] of TON_TIME;
+      stat_SensorPermanentlyOccupied { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Array[1..8] of Bool;
+      stat_ErrorTechnologyObject : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      temp_counter : Int;
+      temp_Time : Time;
+      temp_MasterAxisForGlueing : UInt;
+      temp_MaxNumberOfGlueing : Int;
+      temp_CamDataCartonDetection : Array[1..8] of "UDT_CamData";
+      temp_Axis : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of DB_ANY;
+      temp_ActualData : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of "UDT_ServoActualData";
+      temp_GlueingEnable : Bool;
+      temp_AxesEnabled : Bool;
+      temp_Reset : Bool;
+      temp_DetectKarton : Array[1..8] of Bool;
+      temp_HMIButtons : Array[1..8] of Bool;
+   END_VAR
+
+
+BEGIN
+	REGION MAP INPUTS
+	    #temp_Axis := #i_Axis;
+	    #temp_ActualData := #i_ActualData;
+	    #temp_GlueingEnable := #i_GlueingEnable;
+	    #temp_AxesEnabled := #i_AxesEnabled;
+	    #temp_Reset := #i_Reset;
+	    #temp_MasterAxisForGlueing := INT_TO_UINT(LIMIT(MN:="LOWERAXISNUMBER", IN:= #i_MasterAxisForGlueing, MX := "UPPERAXISNUMBER"));
+	    #temp_MaxNumberOfGlueing := LIMIT(MN := 1, IN := #i_MaxNumberOfGlueing, MX := 8);
+	    #temp_DetectKarton[1] := #i_DetectKarton_1;
+	    #temp_DetectKarton[2] := #i_DetectKarton_2;
+	    #temp_DetectKarton[3] := #i_DetectKarton_3;
+	    #temp_DetectKarton[4] := #i_DetectKarton_4;
+	    #temp_DetectKarton[5] := #i_DetectKarton_5;
+	    #temp_DetectKarton[6] := #i_DetectKarton_6;
+	    #temp_DetectKarton[7] := #i_DetectKarton_7;
+	    #temp_DetectKarton[8] := #i_DetectKarton_8;
+	    #temp_HMIButtons[1] := #iq_HMIButtons."Leimventil 1";
+	    #temp_HMIButtons[2] := #iq_HMIButtons."Leimventil 2";
+	    #temp_HMIButtons[3] := #iq_HMIButtons."Leimventil 3";
+	    #temp_HMIButtons[4] := #iq_HMIButtons."Leimventil 4";
+	    #temp_HMIButtons[5] := #iq_HMIButtons."Leimventil 5";
+	    #temp_HMIButtons[6] := #iq_HMIButtons."Leimventil 6";
+	    #temp_HMIButtons[7] := #iq_HMIButtons."Leimventil 7";
+	    #temp_HMIButtons[8] := #iq_HMIButtons."Leimventil 8";
+	END_REGION
+	
+	REGION TRANSFER CAMDATA TO CAMTRACK
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	        IF DB_ANY_TO_UINT(#iq_Camtracks[#temp_counter]) > 0 THEN
+	            #stat_CamValues[#temp_counter](i_Axis := #temp_Axis[#temp_MasterAxisForGlueing],
+	                                           iq_Leimnocken := #iq_CamData[#temp_counter].Leimung,
+	                                           iq_CamTrack := #iq_Camtracks[#temp_counter]);
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION CALCULATE STARTPOINT FOR DETECTION
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	            "FC_GlueDetectionCarton"(i_Shift:=-50.0,
+	                                     i_Modulo:=#temp_ActualData[#temp_MasterAxisForGlueing].Modulo,
+	                                     iq_Cam:=#iq_CamData[#temp_counter].Leimung,
+	                                     iq_CamDetection:=#temp_CamDataCartonDetection[#temp_counter]);
+	            
+	    END_FOR;
+	END_REGION
+	
+	REGION CARTON DETECTION
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	        "FC_CamDecoding"(i_CamOn:=#temp_CamDataCartonDetection[#temp_counter].On,
+	                         i_CamOff:=#temp_CamDataCartonDetection[#temp_counter].Off,
+	                         i_Position:=#temp_ActualData[#temp_MasterAxisForGlueing].ActualPosition,
+	                         iq_CamState:=#stat_CamCartonDetection[#temp_counter]);
+	        
+	        IF #temp_ActualData[#temp_MasterAxisForGlueing].ActualVelocity > 30.0
+	            AND #temp_DetectKarton[#temp_counter]
+	            AND #stat_CamCartonDetection[#temp_counter].active
+	        THEN
+	            #stat_CartonDetectionState[#temp_counter] := TRUE;
+	        END_IF;
+	        
+	        IF (NOT #temp_DetectKarton[#temp_counter] AND #stat_CamCartonDetection[#temp_counter].r_trig)
+	            OR #temp_ActualData[#temp_MasterAxisForGlueing].ActualVelocity < 30.0
+	            OR NOT #temp_GlueingEnable
+	            OR NOT #temp_AxesEnabled
+	        THEN
+	            #stat_CartonDetectionState[#temp_counter] := FALSE;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION ACTIVATE/DEACTIVATE CAMTRACKS
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	        IF #iq_OMAC["OMAC_MODE_MANUAL"].EXECUTE THEN
+	            #stat_MCCamTrack[#temp_counter].Mode := 2;
+	        ELSE
+	            #stat_MCCamTrack[#temp_counter].Mode := 0;
+	        END_IF;
+	        
+	        IF DB_ANY_TO_UINT(#iq_Camtracks[#temp_counter]) > 0 THEN
+	            #stat_MCCamTrack[#temp_counter](CamTrack := #iq_Camtracks[#temp_counter],
+	                                            Enable := #stat_CartonDetectionState[#temp_counter] OR (#iq_OMAC["OMAC_MODE_MANUAL"].EXECUTE AND #temp_HMIButtons[#temp_counter]),
+	                                            Mode := #stat_MCCamTrack[#temp_counter].Mode);
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION SENSOR PERMANENTLY OCCUPIED
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	        #stat_TONSensorPermanentlyOccupied[#temp_counter](IN := #temp_AxesEnabled AND #temp_DetectKarton[#temp_counter],
+	                                                          PT := #temp_Time);
+	        
+	        IF #stat_TONSensorPermanentlyOccupied[#temp_counter].Q
+	        THEN
+	            #stat_SensorPermanentlyOccupied[#temp_counter] := TRUE;
+	        ELSIF #temp_Reset THEN
+	            #stat_SensorPermanentlyOccupied[#temp_counter] := FALSE;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION ERROR CAMTRACKS
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	        IF #stat_ResetCamTrack[#temp_counter].Error THEN
+	            #stat_ErrorTechnologyObject := TRUE;
+	        END_IF;
+	        IF #temp_Reset THEN
+	            #stat_ErrorTechnologyObject := FALSE;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION RESET CAMTRACKS
+	    FOR #temp_counter := 1 TO #temp_MaxNumberOfGlueing BY 1 DO
+	        IF DB_ANY_TO_UINT(#iq_Camtracks[#temp_counter]) > 0 THEN
+	            "FC_ResetCamTrack"(CamTrack := #iq_Camtracks[#temp_counter],
+	                               Execute := #temp_Reset,
+	                               Restart := false,
+	                               MC_Reset := #stat_ResetCamTrack[#temp_counter]);
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_TrackOutput_1 := #stat_MCCamTrack[1].TrackOutput;
+	    #q_TrackOutput_2 := #stat_MCCamTrack[2].TrackOutput;
+	    #q_TrackOutput_3 := #stat_MCCamTrack[3].TrackOutput;
+	    #q_TrackOutput_4 := #stat_MCCamTrack[4].TrackOutput;
+	    #q_TrackOutput_5 := #stat_MCCamTrack[5].TrackOutput;
+	    #q_TrackOutput_6 := #stat_MCCamTrack[6].TrackOutput;
+	    #q_TrackOutput_7 := #stat_MCCamTrack[7].TrackOutput;
+	    #q_TrackOutput_8 := #stat_MCCamTrack[8].TrackOutput;
+	    
+	    #q_SensorPermanentlyOccupied_1 := #stat_SensorPermanentlyOccupied[1];
+	    #q_SensorPermanentlyOccupied_2 := #stat_SensorPermanentlyOccupied[2];
+	    #q_SensorPermanentlyOccupied_3 := #stat_SensorPermanentlyOccupied[3];
+	    #q_SensorPermanentlyOccupied_4 := #stat_SensorPermanentlyOccupied[4];
+	    #q_SensorPermanentlyOccupied_5 := #stat_SensorPermanentlyOccupied[5];
+	    #q_SensorPermanentlyOccupied_6 := #stat_SensorPermanentlyOccupied[6];
+	    #q_SensorPermanentlyOccupied_7 := #stat_SensorPermanentlyOccupied[7];
+	    #q_SensorPermanentlyOccupied_8 := #stat_SensorPermanentlyOccupied[8];
+	    
+	    #q_ErrorTechnologyObject := #stat_ErrorTechnologyObject;
+	END_REGION
+END_FUNCTION_BLOCK
+

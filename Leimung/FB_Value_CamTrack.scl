@@ -1,0 +1,90 @@
+﻿FUNCTION_BLOCK "FB_Value_CamTrack"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Axis {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Leimnocken : Array[*] of "UDT_CamData";   // Array mit variabler Grenze
+      iq_CamTrack {InstructionName := 'TO_CamTrack'; LibVersion := '6.0'} : TO_CamTrack;   // Nockenspur
+   END_VAR
+
+   VAR 
+      stat_UpperBound : DInt;
+      stat_LowerBound : DInt;
+   END_VAR
+
+   VAR_TEMP 
+      temp_track : DInt;
+   END_VAR
+
+
+BEGIN
+	//Array Grenzen ermitteln
+	#stat_UpperBound := UPPER_BOUND(ARR:=#iq_Leimnocken, DIM:=1);
+	#stat_LowerBound := LOWER_BOUND(ARR := #iq_Leimnocken, DIM := 1);
+	
+	IF #stat_UpperBound > 16 THEN
+	    #stat_UpperBound := 16;
+	END_IF;
+	
+	//Spurlänge der Leimnocke auf Modulo der Achse setzen
+	//
+	#iq_CamTrack.Parameter.CamTrackLength := #i_Axis.Modulo.Length;
+	
+	//Nockenwerte an Camtrack übermitteln
+	//
+	FOR #temp_track := #stat_LowerBound TO #stat_UpperBound BY 1 DO
+	    
+	    //Solange kein Nulldurchgang bei den Nocken erfolgt werden die Daten 1 zu 1 übertagen
+	    IF #iq_Leimnocken[#temp_track].On <= #iq_Leimnocken[#temp_track].Off
+	    THEN
+	        #iq_CamTrack.Parameter.Cam[#temp_track].OnPosition := #iq_Leimnocken[#temp_track].On;
+	        #iq_CamTrack.Parameter.Cam[#temp_track].OffPosition := #iq_Leimnocken[#temp_track].Off;
+	        
+	        IF #iq_Leimnocken[#temp_track].On <> #iq_Leimnocken[#temp_track].Off
+	        THEN
+	            #iq_CamTrack.Parameter.Cam[#temp_track].Existent := true;
+	            #iq_CamTrack.Parameter.Cam[#temp_track + 16].Existent := false;
+	        ELSE
+	            #iq_CamTrack.Parameter.Cam[#temp_track].Existent := false;
+	            #iq_CamTrack.Parameter.Cam[#temp_track + 16].Existent := false;
+	        END_IF;
+	    END_IF;
+	    
+	    //Wenn ein Nulldurchgang vorhanden ist werden die Nocken in zwei Teile unterteilt
+	    //Anfang - Modulo, 0 - Ende
+	    IF #iq_Leimnocken[#temp_track].On > #iq_Leimnocken[#temp_track].Off
+	    THEN
+	        #iq_CamTrack.Parameter.Cam[#temp_track].OnPosition := #iq_Leimnocken[#temp_track].On;
+	        #iq_CamTrack.Parameter.Cam[#temp_track].OffPosition := #i_Axis.Modulo.Length; //DINT_TO_LREAL(#Leimnocken[#track].Ende);
+	        
+	        IF #iq_Leimnocken[#temp_track].On <> #iq_Leimnocken[#temp_track].Off
+	        THEN
+	            #iq_CamTrack.Parameter.Cam[#temp_track].Existent := true;
+	        ELSE
+	            #iq_CamTrack.Parameter.Cam[#temp_track].Existent := false;
+	        END_IF;
+	        
+	        #iq_CamTrack.Parameter.Cam[#temp_track + 16].OnPosition := 0.0; //DINT_TO_LREAL(#Leimnocken[#track].Anfang);
+	        #iq_CamTrack.Parameter.Cam[#temp_track + 16].OffPosition := #iq_Leimnocken[#temp_track].Off;
+	        
+	        IF #iq_CamTrack.Parameter.Cam[#temp_track + 16].OnPosition <> #iq_CamTrack.Parameter.Cam[#temp_track + 16].OffPosition
+	        THEN
+	            #iq_CamTrack.Parameter.Cam[#temp_track + 16].Existent := true;
+	        ELSE
+	            #iq_CamTrack.Parameter.Cam[#temp_track + 8].Existent := false;
+	        END_IF;
+	    END_IF;
+	
+	    
+	    IF #iq_Leimnocken[#temp_track].On = #iq_Leimnocken[#temp_track].Off
+	    THEN
+	        #iq_CamTrack.Parameter.Cam[#temp_track].Existent := false;
+	    END_IF;
+	    
+	END_FOR;
+	
+END_FUNCTION_BLOCK
+

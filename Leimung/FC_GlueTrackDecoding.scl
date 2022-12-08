@@ -1,0 +1,59 @@
+﻿FUNCTION "FC_GlueTrackDecoding" : Bool
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_CamOn : Real;   // Nockenanfangswert
+      i_CamOff : Real;   // Nockenendwert
+      i_Position : Variant;   // Drehgeberwert
+   END_VAR
+
+   VAR_TEMP 
+      temp_VariantPosition : Struct
+         "Int" : Int;
+         "DInt" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_Position : Real;
+      temp_Cam : Bool;   // Temporäre Nocke für interne Nutzung
+   END_VAR
+
+
+BEGIN
+	REGION Detect datatypes
+	    CASE TypeOf(#i_Position) OF
+	        Int:
+	            VariantGet(SRC := #i_Position,
+	                       DST => #temp_VariantPosition."Int");
+	            
+	            #temp_Position := INT_TO_REAL(#temp_VariantPosition."Int");
+	        DInt:
+	            VariantGet(SRC := #i_Position,
+	                       DST => #temp_VariantPosition."DInt");
+	            
+	            #temp_Position := DINT_TO_REAL(#temp_VariantPosition."DInt");
+	        Real:
+	            VariantGet(SRC := #i_Position,
+	                       DST => #temp_VariantPosition."Real");
+	            
+	            #temp_Position := #temp_VariantPosition."Real";
+	        LReal:
+	            VariantGet(SRC := #i_Position,
+	                       DST => #temp_VariantPosition."LReal");
+	            
+	            #temp_Position := LREAL_TO_REAL(#temp_VariantPosition."LReal");
+	    END_CASE;
+	END_REGION
+	
+	REGION Generate Cam
+	    #temp_Cam := (#i_CamOn < #i_CamOff AND #temp_Position > #i_CamOn AND #temp_Position < #i_CamOff)
+	    OR (#i_CamOn > #i_CamOff AND (#temp_Position > #i_CamOn OR #temp_Position < #i_CamOff));
+	END_REGION
+	
+	REGION Output Cam
+	    #FC_GlueTrackDecoding := #temp_Cam;
+	END_REGION
+	
+	
+END_FUNCTION
+

@@ -1,0 +1,234 @@
+﻿FUNCTION "FC_GlueTrackComp" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Enable : Bool;   // activate output
+      i_DelayOn : Real;   // Sensor Delay On in ms
+      i_DelayOff : Real;   // Sensor Delay Off in ms
+      i_Speed : Variant;   // Speed of the machine parts/min
+      i_Velocity : Variant;   // Velocity of the machine mm/s
+      i_Modulo : Variant;   // Modulo of the machine
+      i_Position : Variant;   // Current Position
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Cam : Array[*] of "UDT_CamData";   // Input from Glue Tracks
+      iq_CamComp : Bool;   // Output of compensated cam
+   END_VAR
+
+   VAR_TEMP 
+      temp_VariantSpeed : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantVelocity : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantModulo : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantPosition : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_Speed : Real;
+      temp_Velocity : Real;
+      temp_Modulo : Real;
+      temp_Position : Real;
+      temp_DelayOn : Real;
+      temp_DelayOff : Real;
+      temp_OffsetOn : Real;
+      temp_OffsetOff : Real;
+      temp_ShiftOn : Real;
+      temp_ShiftOff : Real;
+      temp_Size : DInt;
+      temp_Counter : Int;
+      temp_CamComp : Bool;
+      temp_CamDecoding : Bool;
+      temp_Enable : Bool;
+   END_VAR
+
+
+BEGIN
+	(* Program to compensate the glue track
+	
+	Company - Econo-PAK
+	Creater - TK / SKAL
+	Date    - 13.12.2021
+	Version - 1.1
+	History - V1.0 -> 14.12.21 -> Create function 
+	####### - V1.1 -> 07.01.22 -> changed names
+	*)
+	
+	REGION Map Inputs
+	    #temp_Enable := #i_Enable;
+	    #temp_DelayOn := #i_DelayOn;
+	    #temp_DelayOff := #i_DelayOff;
+	END_REGION
+	
+	REGION Read Array-Size
+	    #temp_Size := UPPER_BOUND(ARR := #iq_Cam, DIM := 1);
+	END_REGION
+	
+	REGION Convert Datatype
+	    REGION i_Speed
+	        CASE TypeOf(#i_Speed) OF
+	            Int:
+	                VariantGet(SRC := #i_Speed,
+	                           DST => #temp_VariantSpeed."Int");
+	                
+	                #temp_Speed := INT_TO_REAL(#temp_VariantSpeed."Int");
+	            DInt:
+	                VariantGet(SRC := #i_Speed,
+	                           DST => #temp_VariantSpeed."Dint");
+	                
+	                #temp_Speed := DINT_TO_REAL(#temp_VariantSpeed."Dint");
+	            Real:
+	                VariantGet(SRC := #i_Speed,
+	                           DST => #temp_VariantSpeed."Real");
+	                
+	                #temp_Speed := #temp_VariantSpeed."Real";
+	            LReal:
+	                VariantGet(SRC := #i_Speed,
+	                           DST => #temp_VariantSpeed."LReal");
+	                
+	                #temp_Speed := LREAL_TO_REAL(#temp_VariantSpeed."LReal");
+	            ELSE
+	                #temp_Speed := 0.0;
+	        END_CASE;
+	    END_REGION
+	    
+	    REGION i_Velocity
+	        CASE TypeOf(#i_Velocity) OF
+	            Int:
+	                VariantGet(SRC := #i_Velocity,
+	                           DST => #temp_VariantVelocity."Int");
+	                
+	                #temp_Velocity := INT_TO_REAL(#temp_VariantVelocity."Int");
+	            DInt:
+	                VariantGet(SRC := #i_Velocity,
+	                           DST => #temp_VariantVelocity."Dint");
+	                
+	                #temp_Velocity := DINT_TO_REAL(#temp_VariantVelocity."Dint");
+	            Real:
+	                VariantGet(SRC := #i_Velocity,
+	                           DST => #temp_VariantVelocity."Real");
+	                
+	                #temp_Velocity := #temp_VariantVelocity."Real";
+	            LReal:
+	                VariantGet(SRC := #i_Velocity,
+	                           DST => #temp_VariantVelocity."LReal");
+	                
+	                #temp_Velocity := LREAL_TO_REAL(#temp_VariantVelocity."LReal");
+	            ELSE
+	                #temp_Velocity := 0.0;
+	        END_CASE;
+	    END_REGION
+	    
+	    REGION i_Modulo
+	        CASE TypeOf(#i_Modulo) OF
+	            Int:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Int");
+	                
+	                #temp_Modulo := INT_TO_REAL(#temp_VariantModulo."Int");
+	            DInt:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Dint");
+	                
+	                #temp_Modulo := DINT_TO_REAL(#temp_VariantModulo."Dint");
+	            Real:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Real");
+	                
+	                #temp_Modulo := #temp_VariantModulo."Real";
+	            LReal:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."LReal");
+	                
+	                #temp_Modulo := LREAL_TO_REAL(#temp_VariantModulo."LReal");
+	            ELSE
+	                #temp_Modulo := 0.0;
+	        END_CASE;
+	    END_REGION
+	    
+	    REGION i_Position
+	        CASE TypeOf(#i_Position) OF
+	            Int:
+	                VariantGet(SRC := #i_Position,
+	                           DST => #temp_VariantPosition."Int");
+	                
+	                #temp_Position := INT_TO_REAL(#temp_VariantPosition."Int");
+	            DInt:
+	                VariantGet(SRC := #i_Position,
+	                           DST => #temp_VariantPosition."Dint");
+	                
+	                #temp_Position := DINT_TO_REAL(#temp_VariantPosition."Dint");
+	            Real:
+	                VariantGet(SRC := #i_Position,
+	                           DST => #temp_VariantPosition."Real");
+	                
+	                #temp_Position := #temp_VariantPosition."Real";
+	            LReal:
+	                VariantGet(SRC := #i_Position,
+	                           DST => #temp_VariantPosition."LReal");
+	                
+	                #temp_Position := LREAL_TO_REAL(#temp_VariantPosition."LReal");
+	            ELSE
+	                #temp_Position := 0.0;
+	        END_CASE;
+	    END_REGION
+	END_REGION
+	
+	REGION Calculate
+	    REGION Generate Offsets
+	        IF #temp_Speed <> 0.0
+	            AND #temp_Velocity = 0.0
+	        THEN
+	            #temp_OffsetOn := #temp_DelayOn * ((#temp_Speed * #temp_Modulo / 60.0) / 1000.0);
+	            #temp_OffsetOff := #temp_DelayOff * ((#temp_Speed * #temp_Modulo / 60.0) / 1000.0);
+	        END_IF;
+	        
+	        IF #temp_Velocity <> 0.0
+	        THEN
+	            #temp_OffsetOn := #temp_DelayOn * (#temp_Velocity / 1000.0);
+	            #temp_OffsetOff := #temp_DelayOff * (#temp_Velocity / 1000.0);
+	        END_IF;
+	    END_REGION
+	    
+	    FOR #temp_Counter := 1 TO DINT_TO_INT(#temp_Size) BY 1 DO
+	        "FC_Shift"(i_StartValue := #iq_Cam[#temp_Counter].On,
+	                   i_Shift := - #temp_OffsetOn,
+	                   i_Modulo := #temp_Modulo,
+	                   iq_Shift := #temp_ShiftOn);
+	        
+	        "FC_Shift"(i_StartValue := #iq_Cam[#temp_Counter].Off,
+	                   i_Shift := - #temp_OffsetOff,
+	                   i_Modulo := #temp_Modulo,
+	                   iq_Shift := #temp_ShiftOff);
+	        
+	        #temp_CamDecoding := "FC_GlueTrackDecoding"(i_CamOn := #temp_ShiftOn
+	                                                    , i_CamOff := #temp_ShiftOff
+	                                                    , i_Position := #temp_Position);
+	        IF #temp_CamDecoding
+	        THEN
+	            #temp_CamComp := true;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION Output
+	    #iq_CamComp := #temp_CamComp AND #temp_Enable;
+	END_REGION
+END_FUNCTION
+

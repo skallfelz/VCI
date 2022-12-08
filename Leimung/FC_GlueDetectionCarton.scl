@@ -1,0 +1,100 @@
+﻿FUNCTION "FC_GlueDetectionCarton" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Shift : LReal;
+      i_Modulo : Variant;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Cam : Array[*] of "UDT_CamData";   // Input from Glue Tracks
+      iq_CamDetection : "UDT_CamData";   // Output of compensated cam
+   END_VAR
+
+   VAR_TEMP 
+      temp_VariantModulo : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_Modulo : Real;
+      temp_Shift : LReal;
+      temp_Size : DInt;
+      temp_Index : Int;
+      temp_Cam : "UDT_CamData";
+   END_VAR
+
+
+BEGIN
+	(* Program to detect the earliest start point
+	
+	Company - Econo-PAK
+	Creater - SKAL
+	Date    - 13.12.2021
+	Version - 1.1
+	History - V1.0 -> 16.12.21 -> Create function 
+	####### - V1.1 -> 07.01.22 -> changed names
+	*)
+	
+	REGION Map Inputs
+	    #temp_Shift := #i_Shift;
+	END_REGION
+	
+	REGION Read Array-Size
+	    #temp_Size := UPPER_BOUND(ARR := #iq_Cam, DIM := 1);
+	END_REGION
+	
+	REGION Convert Datatype
+	    REGION i_Modulo
+	        CASE TypeOf(#i_Modulo) OF
+	            Int:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Int");
+	                
+	                #temp_Modulo := INT_TO_REAL(#temp_VariantModulo."Int");
+	            DInt:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Dint");
+	                
+	                #temp_Modulo := DINT_TO_REAL(#temp_VariantModulo."Dint");
+	            Real:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Real");
+	                
+	                #temp_Modulo := #temp_VariantModulo."Real";
+	            LReal:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."LReal");
+	                
+	                #temp_Modulo := LREAL_TO_REAL(#temp_VariantModulo."LReal");
+	            ELSE
+	                #temp_Modulo := 0.0;
+	        END_CASE;
+	    END_REGION
+	END_REGION
+	
+	REGION Calculate
+	    FOR #temp_Index := 1 TO DINT_TO_INT(#temp_Size) BY 1 DO
+	        IF (#iq_Cam[#temp_Index].On <> #iq_Cam[#temp_Index].Off)
+	        THEN
+	            IF #temp_Index = 1
+	                OR (#iq_Cam[#temp_Index].On < #temp_Cam.Off
+	                AND #temp_Index <> 1)
+	            THEN
+	                #temp_Cam.Off := #iq_Cam[#temp_Index].On;
+	            END_IF;
+	        END_IF;
+	    END_FOR;
+	    
+	    "FC_Shift"(i_StartValue := #temp_Cam.Off,
+	               i_Shift := #temp_Shift,
+	               i_Modulo := #temp_Modulo,
+	               iq_Shift := #temp_Cam.On);
+	END_REGION
+	
+	REGION Output
+	    #iq_CamDetection := #temp_Cam;
+	END_REGION
+END_FUNCTION
+
