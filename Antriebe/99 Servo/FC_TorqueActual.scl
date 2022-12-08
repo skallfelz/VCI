@@ -1,0 +1,37 @@
+﻿FUNCTION "FC_TorqueActual" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+   END_VAR
+
+   VAR_IN_OUT 
+      "Max. Drehmoment gemessen" : LReal;
+      "Min. Drehmoment gemessen" : LReal;
+   END_VAR
+
+
+BEGIN
+	IF NOT #Axis.Actor.InverseDirection
+	THEN
+	    IF #Axis.StatusTorqueData.ActualTorque > #"Max. Drehmoment gemessen"
+	    THEN
+	        #"Max. Drehmoment gemessen" := #Axis.StatusTorqueData.ActualTorque;
+	    END_IF;
+	    
+	    IF #Axis.StatusTorqueData.ActualTorque < #"Min. Drehmoment gemessen" THEN
+	        #"Min. Drehmoment gemessen" := #Axis.StatusTorqueData.ActualTorque;
+	    END_IF;
+	ELSE
+	    IF - #Axis.StatusTorqueData.ActualTorque > #"Max. Drehmoment gemessen"
+	    THEN
+	        #"Max. Drehmoment gemessen" := - #Axis.StatusTorqueData.ActualTorque;
+	    END_IF;
+	    
+	    IF - #Axis.StatusTorqueData.ActualTorque < #"Min. Drehmoment gemessen" THEN
+	        #"Min. Drehmoment gemessen" := - #Axis.StatusTorqueData.ActualTorque;
+	    END_IF;
+	END_IF;
+	
+END_FUNCTION
+

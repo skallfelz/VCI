@@ -1,0 +1,15 @@
+﻿FUNCTION "FC_ReadActualData_PosAxis" : "UDT_ServoActualData"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis {InstructionName := 'TO_PositioningAxis'; LibVersion := '6.0'} : TO_PositioningAxis;
+   END_VAR
+
+
+BEGIN
+	#FC_ReadActualData_PosAxis.ActualPosition := #Axis.ActualPosition;
+	#FC_ReadActualData_PosAxis.ActualVelocity := #Axis.ActualVelocity;
+	#FC_ReadActualData_PosAxis.ActualTorque := #Axis.StatusTorqueData.ActualTorque;
+	#FC_ReadActualData_PosAxis.Modulo := #Axis.Modulo.Length;
+END_FUNCTION
+

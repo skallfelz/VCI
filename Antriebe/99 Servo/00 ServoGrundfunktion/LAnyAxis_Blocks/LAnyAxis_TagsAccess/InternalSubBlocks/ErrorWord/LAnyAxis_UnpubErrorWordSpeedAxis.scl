@@ -1,0 +1,15 @@
+﻿FUNCTION "LAnyAxis_UnpubErrorWordSpeedAxis" : DWord
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AnyAxis
+VERSION : 1.0
+   VAR_INPUT 
+      axis {InstructionName := 'TO_SpeedAxis'; LibVersion := '6.0'} : TO_SpeedAxis;
+   END_VAR
+
+
+BEGIN
+	// Read axis parameter
+	#LAnyAxis_UnpubErrorWordSpeedAxis := #axis.ErrorWord;
+END_FUNCTION
+

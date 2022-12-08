@@ -1,0 +1,15 @@
+﻿FUNCTION "FC_ReadActualData_SpeedAxis" : "UDT_ServoActualData"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis {InstructionName := 'TO_SpeedAxis'; LibVersion := '6.0'} : TO_SpeedAxis;
+   END_VAR
+
+
+BEGIN
+	#FC_ReadActualData_SpeedAxis.ActualPosition := 0.0;
+	#FC_ReadActualData_SpeedAxis.ActualVelocity := #Axis.ActualSpeed;
+	#FC_ReadActualData_SpeedAxis.ActualTorque := #Axis.StatusTorqueData.ActualTorque;
+	#FC_ReadActualData_SpeedAxis.Modulo := 0.0;
+END_FUNCTION
+

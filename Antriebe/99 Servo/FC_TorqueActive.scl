@@ -1,0 +1,52 @@
+﻿FUNCTION "FC_TorqueActive" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      StartAdress : DInt;   // Anfangs Eingangsadresse der Daten
+   END_VAR
+
+   VAR_OUTPUT 
+      Max_Torque_active : LReal;
+      Min_Torque_active : LReal;
+   END_VAR
+
+   VAR_TEMP 
+      l_w_Max_Active : Word;
+      l_w_Min_Active : Word;
+      l_w_Normierung : Word;
+      l_i_Max_Active : Int;
+      l_i_Min_Active : Int;
+      l_i_Normierung : Int;
+      l_r_max_active : Real;
+      l_r_min_active : Real;
+   END_VAR
+
+
+BEGIN
+	#l_w_Normierung := 16#4000;
+	#l_i_Normierung := 16384;
+	
+	IF #StartAdress > 0
+	THEN
+	    #l_w_Max_Active := PEEK_WORD(area := 16#1,
+	                                 dbNumber := 0,
+	                                 byteOffset := #StartAdress + 20);
+	    
+	    #l_w_Min_Active := PEEK_WORD(area := 16#1,
+	                                 dbNumber := 0,
+	                                 byteOffset := #StartAdress + 22);
+	    
+	    #l_i_Max_Active := WORD_TO_INT(#l_w_Max_Active);
+	    #l_i_Min_Active := WORD_TO_INT(#l_w_Min_Active);
+	    
+	    #l_r_max_active := INT_TO_REAL(#l_i_Max_Active) / INT_TO_REAL(#l_i_Normierung);
+	    #l_r_min_active := INT_TO_REAL(#l_i_Min_Active) / INT_TO_REAL(#l_i_Normierung);
+	END_IF;
+	
+	#Max_Torque_active := #Axis.Actor.DriveParameter.ReferenceTorque * #l_r_max_active;
+	#Min_Torque_active := #Axis.Actor.DriveParameter.ReferenceTorque * #l_r_min_active;
+	
+	
+END_FUNCTION
+

@@ -1,0 +1,44 @@
+﻿FUNCTION "FC_CamIn" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Master {InstructionName := 'TO_Axis'; LibVersion := '6.0'} : TO_Axis;
+      Slave {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      CAM {InstructionName := 'TO_Cam'; LibVersion := '6.0'} : TO_Cam;
+      Execute : Bool;
+      MasterOffset : LReal;
+      SlaveOffset : LReal;
+      MasterScaling { S7_PredefinedAssignment := '1.0'} : LReal;
+      SlaveScaling { S7_PredefinedAssignment := '1.0'} : LReal;
+      MasterSyncPosition : LReal;
+      SyncProfileReference { S7_PredefinedAssignment := '2'} : DInt;   // 0 = Aufsynchroniseren über Dynamik, 1 = Aufsynchronisieren über Leitwert, 2 = direkt Synchron setzen
+      ACC { S7_PredefinedAssignment := '-1.0'} : LReal;
+      DC { S7_PredefinedAssignment := '-1.0'} : LReal;
+      ApplicationMode : DInt;   // 0 = einmalig / nicht zyklisch, 1 = Zyklisch, 2 = Zyklisch anhängend
+      SyncDirection : DInt;   // 1 = positiv, 2 = negativ, 3 = kürzester Weg
+   END_VAR
+
+   VAR_IN_OUT 
+      MC_CamIn {InstructionName := 'MC_CAMIN'; LibVersion := '6.0'} : MC_CAMIN;
+   END_VAR
+
+
+BEGIN
+	#MC_CamIn(Master:=#Master,
+	          Slave:=#Slave,
+	          Cam:=#CAM,
+	          Execute:=#Execute,
+	          MasterOffset:=#MasterOffset,
+	          SlaveOffset := #SlaveOffset,
+	          MasterScaling:=#MasterScaling,
+	          SlaveScaling:=#SlaveScaling,
+	          MasterSyncPosition:=#MasterSyncPosition,
+	          SyncProfileReference:=#SyncProfileReference,
+	          Acceleration:=#ACC,
+	          Deceleration:=#DC,
+	          ApplicationMode:=#ApplicationMode,
+	          SyncDirection:=#SyncDirection);
+	
+	
+END_FUNCTION
+

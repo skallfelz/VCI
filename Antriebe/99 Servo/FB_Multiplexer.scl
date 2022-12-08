@@ -1,0 +1,121 @@
+﻿FUNCTION_BLOCK "FB_Multiplexer"
+
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+
+END_VAR
+
+VAR_OUTPUT
+
+END_VAR
+
+VAR_IN_OUT
+
+END_VAR
+
+VAR
+  rtrig_ServoNr{InstructionName := 'R_TRIG_1500'; LibVersion := '1.0'} : R_TRIG;
+  Achse : Int;
+END_VAR
+
+VAR_TEMP
+
+END_VAR
+
+VAR CONSTANT
+
+END_VAR
+
+
+
+
+BEGIN
+	#rtrig_ServoNr(CLK := "HMI".Multiplex.ServoNr > 0);
+	
+	REGION Daten einmalig an HMI
+	    IF #rtrig_ServoNr.Q
+	    THEN
+	        //Kurvenpunkte einmalig an HMI senden
+	        "HMI".Multiplex.AchsData := "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr];
+	        
+	        //Drehmomente einmalig an HMI senden
+	        "HMI".Multiplex.AchsMoment := "SERVO".AchsMoment["HMI".Multiplex.ServoNr];
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION untere Drehmomentgrenzen    
+	    
+	    FOR #Achse := "LOWERAXISNUMBER" TO "UPPERAXISNUMBER" BY 1 DO
+	        
+	        IF "SERVO".AchsMoment[#Achse]."Max Drehmoment Soll" < 1.0
+	        THEN
+	            "SERVO".AchsMoment[#Achse]."Max Drehmoment Soll" := 1.0;
+	        END_IF;
+	        
+	        IF "SERVO".AchsMoment[#Achse]."Min Drehmoment Soll" > -1.0
+	        THEN
+	            "SERVO".AchsMoment[#Achse]."Min Drehmoment Soll" := -1.0;
+	        END_IF;
+	        
+	        
+	    END_FOR;
+	END_REGION
+	
+	REGION Daten umkopieren
+	    IF "HMI".Multiplex.ServoNr > 0
+	    THEN
+	        //Kurvenpunkte von HMI in DB schreiben
+	        //"FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr].MasterOffset := "HMI".Multiplex.AchsData.MasterOffset;
+	        "HMI".Multiplex.AchsData.MasterOffset := "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr].MasterOffset;
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Max Position" := "HMI".Multiplex.AchsData."Max Position";
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Min Position" := "HMI".Multiplex.AchsData."Min Position";
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr].Wendepunktverschiebung := "HMI".Multiplex.AchsData.Wendepunktverschiebung;
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr].Doppelhub := "HMI".Multiplex.AchsData.Doppelhub;
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Kurvenscheibe aktiv" := "HMI".Multiplex.AchsData."Kurvenscheibe aktiv";
+	        //"FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr].SlaveOffset := "HMI".Multiplex.AchsData.SlaveOffset;
+	        "HMI".Multiplex.AchsData.SlaveOffset := "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr].SlaveOffset;
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Offset_HMI (Phasing)" := "HMI".Multiplex.AchsData."Offset_HMI (Phasing)";
+	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Offset_HMI (Offset)" := "HMI".Multiplex.AchsData."Offset_HMI (Offset)";
+	        
+	        
+	        
+	        
+	        //Drehmomente von HMI in DB schreiben
+	        "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Max Drehmoment Soll" := "HMI".Multiplex."AchsMoment"."Max Drehmoment Soll";
+	        "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Min Drehmoment Soll" := "HMI".Multiplex."AchsMoment"."Min Drehmoment Soll";
+	        
+	        "HMI".Multiplex."AchsMoment"."Max Drehmoment gemessen" := "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Max Drehmoment gemessen";
+	        "HMI".Multiplex."AchsMoment"."Min Drehmoment gemessen" := "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Min Drehmoment gemessen";
+	        
+	        "HMI".Multiplex."AchsMoment"."Max Drehmoment Ist" := "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Max Drehmoment Ist";
+	        "HMI".Multiplex."AchsMoment"."Min Drehmoment Ist" := "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Min Drehmoment Ist";
+	        
+	        //Aktuelle Position der Achse an HMI schicken
+	        FOR #Achse := "LOWERAXISNUMBER" TO "UPPERAXISNUMBER" BY 1 DO
+	            IF "HMI".Multiplex.ServoNr = #Achse THEN
+	                "HMI".Multiplex."Servo - aktuelle Position" := "SERVO".ActualData[#Achse].ActualPosition;
+	            END_IF;
+	        END_FOR;
+	        
+	    ELSE
+	        "HMI".Multiplex."Servo - aktuelle Position" := "A_VirtuellerMaster".ActualPosition;
+	    END_IF;
+	END_REGION
+	
+	REGION HMI_Grenzen
+	    FOR #Achse := "LOWERAXISNUMBER" TO "UPPERAXISNUMBER" BY 1 DO
+	        IF DB_ANY_TO_UINT("SERVO".Achse[#Achse]) <> 0 THEN
+	            "FC_GetLimitsSelectDrive"(i_Axis := "SERVO".Achse[#Achse],
+	                                      iq_ServoLimits := "HMI".Multiplex.AchsGrenzen[#Achse]);
+	            
+	            IF "HMI".Multiplex.ServoNr = #Achse THEN
+	                "HMI".Limits.AchsLimits := "HMI".Multiplex.AchsGrenzen[#Achse];
+	            END_IF;
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+END_FUNCTION_BLOCK
+

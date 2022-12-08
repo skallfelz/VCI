@@ -1,0 +1,466 @@
+﻿FUNCTION_BLOCK "LCamHdl_CreateCamBasic"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : CamHdl
+VERSION : 1.1
+   VAR_INPUT 
+      execute : Bool;
+      numberOfPoints : Int := -1;
+   END_VAR
+
+   VAR_OUTPUT 
+      done { ExternalWritable := 'False'} : Bool;
+      busy { ExternalWritable := 'False'} : Bool;
+      error { ExternalWritable := 'False'} : Bool;
+      status { ExternalWritable := 'False'} : Word := #STATUS_NO_CALL;
+      diagnostics { ExternalWritable := 'False'} : "LCamHdl_typeDiagnostics";
+   END_VAR
+
+   VAR_IN_OUT 
+      camProfile : Array[*] of "LCamHdl_typeBasicPoint";
+      cam {InstructionName := 'TO_Cam'; LibVersion := '6.0'} : TO_Cam;
+   END_VAR
+
+   VAR 
+      statSegments {InstructionName := 'TO_Cam_Struct_SegmentData'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Array[1..#NO_OF_CAM_SEGMENTS] of TO_Cam_Struct_SegmentData;
+      instInterpolate {InstructionName := 'MC_INTERPOLATECAM'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : MC_INTERPOLATECAM;
+      instReset {InstructionName := 'MC_RESET'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : MC_RESET;
+      statStatus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word := #STATUS_NO_CALL;
+      statState { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt := #STATE_IDLE;
+      statExecuteOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statActElement { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statActSegment { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statNoOfSegments { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statWriteCamCounter { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statError { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statBusy { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statDone { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statUpperBound { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statLowerBound { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statRepeat { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statX0 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statX1 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statY0 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statY1 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statM0 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statM1 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statK0 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statK1 { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      statPointIndex { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statTOAccessCounter { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+   END_VAR
+
+   VAR_TEMP 
+      tempNextElement : Int;
+      tempDY : LReal;
+      tempDX : LReal;
+      tempDX_2 : LReal;
+      tempDX_3 : LReal;
+      tempDX_4 : LReal;
+      tempDX_5 : LReal;
+      tempCamStatusWord : DWord;
+   END_VAR
+
+   VAR CONSTANT 
+      STATUS_EXECUTION_FINISHED : Word := 16#0000;
+      STATUS_NO_CALL : Word := 16#7000;
+      STATUS_FIRST_CALL : Word := 16#7001;
+      STATUS_SUBSEQUENT_CALL : Word := 16#7002;
+      ERR_NO_OF_POINTS_OUT_OF_BOUNDS : Word := 16#8200;
+      ERR_CAM_SEGMENTS_OUT_OF_BOUNDS : Word := 16#8201;
+      ERR_INVALID_LEADING_VALUE : Word := 16#8202;
+      ERR_CAM_DISK_IN_USE : Word := 16#8400;
+      ERR_INTERPOLATE_CAM : Word := 16#8600;
+      ERR_INVALID_STATE : Word := 16#8601;
+      ERR_RESET_CAM : Word := 16#8602;
+      STATE_IDLE : DInt;
+      STATE_FIRST_CYCLE : DInt := 1;
+      STATE_RESET_CAM : DInt := 2;
+      STATE_ADD_SEGMENTS : DInt := 3;
+      STATE_COPY_SEGMENTS : DInt := 4;
+      STATE_DELETE_UNUSED_CAM_DATA : DInt := 5;
+      STATE_INTERPOLATE_CAM : DInt := 6;
+      STATE_DONE : DInt := 7;
+      STATE_ERROR : DInt := 8;
+      MAX_NO_OF_TO_ACCESSES_PER_CYCLE : Int := 400;
+      TO_ACCESSES_SEGMENT_ADD : Int := 13;
+      TO_ACCESSES_ELEMENT_DELETE : Int := 2;
+      NO_OF_CAM_POINTS : Int := 1000;
+      NO_OF_CAM_SEGMENTS : Int := 50;
+   END_VAR
+
+
+BEGIN
+	//============================================================================================
+	// Siemens AG                                                                                 
+	// (c)Copyright 2016 All Rights Reserved                                                     
+	//--------------------------------------------------------------------------------------------
+	// Library: LCamHdl                                                                           
+	// Tested with: S7-1515T                                                                      
+	// Engineering: TIA Portal V14
+	// 
+	// Restrictions: ---                                                                          
+	// Requirements: S7-1500T                                                                       
+	// Functionality: Basic cam disk creation in the runtime system of the controller:            
+	//                With the point based #camProfile this FB calculates (the coefficients of)   
+	//                the segments for the technology object TO_Cam.                                
+	//                The interpolation of the cam is also done.                                  
+	// Support: tech.team.motioncontrol@siemens.com                                               
+	// Note: Parameter comments are only available in language 'English (United States)'          
+	//--------------------------------------------------------------------------------------------
+	// Change log table:                                                                            
+	// Version   Date         Expert in charge   Changes applied                                  
+	// 01.00.00  04.10.2016   SM                 First Released Version                           
+	// 01.00.01  31.03.2017   KP                 Added support information                        
+	//                                           Block is compilable in V14 SP1
+	// 01.01.00  17.11.2017   KP                 Change of interface             
+	//============================================================================================
+	
+	//Check if FB is triggered
+	IF #execute AND
+	  NOT #statExecuteOld
+	  // AND NOT #statBusy // FB should finish current job before new job can be started with rising edge of execute
+	THEN
+	  //Functionality is busy
+	  #statBusy := TRUE;
+	  
+	  //Reset other outputs
+	  #statError := FALSE;
+	  #statStatus := #STATUS_FIRST_CALL;
+	  #statState := #STATE_FIRST_CYCLE;
+	  
+	  #diagnostics.state := 0;
+	  #diagnostics.status := 0;
+	  #diagnostics.subfunctionStatus := 0;
+	  #diagnostics.errorElementNo := -1;
+	  
+	  #busy := #statBusy;
+	  #error := #statError;
+	  #statExecuteOld := #execute;
+	  
+	  //Check if FB is disabled (falling edge) after job is done or FB is in error state
+	ELSIF (NOT #execute AND NOT #statBusy) AND
+	  (#statError OR #statDone)
+	THEN
+	  //Error outputs are reset with falling edge of enable input
+	  #statError := FALSE;
+	  
+	  //Enable and busy are reset with falling edge of enable input
+	  #statDone := FALSE;
+	  #statBusy := FALSE;
+	  
+	  //Write outputs
+	  #statState := #STATE_IDLE;
+	  #statStatus := #STATUS_NO_CALL;
+	  
+	  #busy := #statBusy;
+	  #done := #statDone;
+	  #error := #statError;
+	  #status := #statStatus;
+	  
+	  #statExecuteOld := #execute;
+	  RETURN;
+	  
+	  //FB is currently executed and not finished
+	ELSIF #statBusy THEN
+	  #statExecuteOld := #execute;
+	  
+	  //FB is disabled
+	ELSE
+	  #statExecuteOld := #execute;
+	  RETURN;
+	END_IF;
+	//----------------------------------------------------------------------------------------------
+	REPEAT
+	  CASE #statState OF
+	    #STATE_IDLE:
+	      ;
+	      
+	    #STATE_FIRST_CYCLE:
+	      REGION STATE_FIRST_CYCLE
+	        // Initialize system functions
+	        #instInterpolate(Cam := #cam,
+	                         Execute := FALSE);
+	        #instReset(Axis := #cam,
+	                   Execute := FALSE);
+	        
+	        #statUpperBound := DINT_TO_INT(UPPER_BOUND(ARR := #camProfile, DIM := 1));
+	        #statLowerBound := DINT_TO_INT(LOWER_BOUND(ARR := #camProfile, DIM := 1));
+	        
+	        #statActElement := #statLowerBound;//Start Index of the camProfile
+	        #statActSegment := 1;
+	        #statWriteCamCounter := 1;
+	        #tempCamStatusWord := #cam.StatusWord;
+	        
+	        // Check number of points and set number of segments in cam
+	        IF (#numberOfPoints < 0) THEN
+	          // Set number of segments to limit of array
+	          #statNoOfSegments := DINT_TO_INT(#statUpperBound - #statLowerBound);
+	          
+	        ELSIF (#numberOfPoints > 1) AND (#numberOfPoints <= (#statUpperBound - #statLowerBound + 1))
+	        THEN
+	          // Number of segments are defined by input numberOfPoints
+	          #statNoOfSegments := (#numberOfPoints - 1);
+	          
+	        ELSE
+	          #statError := TRUE;
+	          #diagnostics.state := #statState;
+	          #statState := #STATE_ERROR;
+	          #statStatus := #ERR_NO_OF_POINTS_OUT_OF_BOUNDS;
+	        END_IF;
+	        
+	        // Check number of segments with capability of the TO Cam
+	        IF #statError THEN
+	          ;
+	        ELSIF (#statNoOfSegments > #NO_OF_CAM_SEGMENTS) OR (#statNoOfSegments <= 0) THEN
+	          #statError := TRUE;
+	          #diagnostics.state := #statState;
+	          #statState := #STATE_ERROR;
+	          #statStatus := #ERR_CAM_SEGMENTS_OUT_OF_BOUNDS;
+	          
+	          // Check if cam is in use
+	        ELSIF (#tempCamStatusWord.%X0 = TRUE) THEN
+	          #statError := TRUE;
+	          #diagnostics.state := #statState;
+	          #statState := #STATE_ERROR;
+	          #statStatus := #ERR_CAM_DISK_IN_USE;
+	          
+	        ELSE
+	          #statStatus := #STATUS_FIRST_CALL;
+	          
+	          // In case of pending error at TO cam - reset cam
+	          IF (#tempCamStatusWord.%X1) THEN
+	            #statState := #STATE_RESET_CAM;
+	          ELSE
+	            #statState := #STATE_ADD_SEGMENTS;
+	          END_IF;
+	          
+	          #statRepeat := TRUE;
+	        END_IF;
+	      END_REGION
+	      
+	    #STATE_RESET_CAM:
+	      REGION STATE_RESET
+	        // Acknowledge errors of cam
+	        #instReset(Axis := #cam,
+	                   Execute := TRUE);
+	        
+	        #statRepeat := FALsE;
+	        #statStatus := #STATUS_SUBSEQUENT_CALL;
+	        
+	        IF (#instReset.Done = TRUE) THEN
+	          #statRepeat := TRUE;
+	          #statState := #STATE_ADD_SEGMENTS;
+	          
+	        ELSIF (#instReset.Error = TRUE) THEN
+	          #statError := True;
+	          #diagnostics.state := #statState;
+	          #diagnostics.subfunctionStatus := #instReset.ErrorId;
+	          #statState := #STATE_ERROR;
+	          #statStatus := #ERR_RESET_CAM;
+	        END_IF;
+	      END_REGION
+	      
+	    #STATE_ADD_SEGMENTS:
+	      REGION STATE_ADD_SEGMENTS 
+	        #statStatus := #STATUS_SUBSEQUENT_CALL;
+	        #tempNextElement := #statActElement + 1;
+	        
+	        //###   Calculate general values/information   ###
+	        // Delta X between X0 (master start point) and X1 (master end point)
+	        #tempDY := #camProfile[#tempNextElement].leadingValue - #camProfile[#statActElement].leadingValue;
+	        
+	        IF (#tempDY <= 0) THEN
+	          // Next master position must be greater than last position
+	          #statError := TRUE;
+	          #diagnostics.state := #statState;
+	          #statState := #STATE_ERROR;
+	          #statStatus := #ERR_INVALID_LEADING_VALUE;
+	          #diagnostics.errorElementNo := #tempNextElement;
+	          
+	          
+	        ELSE
+	          // Delta Y between Y0 (slave start point) and Y1 (slave end point)
+	          #statX0 := #camProfile[#statActElement].leadingValue;
+	          #statX1 := #camProfile[#tempNextElement].leadingValue;
+	          #statY0 := #camProfile[#statActElement].followingValue;
+	          #statY1 := #camProfile[#tempNextElement].followingValue;
+	          #statM0 := #camProfile[#statActElement].velocityRatio;
+	          #statM1 := #camProfile[#tempNextElement].velocityRatio;
+	          #statK0 := #camProfile[#statActElement].accelerationRatio;
+	          #statK1 := #camProfile[#tempNextElement].accelerationRatio;
+	          // Runtime optimation
+	          #tempDY := #statY0 - #statY1;//Following_Range
+	          #tempDX := #statX0 - #statX1;//Leading Range
+	          #tempDX_2 := #tempDX * #tempDX;//Leading Range ^2
+	          #tempDX_3 := #tempDX_2 * #tempDX;//Leading Range ^3
+	          #tempDX_4 := #tempDX_3 * #tempDX;//Leading Range ^4
+	          #tempDX_5 := #tempDX_4 * #tempDX;//Leading Range ^5
+	          // Optimized
+	          #statSegments[#statActSegment].a0 := #statY0;
+	          #statSegments[#statActSegment].a1 := #statM0;
+	          #statSegments[#statActSegment].a2 := #statK0 * 0.5;
+	          #statSegments[#statActSegment].a3 := ((1.5 * #statK0 - 0.5 * #statK1) * #tempDX_2 - (6.0 * #statM0 + 4.0 * #statM1) * #tempDX + 10.0 * #tempDY) / #tempDX_3;
+	          #statSegments[#statActSegment].a4 := ((1.5 * #statK0 - #statK1) * #tempDX_2 - (8.0 * #statM0 + 7.0 * #statM1) * #tempDX + 15.0 * #tempDY) / #tempDX_4;
+	          #statSegments[#statActSegment].a5 := (0.5 * (#statK0 - #statK1) * #tempDX_2 - (3.0 * #statM0 + 3.0 * #statM1) * #tempDX + 6.0 * #tempDY) / #tempDX_5;
+	          #statSegments[#statActSegment].a6 := 0.0;
+	          #statSegments[#statActSegment].xmin := #statX0;
+	          #statSegments[#statActSegment].xmax := #statX1;
+	          // Increment cam segment
+	          IF (#statActSegment <= #NO_OF_CAM_SEGMENTS) THEN
+	            #statActSegment += 1;
+	          ELSE
+	            #statError := True;
+	            #diagnostics.state := #statState;
+	            #statState := #STATE_ERROR;
+	            #statStatus := #ERR_CAM_SEGMENTS_OUT_OF_BOUNDS;
+	          END_IF;
+	          
+	          // Check if last cam element was added
+	          #statActElement += 1;
+	          IF (#statActElement - #statNoOfSegments >= #statLowerBound)
+	          THEN      // go to interpolate cam
+	            #statState := #STATE_COPY_SEGMENTS;
+	          END_IF;
+	        END_IF;
+	      END_REGION
+	      
+	    #STATE_COPY_SEGMENTS:
+	      REGION STATE_WRITE_CAM
+	        // Write Segments to Cam
+	        WHILE (#statWriteCamCounter <= #statNoOfSegments) DO
+	          #cam.Segment[#statWriteCamCounter].a0 := #statSegments[#statWriteCamCounter].a0;
+	          #cam.Segment[#statWriteCamCounter].a1 := #statSegments[#statWriteCamCounter].a1;
+	          #cam.Segment[#statWriteCamCounter].a2 := #statSegments[#statWriteCamCounter].a2;
+	          #cam.Segment[#statWriteCamCounter].a3 := #statSegments[#statWriteCamCounter].a3;
+	          #cam.Segment[#statWriteCamCounter].a4 := #statSegments[#statWriteCamCounter].a4;
+	          #cam.Segment[#statWriteCamCounter].a5 := #statSegments[#statWriteCamCounter].a5;
+	          #cam.Segment[#statWriteCamCounter].a6 := #statSegments[#statWriteCamCounter].a6;
+	          #cam.Segment[#statWriteCamCounter].sineAmplitude := #statSegments[#statWriteCamCounter].sineAmplitude;
+	          #cam.Segment[#statWriteCamCounter].sinePeriod := #statSegments[#statWriteCamCounter].sinePeriod;
+	          #cam.Segment[#statWriteCamCounter].sinePhase := #statSegments[#statWriteCamCounter].sinePhase;
+	          
+	          #cam.Segment[#statWriteCamCounter].xmin := #statSegments[#statWriteCamCounter].xmin;
+	          #cam.Segment[#statWriteCamCounter].xmax := #statSegments[#statWriteCamCounter].xmax;
+	          #cam.ValidSegment[#statWriteCamCounter] := True;
+	          #statWriteCamCounter += 1;
+	        END_WHILE;
+	        
+	        #statPointIndex := 1;
+	        #statTOAccessCounter := 0;
+	        #statState := #STATE_DELETE_UNUSED_CAM_DATA;
+	        #statTOAccessCounter := #statWriteCamCounter * #TO_ACCESSES_SEGMENT_ADD;
+	      END_REGION
+	      
+	    #STATE_DELETE_UNUSED_CAM_DATA:
+	      REGION STATE_DELETE_UNUSED_CAM_DATA
+	        #statRepeat := FALSE;
+	        
+	        // Set not used segments to invalid
+	        WHILE ((#statWriteCamCounter <= #NO_OF_CAM_SEGMENTS) AND (#statTOAccessCounter <= #MAX_NO_OF_TO_ACCESSES_PER_CYCLE)) DO
+	          IF (#cam.ValidSegment[#statWriteCamCounter] = TRUE) THEN
+	            #cam.ValidSegment[#statWriteCamCounter] := FALSE;
+	            #statWriteCamCounter += 1;
+	            #statTOAccessCounter += #TO_ACCESSES_ELEMENT_DELETE;
+	          ELSE
+	            #statWriteCamCounter := #NO_OF_CAM_SEGMENTS + 1;
+	            EXIT;
+	          END_IF;
+	        END_WHILE;
+	        
+	        // Set ValidPoints to False
+	        WHILE ((#statPointIndex <= #NO_OF_CAM_POINTS) AND (#statTOAccessCounter <= #MAX_NO_OF_TO_ACCESSES_PER_CYCLE)) DO
+	          IF (#cam.ValidPoint[#statPointIndex] = TRUE) THEN
+	            #cam.ValidPoint[#statPointIndex] := FALSE;
+	            #statPointIndex += 1;
+	            #statTOAccessCounter += #TO_ACCESSES_ELEMENT_DELETE;
+	          ELSE
+	            #statState := #STATE_INTERPOLATE_CAM;
+	            #statRepeat := TRUE;
+	            EXIT;
+	          END_IF;
+	        END_WHILE;
+	        
+	        IF (#statPointIndex > #NO_OF_CAM_POINTS) THEN
+	          #statState := #STATE_INTERPOLATE_CAM;
+	          #statRepeat := TRUE;
+	        ELSE
+	          #statTOAccessCounter := 0;
+	        END_IF;
+	        
+	        
+	      END_REGION
+	      
+	    #STATE_INTERPOLATE_CAM:
+	      REGION STATE_INTERPOLATE_CAM
+	        #instInterpolate(Cam := #cam,
+	                         Execute := true);
+	        
+	        IF #instInterpolate.Done THEN
+	          #statState := #STATE_DONE;
+	          #statStatus := #STATUS_EXECUTION_FINISHED;
+	          #statDone := True;
+	          #statBusy := False;
+	          
+	        ELSIF #instInterpolate.Error THEN
+	          #statError := True;
+	          #diagnostics.state := #statState;
+	          #diagnostics.subfunctionStatus := #instInterpolate.ErrorId;
+	          #statState := #STATE_ERROR;
+	          #statStatus := #ERR_INTERPOLATE_CAM;
+	          
+	        ELSE
+	          #statRepeat := FALSE;//wait
+	        END_IF;
+	      END_REGION
+	      
+	    #STATE_DONE:
+	      ;
+	      
+	    #STATE_ERROR:
+	      REGION STATE_ERROR
+	        IF (#execute = FALSE) THEN
+	          // Decrement the numberOfRequest when allocation is returned
+	          #statStatus := #STATUS_NO_CALL;
+	          #statState := #STATE_IDLE;
+	        END_IF;
+	        #statRepeat := False;
+	      END_REGION
+	    ELSE
+	      REGION INVALID_STATE
+	        #statError := True;
+	        #statStatus := #ERR_INVALID_STATE;
+	        #statRepeat := False;
+	      END_REGION
+	  END_CASE;
+	UNTIL NOT #statRepeat
+	END_REPEAT;
+	//----------------------------------------------------------------------------------------------
+	//Write outputs and error handling
+	//----------------------------------------------------------------------------------------------
+	REGION Outputs
+	  // Error occurred in request
+	  IF #statError THEN
+	    #statDone := FALSE;
+	    #statBusy := FALSE;
+	    //#diagnostics.status := #statStatus;
+	    #diagnostics.status := #statStatus;
+	    
+	    //Request finished
+	  ELSIF #statDone THEN
+	    #statError := FALSE;
+	    #statBusy := FALSE;
+	    #statStatus := #STATUS_EXECUTION_FINISHED;
+	  END_IF;
+	  // Write static values to outputs
+	  
+	  
+	  #status := #statStatus;
+	  
+	  #error := #statError;
+	  #busy := #statBusy;
+	  #done := #statDone;
+	  //----------------------------------------------------------------------------------------------
+	END_REGION
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,23 @@
+﻿FUNCTION "LAnyAxis_UnpubCamInMasterSyncAxis" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AnyAxis
+VERSION : 1.0
+   VAR_INPUT 
+      slave {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      master {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      cam {InstructionName := 'TO_CamBase'; LibVersion := '6.0'} : TO_CamBase;
+   END_VAR
+
+   VAR_IN_OUT 
+      instMC {InstructionName := 'MC_CAMIN'; LibVersion := '6.0'} : MC_CAMIN;
+   END_VAR
+
+
+BEGIN
+	// Call of MC_Instruction
+	#instMC(Master := #master,
+	        Slave := #slave,
+	        Cam := #cam);
+END_FUNCTION
+

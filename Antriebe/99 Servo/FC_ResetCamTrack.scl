@@ -1,0 +1,22 @@
+﻿FUNCTION "FC_ResetCamTrack" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      CamTrack {InstructionName := 'TO_CamTrack'; LibVersion := '6.0'} : TO_CamTrack;
+      Execute : Bool;
+      Restart { S7_PredefinedAssignment := 'false'} : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      MC_Reset {InstructionName := 'MC_RESET'; LibVersion := '6.0'} : MC_RESET;
+   END_VAR
+
+
+BEGIN
+	#MC_Reset(Axis:=#CamTrack,
+	          Execute:=#Execute,
+	          Restart:=#Restart);
+	
+	
+END_FUNCTION
+

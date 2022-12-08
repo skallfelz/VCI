@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T10:21:16.7348916Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.GlobalDB ID="0">
+    <AttributeList>
+      <AutoNumber>false</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <DBAccessibleFromWebserver>true</DBAccessibleFromWebserver>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Static">
+    <Member Name="Leimnocken" Datatype="Array[1..8] of DB_ANY" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="Cam" Datatype="Array[&quot;LOWERAXISNUMBER&quot;..&quot;UPPERAXISNUMBER&quot;] of DB_ANY" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="Achse" Datatype="Array[&quot;LOWERAXISNUMBER&quot;..&quot;UPPERAXISNUMBER&quot;] of DB_ANY" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="AchsMoment" Datatype="Array[&quot;LOWERAXISNUMBER&quot;..&quot;UPPERAXISNUMBER&quot;] of &quot;UDT_ServoMoment&quot;" Remanence="Retain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="Max Drehmoment gemessen" Datatype="LReal" /><Member Name="Min Drehmoment gemessen" Datatype="LReal" /><Member Name="Max Drehmoment Soll" Datatype="LReal" /><Member Name="Min Drehmoment Soll" Datatype="LReal" /><Member Name="Max Drehmoment Ist" Datatype="LReal" /><Member Name="Min Drehmoment Ist" Datatype="LReal" /></Section></Sections></Member>
+    <Member Name="StatusError" Datatype="Array[&quot;LOWERAXISNUMBER&quot;..&quot;UPPERAXISNUMBER&quot;] of &quot;UDT_ServoStatusError&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="Status Achse - Simulation aktiv" Datatype="Bool" /><Member Name="Status Achse - Freigegeben" Datatype="Bool" /><Member Name="Status Achse - Lagegeregelter Betrieb" Datatype="Bool" /><Member Name="Status Achse - Referenziert" Datatype="Bool" /><Member Name="Status Achse - Fehler" Datatype="Bool" /><Member Name="Status Achse - Restart aktiv" Datatype="Bool" /><Member Name="Status Achse - Achssteuertafel aktiv" Datatype="Bool" /><Member Name="Status Achse - Antrieb bereit" Datatype="Bool" /><Member Name="Status Achse - Geberistwerte gültig" Datatype="DInt" /><Member Name="Status Achse - Aktiver Geber" Datatype="UDInt" /><Member Name="Status Achse - Restart erforderlich" Datatype="Bool" /><Member Name="Status Endschalter - Neg. SW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Endschalter - Pos. SW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Endschalter - Neg. HW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Endschalter - Pos. HW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Bewegung - Done" Datatype="Bool" /><Member Name="Status Bewegung - Referenzierauftrag" Datatype="Bool" /><Member Name="Status Bewegung - Tippen" Datatype="Bool" /><Member Name="Status Bewegung - Geschwindigkeitsvorgabe" Datatype="Bool" /><Member Name="Status Bewegung - Positionierauftrag" Datatype="Bool" /><Member Name="Status Bewegung - Konstante Geschwindigkeit" Datatype="Bool" /><Member Name="Status Bewegung - Stillstand" Datatype="Bool" /><Member Name="Status Bewegung - Beschleunigen" Datatype="Bool" /><Member Name="Status Bewegung - Verzögern" Datatype="Bool" /><Member Name="Status Bewegung - Momentenbegrenzung aktiv" Datatype="Bool" /><Member Name="Status Bewegung - Stoppauftrag aktiv" Datatype="Bool" /><Member Name="Status Gleichlauf - Aufsynchronisieren" Datatype="Bool" /><Member Name="Status Gleichlauf - Synchron" Datatype="Bool" /><Member Name="Status Gleichlauf - Aufsynchroniseren wartend" Datatype="DInt" /><Member Name="Status Gleichlauf - Additiver Leitwert aktiv" Datatype="Bool" /><Member Name="Status Gleichlauf - Überlagertes Profil" Datatype="Bool" /><Member Name="Fehler - System" Datatype="Bool" /><Member Name="Fehler - Konfiguration" Datatype="Bool" /><Member Name="Fehler - Anwenderprogramm" Datatype="Bool" /><Member Name="Fehler - Antrieb" Datatype="Bool" /><Member Name="Fehler - Geber" Datatype="Bool" /><Member Name="Fehler - Datenaustausch" Datatype="Bool" /><Member Name="Fehler - Peripherie" Datatype="Bool" /><Member Name="Fehler - Auftrag abgewiesen" Datatype="Bool" /><Member Name="Fehler - Referenzieren" Datatype="Bool" /><Member Name="Fehler - Positionieren" Datatype="Bool" /><Member Name="Fehler - Dynamikbegrenzung" Datatype="Bool" /><Member Name="Fehler - Schleppfehler" Datatype="Bool" /><Member Name="Fehler - SW-Endschalter" Datatype="Bool" /><Member Name="Fehler - HW-Endschalter" Datatype="Bool" /><Member Name="Fehler - Adaptieren" Datatype="Bool" /><Member Name="Fehler - Aufsynchronisieren" Datatype="Bool" /><Member Name="Warnungen - Konfiguration" Datatype="Bool" /><Member Name="Warnungen - Auftrag abgewiesen" Datatype="Bool" /><Member Name="Warnungen - Dynamikbegrenzung" Datatype="Bool" /><Member Name="Warnungen - Aufsynchronisieren" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="ActualData" Datatype="Array[&quot;LOWERAXISNUMBER&quot;..&quot;UPPERAXISNUMBER&quot;] of &quot;UDT_ServoActualData&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="ActualPosition" Datatype="LReal" /><Member Name="ActualVelocity" Datatype="LReal" /><Member Name="ActualTorque" Datatype="LReal" /><Member Name="Modulo" Datatype="LReal" /></Section></Sections></Member>
+    <Member Name="StatusError_VM" Datatype="&quot;UDT_ServoStatusError&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="Status Achse - Simulation aktiv" Datatype="Bool" /><Member Name="Status Achse - Freigegeben" Datatype="Bool" /><Member Name="Status Achse - Lagegeregelter Betrieb" Datatype="Bool" /><Member Name="Status Achse - Referenziert" Datatype="Bool" /><Member Name="Status Achse - Fehler" Datatype="Bool" /><Member Name="Status Achse - Restart aktiv" Datatype="Bool" /><Member Name="Status Achse - Achssteuertafel aktiv" Datatype="Bool" /><Member Name="Status Achse - Antrieb bereit" Datatype="Bool" /><Member Name="Status Achse - Geberistwerte gültig" Datatype="DInt" /><Member Name="Status Achse - Aktiver Geber" Datatype="UDInt" /><Member Name="Status Achse - Restart erforderlich" Datatype="Bool" /><Member Name="Status Endschalter - Neg. SW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Endschalter - Pos. SW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Endschalter - Neg. HW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Endschalter - Pos. HW-Endschalter angefahren" Datatype="Bool" /><Member Name="Status Bewegung - Done" Datatype="Bool" /><Member Name="Status Bewegung - Referenzierauftrag" Datatype="Bool" /><Member Name="Status Bewegung - Tippen" Datatype="Bool" /><Member Name="Status Bewegung - Geschwindigkeitsvorgabe" Datatype="Bool" /><Member Name="Status Bewegung - Positionierauftrag" Datatype="Bool" /><Member Name="Status Bewegung - Konstante Geschwindigkeit" Datatype="Bool" /><Member Name="Status Bewegung - Stillstand" Datatype="Bool" /><Member Name="Status Bewegung - Beschleunigen" Datatype="Bool" /><Member Name="Status Bewegung - Verzögern" Datatype="Bool" /><Member Name="Status Bewegung - Momentenbegrenzung aktiv" Datatype="Bool" /><Member Name="Status Bewegung - Stoppauftrag aktiv" Datatype="Bool" /><Member Name="Status Gleichlauf - Aufsynchronisieren" Datatype="Bool" /><Member Name="Status Gleichlauf - Synchron" Datatype="Bool" /><Member Name="Status Gleichlauf - Aufsynchroniseren wartend" Datatype="DInt" /><Member Name="Status Gleichlauf - Additiver Leitwert aktiv" Datatype="Bool" /><Member Name="Status Gleichlauf - Überlagertes Profil" Datatype="Bool" /><Member Name="Fehler - System" Datatype="Bool" /><Member Name="Fehler - Konfiguration" Datatype="Bool" /><Member Name="Fehler - Anwenderprogramm" Datatype="Bool" /><Member Name="Fehler - Antrieb" Datatype="Bool" /><Member Name="Fehler - Geber" Datatype="Bool" /><Member Name="Fehler - Datenaustausch" Datatype="Bool" /><Member Name="Fehler - Peripherie" Datatype="Bool" /><Member Name="Fehler - Auftrag abgewiesen" Datatype="Bool" /><Member Name="Fehler - Referenzieren" Datatype="Bool" /><Member Name="Fehler - Positionieren" Datatype="Bool" /><Member Name="Fehler - Dynamikbegrenzung" Datatype="Bool" /><Member Name="Fehler - Schleppfehler" Datatype="Bool" /><Member Name="Fehler - SW-Endschalter" Datatype="Bool" /><Member Name="Fehler - HW-Endschalter" Datatype="Bool" /><Member Name="Fehler - Adaptieren" Datatype="Bool" /><Member Name="Fehler - Aufsynchronisieren" Datatype="Bool" /><Member Name="Warnungen - Konfiguration" Datatype="Bool" /><Member Name="Warnungen - Auftrag abgewiesen" Datatype="Bool" /><Member Name="Warnungen - Dynamikbegrenzung" Datatype="Bool" /><Member Name="Warnungen - Aufsynchronisieren" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="Dynamikwerte" Datatype="&quot;UDT_ServoData&quot;" Remanence="Retain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="ACC" Datatype="LReal" /><Member Name="DC" Datatype="LReal" /><Member Name="Stop Position" Datatype="LReal" /><Member Name="MasterOffset" Datatype="LReal" /><Member Name="SlaveOffset" Datatype="LReal" /><Member Name="Max Position" Datatype="LReal" /><Member Name="Min Position" Datatype="LReal" /><Member Name="Wendepunktverschiebung" Datatype="LReal" /><Member Name="Offset_HMI (Phasing)" Datatype="LReal" /><Member Name="Offset_HMI (Offset)" Datatype="LReal" /><Member Name="aktuellesPhasing" Datatype="LReal" /><Member Name="aktuellerOffset" Datatype="LReal" /><Member Name="Kurvenscheibe aktiv" Datatype="Bool" /><Member Name="Doppelhub aktiv" Datatype="Bool" /><Member Name="Doppelhub" Datatype="LReal" /></Section></Sections></Member>
+    <Member Name="Position_VM" Datatype="LReal" Remanence="Retain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="Freigabe" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+  </Section>
+</Sections></Interface>
+      <IsOnlyStoredInLoadMemory>false</IsOnlyStoredInLoadMemory>
+      <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+      <IsWriteProtectedInAS>false</IsWriteProtectedInAS>
+      <MemoryLayout>Optimized</MemoryLayout>
+      <MemoryReserve>100</MemoryReserve>
+      <Name>SERVO</Name>
+      <Number>1300</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="5" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="6" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="7" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="8" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.GlobalDB>
+</Document>

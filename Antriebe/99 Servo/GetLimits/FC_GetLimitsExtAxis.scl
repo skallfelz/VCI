@@ -1,0 +1,43 @@
+﻿FUNCTION "FC_GetLimitsExtAxis" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Axis {InstructionName := 'TO_ExternalEncoder'; LibVersion := '6.0'} : TO_ExternalEncoder;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_ServoLimits : "UDT_ServoLimits";
+   END_VAR
+
+   VAR_TEMP 
+      temp_ServoLimits : "UDT_ServoLimits";
+   END_VAR
+
+
+BEGIN
+	REGION GET LIMITS
+	    IF #i_Axis.Modulo.Enable THEN
+	        #temp_ServoLimits.MinPosition := #i_Axis.Modulo.StartValue;
+	        #temp_ServoLimits.MaxPosition := #i_Axis.Modulo.StartValue + #i_Axis.Modulo.Length;
+	    END_IF;
+	    
+	    IF NOT #i_Axis.Modulo.Enable THEN
+	        #temp_ServoLimits.MinPosition := -99999.9;
+	        #temp_ServoLimits.MaxPosition := 99999.9;
+	    END_IF;
+	    
+	    #temp_ServoLimits.MinVel := 100.0;
+	    #temp_ServoLimits.MaxVel := 100.0;
+	    
+	    #temp_ServoLimits.MinACC := 100.0;
+	    #temp_ServoLimits.MaxACC := 100.0;
+	    
+	    #temp_ServoLimits.MinACC := 100.0;
+	    #temp_ServoLimits.MaxACC := 100.0;
+	END_REGION
+	
+	REGION OUTPUT
+	    #iq_ServoLimits := #temp_ServoLimits;
+	END_REGION
+END_FUNCTION
+

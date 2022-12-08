@@ -1,0 +1,68 @@
+﻿FUNCTION "FC_GetLimitsPosAxis" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Axis {InstructionName := 'TO_PositioningAxis'; LibVersion := '6.0'} : TO_PositioningAxis;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_ServoLimits : "UDT_ServoLimits";
+   END_VAR
+
+   VAR_TEMP 
+      temp_ServoLimits : "UDT_ServoLimits";
+   END_VAR
+
+
+BEGIN
+	REGION GET LIMITS
+	    IF #i_Axis.Modulo.Enable THEN
+	        #temp_ServoLimits.MinPosition := #i_Axis.Modulo.StartValue;
+	        #temp_ServoLimits.MaxPosition := #i_Axis.Modulo.StartValue + #i_Axis.Modulo.Length;
+	        
+	        #temp_ServoLimits.MinVel := 1.0;
+	        #temp_ServoLimits.MaxVel := #i_Axis.DynamicLimits.MaxVelocity;
+	        
+	        #temp_ServoLimits.MinACC := 100.0;
+	        #temp_ServoLimits.MaxACC := #i_Axis.DynamicLimits.MaxAcceleration;
+	        
+	        #temp_ServoLimits.MinACC := 100.0;
+	        #temp_ServoLimits.MaxACC := #i_Axis.DynamicLimits.MaxDeceleration;
+	    END_IF;
+	    
+	    IF NOT #i_Axis.Modulo.Enable
+	        AND (#i_Axis.PositionLimits_SW.Active) THEN
+	        #temp_ServoLimits.MinPosition := #i_Axis.PositionLimits_SW.MinPosition;
+	        #temp_ServoLimits.MaxPosition := #i_Axis.PositionLimits_SW.MaxPosition;
+	        
+	        #temp_ServoLimits.MinVel := 1.0;
+	        #temp_ServoLimits.MaxVel := #i_Axis.DynamicLimits.MaxVelocity;
+	        
+	        #temp_ServoLimits.MinACC := 100.0;
+	        #temp_ServoLimits.MaxACC := #i_Axis.DynamicLimits.MaxAcceleration;
+	        
+	        #temp_ServoLimits.MinACC := 100.0;
+	        #temp_ServoLimits.MaxACC := #i_Axis.DynamicLimits.MaxDeceleration;
+	    END_IF;
+	    
+	    IF NOT #i_Axis.Modulo.Enable
+	        AND NOT #i_Axis.PositionLimits_SW.Active THEN
+	        #temp_ServoLimits.MinPosition := -99999.9;
+	        #temp_ServoLimits.MaxPosition := 99999.9;
+	        
+	        #temp_ServoLimits.MinVel := 1.0;
+	        #temp_ServoLimits.MaxVel := #i_Axis.DynamicLimits.MaxVelocity;
+	        
+	        #temp_ServoLimits.MinACC := 100.0;
+	        #temp_ServoLimits.MaxACC := #i_Axis.DynamicLimits.MaxAcceleration;
+	        
+	        #temp_ServoLimits.MinACC := 100.0;
+	        #temp_ServoLimits.MaxACC := #i_Axis.DynamicLimits.MaxDeceleration;
+	    END_IF;
+	END_REGION
+	
+	REGION OUTPUT
+	    #iq_ServoLimits := #temp_ServoLimits;
+	END_REGION
+END_FUNCTION
+

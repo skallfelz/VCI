@@ -1,0 +1,589 @@
+﻿FUNCTION_BLOCK "FB_CamInWithOffset"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_enable { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      i_MasterAxis {InstructionName := 'TO_PositioningAxis'; LibVersion := '6.0'} : TO_PositioningAxis;
+      i_SlaveAxis {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      i_Cam {InstructionName := 'TO_Cam'; LibVersion := '6.0'} : TO_Cam;
+      i_MasterScaling { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_PredefinedAssignment := '1.0'} : LReal := 1.0;
+      i_SlaveScaling { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_PredefinedAssignment := '1.0'} : LReal := 1.0;
+      i_SyncProfileReference { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_PredefinedAssignment := '2'} : DInt := 2;   // 0 = pre-sync by dynamics, 1 = pre-sync by leading value, 2 = sync direct, 3 = sync by dynamik afterward, 4 = sync by leading value afterward, 5 = sync direct on cam end
+      i_Velocity { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal := -1.0;
+      i_ACC { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_PredefinedAssignment := '-1.0'} : LReal := -1.0;
+      i_DC { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_PredefinedAssignment := '-1.0'} : LReal := -1.0;
+      i_ApplicationMode { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt := 2;   // 0 = once, 1 = cycle, 2 = cycle continous
+      i_SyncDirection { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt := 3;   // 1 = positive, 2 = negative, 3 = shortest way
+      i_PhasingPlus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      i_PhasingMinus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      i_OffsetPlus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      i_OffsetMinus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      q_done { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      q_busy { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      q_error { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      q_errorID { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word;
+      q_status { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word;
+      q_InSync { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      q_StartSync { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_AxisData : "UDT_ServoData";
+   END_VAR
+
+   VAR 
+      stat_done { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_busy { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_error { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_errorID { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word;
+      stat_status { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word;
+      stat_InSync { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_StartSync { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_EnableOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_StartPhasingPositive { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_StartPhasingNegative { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_StartOffsetPositive { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_StartOffsetNegative { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_PhasingPlusOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_PhasingMinusOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_OffsetPlusOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_OffsetMinusOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      stat_FBStateMachine { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      stat_GeneratedLeadingValue { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      stat_GeneratedLeadingValueStandardised { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      stat_GeneratedFollowingValue { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      stat_GeneratedFollowingValueStandardised { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      stat_Interpolate {InstructionName := 'MC_INTERPOLATECAM'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_INTERPOLATECAM;
+      stat_GetLeadingValue {InstructionName := 'MC_GETCAMLEADINGVALUE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_GETCAMLEADINGVALUE;
+      stat_GetFollowingValue {InstructionName := 'MC_GETCAMFOLLOWINGVALUE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_GETCAMFOLLOWINGVALUE;
+      stat_MoveAbsolute {InstructionName := 'MC_MOVEABSOLUTE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_MOVEABSOLUTE;
+      stat_CamIn {InstructionName := 'MC_CAMIN'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_CAMIN;
+      stat_PhasingAbsolute {InstructionName := 'MC_PHASINGABSOLUTE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_PHASINGABSOLUTE;
+      stat_PhasingRelative {InstructionName := 'MC_PHASINGRELATIVE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_PHASINGRELATIVE;
+      stat_OffsetAbsolute {InstructionName := 'MC_OFFSETABSOLUTE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_OFFSETABSOLUTE;
+      stat_OffsetRelative {InstructionName := 'MC_OFFSETRELATIVE'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_OFFSETRELATIVE;
+      stat_CamOut {InstructionName := 'MC_CAMOUT'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_CAMOUT;
+   END_VAR
+
+   VAR_TEMP 
+      temp_Enable : Bool;
+      temp_MasterScaling : LReal;
+      temp_SlaveScaling : LReal;
+      temp_SyncProfileReference : DInt;   // 0 = pre-sync by dynamics, 1 = pre-sync by leading value, 2 = sync direct, 3 = sync by dynamik afterward, 4 = sync by leading value afterward, 5 = sync direct on cam end
+      temp_Velocity : LReal;
+      temp_ACC : LReal;
+      temp_DC : LReal;
+      temp_ApplicationMode : DInt;   // 0 = once, 1 = cycle, 2 = cycle continous
+      temp_SyncDirection : DInt;   // 1 = positive, 2 = negative, 3 = shortest way
+      temp_PhasingPlus : Bool;
+      temp_PhasingMinus : Bool;
+      temp_OffsetPlus : Bool;
+      temp_OffsetMinus : Bool;
+      "temp_GetFollowingValue.LeadingValue" : LReal;
+      temp_GetLeadingValue : LReal;
+   END_VAR
+
+   VAR CONSTANT 
+      FB_STATE_NO_PROCESS : Int := 0;
+      FB_STATE_START_PROCESSING : Int := 10;
+      FB_STATE_INTERPOLATE : Int := 20;
+      FB_STATE_GET_LEADING_VALUE : Int := 30;
+      FB_STATE_GET_FOLLOWING_VALUE : Int := 40;
+      FB_STATE_MOVE_AXIS : Int := 50;
+      FB_STATE_CAMIN : Int := 60;
+      FB_STATE_AXIS_SYNC : Int := 70;
+      FB_STATE_PHASESHIFT_ABSOLUTE : Int := 80;
+      FB_STATE_PHASESHIFT_RELATIVE : Int := 90;
+      FB_STATE_OFFSET_ABSOLUTE : Int := 100;
+      FB_STATE_OFFSET_RELATIVE : Int := 110;
+      FB_STATE_CAMOUT : Int := 120;
+      STATUS_EXECUTION_FINISHED : Word := 16#0000;   // Execution finished without errors
+      STATUS_NO_CALL : Word := 16#7000;   // No job being currently processed
+      STATUS_FIRST_CALL : Word := 16#7001;   // First call after incoming new job (rising edge 'execute')
+      STATUS_SUBSEQUENT_CALL : Word := 16#7002;   // Subsequent call during active processing without further details
+      ERROR_INTERPOLATE : Word := 16#8003;
+      ERROR_FOLLOWINGVALUE : Word := 16#8004;
+      ERROR_LEADINGVALUE : Word := 16#8005;
+      ERROR_CAMIN : Word := 16#8006;
+      ERROR_MOVEABSOLUTE : Word := 16#8007;
+      ERROR_PHASING_ABSOLUTE : Word := 16#8009;
+      ERROR_PHASING_RELATIVE : Word := 16#8010;
+      ERROR_OFFSET_ABSOLUTE : Word := 16#8011;
+      ERROR_OFFSET_RELATIVE : Word := 16#8012;
+      ERROR_CAMOUT : Word := 16#8013;
+      POSITIVE_DIRECTION : Int := 1;
+      NEGATIVE_DIRECTION : Int := 2;
+      SHORTEST_WAY : Int := 3;
+      PHASING_DIRECTION_POSITIVE : Int := 1;
+      PHASING_DIRECTION_NEGATIVE : Int := 2;
+      PHASING_DIRECTION_SAME : Int := 3;
+      OFFSET_DIRECTION_POSITIVE : Int := 1;
+      OFFSET_DIRECTION_NEGATIVE : Int := 2;
+      OFFSET_DIRECTION_SAME : Int := 3;
+   END_VAR
+
+
+BEGIN
+	//==========================================================================================
+	// Econo-PAK GmbH
+	//------------------------------------------------------------------------------------------
+	// The FB is executing a sequence to calculate position for CamIn. move axis and sync axis
+	// includes phaseshift and offset
+	//------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   25.02.2022    SK                  First release version v1.0
+	// 01.00.01   04.03.2022    SK                  Add function MC_CAMOUT
+	// 01.00.02   07.03.2022    SK                  Fixed the calculation for pre positioning
+	// 01.00.03   08.03.2022    SK                  Fixed the MasterSyncPos, now with Modulo
+	// 01.00.04   09.03.2022    SK                  Implement phasing and offset
+	// 01.00.05   10.03.2022    SK                  Add some comments
+	// 01.00.06   29.03.2022    SK                  Changed Phasing & Offset for non-production mode
+	//===========================================================================================
+	
+	REGION MAP INPUTS
+	    #temp_Enable                    := #i_enable;
+	    #temp_MasterScaling             := #i_MasterScaling;
+	    #temp_SlaveScaling              := #i_SlaveScaling;
+	    #temp_SyncProfileReference      := #i_SyncProfileReference;
+	    #temp_Velocity                  := #i_Velocity;
+	    #temp_ACC                       := #i_ACC;
+	    #temp_DC                        := #i_DC;
+	    #temp_ApplicationMode           := #i_ApplicationMode;
+	    #temp_SyncDirection             := #i_SyncDirection;
+	    #temp_PhasingPlus               := #i_PhasingPlus;
+	    #temp_PhasingMinus              := #i_PhasingMinus;
+	    #temp_OffsetPlus                := #i_OffsetPlus;
+	    #temp_OffsetMinus               := #i_OffsetMinus;
+	END_REGION
+	
+	REGION ENABLING/DISABLING
+	    IF (#temp_Enable = TRUE) AND (#stat_status = #STATUS_NO_CALL) THEN // Enable FB
+	        // First call; initialize FB
+	        #stat_busy := TRUE;
+	        #stat_error := FALSE;
+	        #stat_status := #STATUS_FIRST_CALL;
+	        #stat_errorID := 16#0000;
+	        
+	        #stat_GeneratedLeadingValue := 0.0;
+	        #stat_GeneratedFollowingValue := 0.0;
+	        
+	        #stat_FBStateMachine := #FB_STATE_START_PROCESSING; // State machine - start processing
+	        
+	        // initialize functionality: reset of variables, diagnostics, etc.
+	        #stat_InSync := FALSE;
+	        
+	    ELSIF (#temp_Enable = FALSE) AND (#stat_EnableOld = TRUE) THEN // Disable FB 
+	        #stat_status := #STATUS_EXECUTION_FINISHED;
+	        
+	    ELSIF (#stat_status = #STATUS_FIRST_CALL) THEN // Set status identifier of subsequent call
+	        #stat_status := #STATUS_SUBSEQUENT_CALL;
+	    END_IF;
+	    
+	    // Edge detection 'enable' input
+	    #stat_EnableOld := #temp_Enable;
+	END_REGION ENABLING/DISABLING
+	
+	REGION STATE_MACHINE
+	    CASE #stat_FBStateMachine OF
+	        #FB_STATE_NO_PROCESS:
+	            REGION STATE_IDLE
+	                ;
+	            END_REGION
+	        #FB_STATE_START_PROCESSING:
+	            REGION STATE_START_PROCESSING
+	                #stat_FBStateMachine := #FB_STATE_INTERPOLATE;
+	            END_REGION
+	        #FB_STATE_INTERPOLATE:
+	            REGION STATE_INTERPOLATE
+	                IF #stat_Interpolate.Done
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_GET_FOLLOWING_VALUE;
+	                END_IF;
+	                IF #stat_Interpolate.Done
+	                    AND FALSE
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_GET_LEADING_VALUE;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_GET_LEADING_VALUE:
+	            REGION STATE_GET_LEADING_VALUE
+	                IF #stat_GetLeadingValue.Done
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_MOVE_AXIS;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_GET_FOLLOWING_VALUE:
+	            REGION STATE_GET_FOLLOWING_VALUE
+	                IF #stat_GetFollowingValue.Done
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_MOVE_AXIS;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_MOVE_AXIS:
+	            REGION STATE_MOVE_AXIS
+	                IF #stat_MoveAbsolute.Done
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_CAMIN;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_CAMIN:
+	            REGION STATE_CAMIN
+	                IF #stat_CamIn.InSync
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_AXIS_SYNC;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_AXIS_SYNC:
+	            REGION STATE_AXIS_SYNC
+	                #stat_InSync := TRUE;
+	                
+	                #stat_StartPhasingPositive := FALSE;
+	                #stat_StartPhasingNegative := FALSE;
+	                #stat_StartOffsetPositive := FALSE;
+	                #stat_StartOffsetNegative := FALSE;
+	                
+	                IF ((#temp_PhasingMinus AND NOT #stat_PhasingMinusOld)
+	                    OR (#temp_PhasingPlus AND NOT #stat_PhasingPlusOld))
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_PHASESHIFT_RELATIVE;
+	                END_IF;
+	                
+	                IF ((#temp_OffsetMinus AND NOT #stat_OffsetMinusOld)
+	                    OR (#temp_OffsetPlus AND NOT #stat_OffsetPlusOld))
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_OFFSET_RELATIVE;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_PHASESHIFT_RELATIVE:
+	            REGION STATE_PHASESHIFT
+	                IF #stat_PhasingRelative.Done
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_AXIS_SYNC;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_OFFSET_RELATIVE:
+	            REGION STATE_OFFSET
+	                IF #stat_OffsetRelative.Done
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_AXIS_SYNC;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_CAMOUT:
+	            REGION STATE_CAMOUT
+	                IF #stat_CamOut.Done
+	                    OR #stat_InSync = FALSE
+	                THEN
+	                    #stat_FBStateMachine := #FB_STATE_NO_PROCESS;
+	                    #stat_InSync := FALSE;
+	                END_IF;
+	            END_REGION
+	        ELSE
+	            ;
+	    END_CASE;
+	END_REGION
+	
+	REGION CALL FUNCTIONS
+	    REGION FB_INTERPOLATE
+	        //Call function
+	        #stat_Interpolate(Cam := #i_Cam,
+	                          Execute:=#stat_FBStateMachine = #FB_STATE_INTERPOLATE);
+	        
+	        //Error Handling
+	        IF #stat_Interpolate.Error THEN
+	            #stat_status := #ERROR_INTERPOLATE;
+	            #stat_errorID := #stat_Interpolate.ErrorId;
+	        END_IF;
+	        
+	    END_REGION
+	    
+	    REGION FB_GETLEADINGVALUE
+	        //NOT IN USE, BUT PREPARED IN STATE MANAGER
+	        #stat_GetLeadingValue(Cam := #i_Cam,
+	                              Execute:=#stat_FBStateMachine = #FB_STATE_GET_LEADING_VALUE);
+	        
+	        IF #stat_GetLeadingValue.Done
+	        THEN
+	            #stat_GeneratedLeadingValueStandardised := #stat_GetLeadingValue.Value;
+	            #stat_GeneratedLeadingValue := ((#temp_MasterScaling / #i_MasterAxis.Modulo.Length) * #stat_GetLeadingValue.Value);
+	        END_IF;
+	        
+	        //Error Handling
+	        IF #stat_GetLeadingValue.Error THEN
+	            #stat_status := #ERROR_LEADINGVALUE;
+	            #stat_errorID := #stat_GetLeadingValue.ErrorId;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION FB_GETFOLLOWINGVALUE
+	        //Calculate Position for leading value
+	        #"temp_GetFollowingValue.LeadingValue" := #i_MasterAxis.ActualPosition + #iq_AxisData.MasterOffset;
+	        
+	        IF (#i_MasterAxis.ActualPosition + #iq_AxisData.MasterOffset) > #i_MasterAxis.Modulo.Length
+	        THEN
+	            #"temp_GetFollowingValue.LeadingValue" := (#i_MasterAxis.ActualPosition + #iq_AxisData.MasterOffset) - #i_MasterAxis.Modulo.Length;
+	        END_IF;
+	        
+	        IF (#i_MasterAxis.ActualPosition + #iq_AxisData.MasterOffset) < 0.0
+	        THEN
+	            #"temp_GetFollowingValue.LeadingValue" := #i_MasterAxis.Modulo.Length + (#i_MasterAxis.ActualPosition + #iq_AxisData.MasterOffset);
+	        END_IF;
+	        
+	        #stat_GetFollowingValue.LeadingValue := (1.0 / #temp_MasterScaling) * #"temp_GetFollowingValue.LeadingValue";
+	        
+	        //Call function
+	        #stat_GetFollowingValue(Cam := #i_Cam,
+	                                Execute:=#stat_FBStateMachine = #FB_STATE_GET_FOLLOWING_VALUE,
+	                                LeadingValue:=#stat_GetFollowingValue.LeadingValue);
+	        
+	        // Save Values
+	        IF #stat_GetFollowingValue.Done
+	        THEN
+	            #stat_GeneratedFollowingValueStandardised := #stat_GetFollowingValue.Value + ((1.0 / #temp_SlaveScaling) * #iq_AxisData.SlaveOffset);
+	            
+	            IF (#stat_GetFollowingValue.Value + ((1.0 / #temp_SlaveScaling)) * #iq_AxisData.SlaveOffset) > 1.0
+	            THEN
+	                #stat_GeneratedFollowingValueStandardised := (#stat_GetFollowingValue.Value + ((1.0 / #temp_SlaveScaling) * #iq_AxisData.SlaveOffset)) - 1.0;
+	            END_IF;
+	            
+	            IF #stat_GetFollowingValue.Value + ((1.0 / #temp_SlaveScaling) * #iq_AxisData.SlaveOffset) < 0.0
+	            THEN
+	                #stat_GeneratedFollowingValueStandardised := 1.0 + (#stat_GetFollowingValue.Value + ((1.0 / #temp_SlaveScaling) * #iq_AxisData.SlaveOffset));
+	            END_IF;
+	            
+	        END_IF;
+	        
+	        #stat_GeneratedFollowingValue := #stat_GeneratedFollowingValueStandardised * #i_SlaveAxis.Modulo.Length;
+	        
+	        //Error Handling
+	        IF #stat_GetFollowingValue.Error THEN
+	            #stat_status := #ERROR_FOLLOWINGVALUE;
+	            #stat_errorID := #stat_GetFollowingValue.ErrorId;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION FB_MOVEABSOLUTE
+	        //Call function
+	        #stat_MoveAbsolute(Axis := #i_SlaveAxis,
+	                           Execute := #stat_FBStateMachine = #FB_STATE_MOVE_AXIS,
+	                           Position:=#stat_GeneratedFollowingValue,
+	                           Velocity:=#temp_Velocity,
+	                           Acceleration:=#temp_ACC,
+	                           Deceleration:=#temp_DC,
+	                           Jerk:=-1,
+	                           Direction:=#SHORTEST_WAY);
+	        
+	        //Error Handling
+	        IF #stat_MoveAbsolute.Error THEN
+	            #stat_status := #ERROR_MOVEABSOLUTE;
+	            #stat_errorID := #stat_MoveAbsolute.ErrorId;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION FB_CAMIN
+	        //Call function
+	        #stat_CamIn(Master := #i_MasterAxis,
+	                    Slave := #i_SlaveAxis,
+	                    Cam := #i_Cam,
+	                    Execute:=#stat_FBStateMachine = #FB_STATE_CAMIN,
+	                    MasterOffset:=#iq_AxisData.MasterOffset,
+	                    SlaveOffset:=#iq_AxisData.SlaveOffset,
+	                    MasterScaling:=#temp_MasterScaling,
+	                    SlaveScaling:=#temp_SlaveScaling,
+	                    MasterSyncPosition:=(#stat_GetFollowingValue.LeadingValue * #temp_MasterScaling),
+	                    SyncProfileReference:=#temp_SyncProfileReference,
+	                    Velocity:=#temp_Velocity,
+	                    Acceleration:=#temp_ACC,
+	                    Deceleration:=#temp_DC,
+	                    Jerk:=-1,
+	                    ApplicationMode:=#temp_ApplicationMode,
+	                    SyncDirection:=#temp_SyncDirection);
+	        
+	        //Error Handling
+	        IF #stat_CamIn.Error THEN
+	            #stat_status := #ERROR_CAMIN;
+	            #stat_errorID := #stat_CamIn.ErrorId;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION FB_PHASINGRELATIVE
+	        //Decide in what direction the phaseshift has do be
+	        IF #temp_PhasingPlus AND NOT #stat_PhasingPlusOld
+	        THEN
+	            #stat_PhasingRelative.Direction := #PHASING_DIRECTION_SAME;
+	            #stat_StartPhasingPositive := TRUE;
+	            #stat_PhasingRelative.PhaseShift := (#iq_AxisData."Offset_HMI (Phasing)");
+	        ELSIF #temp_PhasingMinus AND NOT #stat_PhasingMinusOld
+	        THEN
+	            #stat_PhasingRelative.Direction := #PHASING_DIRECTION_SAME;
+	            #stat_StartPhasingNegative := TRUE;
+	            #stat_PhasingRelative.PhaseShift := -(#iq_AxisData."Offset_HMI (Phasing)");
+	        END_IF;
+	        
+	        //Reset bools and abort a waiting phase shift
+	        IF #stat_FBStateMachine = #FB_STATE_CAMOUT THEN
+	            #stat_StartPhasingPositive := FALSE;
+	            #stat_StartPhasingNegative := FALSE;
+	            #stat_PhasingRelative.ProfileReference := 5;
+	        ELSE
+	            #stat_PhasingRelative.ProfileReference := 1;
+	        END_IF;
+	        
+	        //save bool state to generate flags
+	        #stat_PhasingPlusOld := #temp_PhasingPlus;
+	        #stat_PhasingMinusOld := #temp_PhasingMinus;
+	        
+	        //Call function
+	        #stat_PhasingRelative(Master := #i_MasterAxis,
+	                              Slave := #i_SlaveAxis,
+	                              Execute := (((#stat_StartPhasingPositive OR #stat_StartPhasingNegative) AND #stat_FBStateMachine = #FB_STATE_PHASESHIFT_RELATIVE) OR #stat_FBStateMachine = #FB_STATE_CAMOUT),
+	                              Velocity := 75.0,
+	                              Acceleration := 500.0,
+	                              Deceleration := 500.0,
+	                              Jerk := -1.0,
+	                              PhasingDistance := 100.0);
+	        
+	        //Calculate the phaseshift to formatdata
+	        IF #stat_PhasingRelative.Done OR (#i_MasterAxis.ActualVelocity = 0) THEN
+	            IF #stat_StartPhasingPositive THEN
+	                #iq_AxisData.MasterOffset += #iq_AxisData."Offset_HMI (Phasing)";
+	                #stat_StartPhasingPositive := FALSE;
+	            END_IF;
+	            IF #stat_StartPhasingNegative THEN
+	                #iq_AxisData.MasterOffset -= #iq_AxisData."Offset_HMI (Phasing)";
+	                #stat_StartPhasingNegative := FALSE;
+	            END_IF;
+	            
+	            //Check for Modulolimits
+	            IF #iq_AxisData.MasterOffset > #i_MasterAxis.Modulo.Length
+	            THEN
+	                #iq_AxisData.MasterOffset := #iq_AxisData.MasterOffset - #i_MasterAxis.Modulo.Length;
+	            ELSIF #iq_AxisData.MasterOffset < 0.0
+	            THEN
+	                #iq_AxisData.MasterOffset := #i_MasterAxis.Modulo.Length + #iq_AxisData.MasterOffset;
+	            END_IF;
+	        END_IF;
+	        
+	        //Error Handling
+	        IF #stat_PhasingRelative.Error THEN
+	            #stat_StartPhasingPositive := FALSE;
+	            #stat_StartPhasingNegative := FALSE;
+	            #stat_status := #ERROR_PHASING_RELATIVE;
+	            #stat_errorID := #stat_PhasingRelative.ErrorId;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION FB_OFFSETRELATIVE
+	        //Decide in what direction the offset has do be
+	        IF #temp_OffsetPlus AND NOT #stat_OffsetPlusOld
+	        THEN
+	            #stat_OffsetRelative.Direction := #OFFSET_DIRECTION_SAME;
+	            #stat_StartOffsetPositive := TRUE;
+	            #stat_OffsetRelative.Offset := (#iq_AxisData."Offset_HMI (Offset)");
+	        ELSIF #temp_OffsetMinus AND NOT #stat_OffsetMinusOld
+	        THEN
+	            #stat_OffsetRelative.Direction := #OFFSET_DIRECTION_SAME;
+	            #stat_StartOffsetNegative := TRUE;
+	            #stat_OffsetRelative.Offset := -(#iq_AxisData."Offset_HMI (Offset)");
+	        END_IF;
+	        
+	        //Reset bools and abort a waiting offset
+	        IF #stat_FBStateMachine = #FB_STATE_CAMOUT THEN
+	            #stat_StartOffsetPositive := FALSE;
+	            #stat_StartOffsetNegative := FALSE;
+	            #stat_OffsetRelative.ProfileReference := 5;
+	        ELSE
+	            #stat_OffsetRelative.ProfileReference := 1;
+	        END_IF;
+	        
+	        //save bool state to generate flags
+	        #stat_OffsetPlusOld := #temp_OffsetPlus;
+	        #stat_OffsetMinusOld := #temp_OffsetMinus;
+	        
+	        //Call function
+	        #stat_OffsetRelative(Slave := #i_SlaveAxis,
+	                             Execute:=(((#stat_StartOffsetPositive OR #stat_StartOffsetNegative) AND #stat_FBStateMachine = #FB_STATE_OFFSET_RELATIVE) OR #stat_FBStateMachine = #FB_STATE_CAMOUT),
+	                             OffsetDistance:=100.0);
+	        
+	        //Calculate the offset to formatdata
+	        IF #stat_OffsetRelative.Done OR (#i_MasterAxis.ActualVelocity = 0.0) THEN
+	            IF #stat_StartOffsetPositive THEN
+	                #iq_AxisData.SlaveOffset += #iq_AxisData."Offset_HMI (Offset)";
+	                #stat_StartOffsetPositive := FALSE;
+	            END_IF;
+	            IF #stat_StartOffsetNegative THEN
+	                #iq_AxisData.SlaveOffset -= #iq_AxisData."Offset_HMI (Offset)";
+	                #stat_StartOffsetNegative := FALSE;
+	            END_IF;
+	            
+	            //Check for Modulolimits
+	            IF #iq_AxisData.SlaveOffset > #i_SlaveAxis.Modulo.Length
+	            THEN
+	                #iq_AxisData.SlaveOffset := #iq_AxisData.SlaveOffset - #i_SlaveAxis.Modulo.Length;
+	            ELSIF #iq_AxisData.SlaveOffset < 0.0
+	            THEN
+	                #iq_AxisData.SlaveOffset := #i_SlaveAxis.Modulo.Length + #iq_AxisData.SlaveOffset;
+	            END_IF;
+	        END_IF;
+	        
+	        //Error Handling
+	        IF #stat_OffsetRelative.Error THEN
+	            #stat_StartOffsetPositive := FALSE;
+	            #stat_StartOffsetNegative := FALSE;
+	            #stat_status := #ERROR_OFFSET_RELATIVE;
+	            #stat_errorID := #stat_OffsetRelative.ErrorId;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION FB_CAMOUT
+	        //Call function
+	        #stat_CamOut(Slave:=#i_SlaveAxis,
+	                     Execute:=#stat_FBStateMachine = #FB_STATE_CAMOUT,
+	                     SlavePosition:=#i_SlaveAxis.Position,
+	                     SyncProfileReference:=0,
+	                     MasterStopDistance:=0.0,
+	                     Deceleration:=500.0,
+	                     Jerk:=-1.0,
+	                     SyncOutDirection:=3);
+	        
+	        //Error Handling
+	        IF #stat_CamOut.Error THEN
+	            #stat_status := #ERROR_CAMOUT;
+	            #stat_errorID := #stat_CamOut.ErrorId;
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION OUTPUTS
+	    IF (#stat_status = #STATUS_EXECUTION_FINISHED) AND (#stat_done = FALSE) THEN
+	        #stat_done := TRUE;
+	        #stat_busy := FALSE;
+	        #stat_error := FALSE;
+	        #stat_FBStateMachine := #FB_STATE_CAMOUT;
+	    ELSIF (#stat_status.%X15 = TRUE) AND (#stat_error = FALSE) THEN // Error occurred (#statStatus is 16#8000 to 16#FFFF)
+	        #stat_done := FALSE;
+	        #stat_busy := FALSE;
+	        #stat_error := TRUE;
+	        #stat_FBStateMachine := #FB_STATE_CAMOUT;
+	    ELSIF (#temp_Enable = FALSE) AND ((#stat_done = TRUE) OR (#stat_error = TRUE) OR #stat_FBStateMachine = #FB_STATE_NO_PROCESS) THEN
+	        #stat_busy := false;
+	        #stat_done := false;
+	        #stat_error := false;
+	        #stat_InSync := false;
+	        #stat_status := #STATUS_NO_CALL;
+	    END_IF;
+	    
+	    //wirte outputs
+	    #q_done := #stat_done;
+	    #q_busy := #stat_busy;
+	    #q_error := #stat_error;
+	    #q_status := #stat_status;
+	    #q_errorID := #stat_errorID;
+	    #q_InSync := #stat_InSync;
+	    #q_StartSync := #stat_StartSync;
+	END_REGION
+END_FUNCTION_BLOCK
+

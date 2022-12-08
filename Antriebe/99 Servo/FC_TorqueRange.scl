@@ -1,0 +1,24 @@
+﻿FUNCTION "FC_TorqueRange" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis {InstructionName := 'TO_SpeedAxis'; LibVersion := '6.0'} : TO_SpeedAxis;
+      Enable { S7_PredefinedAssignment := 'TRUE'} : Bool;
+      UpperLimit { S7_PredefinedAssignment := '20.0'} : LReal;
+      LowerLimit { S7_PredefinedAssignment := '-20.0'} : LReal;
+   END_VAR
+
+   VAR_IN_OUT 
+      MC_TorqueRange {InstructionName := 'MC_TORQUERANGE'; LibVersion := '6.0'} : MC_TORQUERANGE;
+   END_VAR
+
+
+BEGIN
+	#MC_TorqueRange(Axis:=#Axis,
+	                Enable:=#Enable,
+	                UpperLimit:=#UpperLimit,
+	                LowerLimit:=#LowerLimit);
+	
+	
+END_FUNCTION
+

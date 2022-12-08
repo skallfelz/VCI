@@ -1,0 +1,200 @@
+﻿FUNCTION_BLOCK "LAnyAxis_MC_CamIn"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AnyAxis
+VERSION : 1.0
+   VAR_INPUT 
+      Master : DB_ANY;
+      Slave : DB_ANY;
+      Cam {InstructionName := 'TO_CamBase'; LibVersion := '6.0'} : TO_CamBase;
+      Execute : Bool;
+      MasterOffset : LReal;
+      SlaveOffset : LReal;
+      MasterScaling : LReal;
+      SlaveScaling : LReal;
+      MasterSyncPosition { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      SyncProfileReference { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      MasterStartDistance { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal;
+      Velocity { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal := -1.0;
+      Acceleration { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal := -1.0;
+      Deceleration { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal := -1.0;
+      Jerk { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : LReal := -1.0;
+      ApplicationMode { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      SyncDirection { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt := 3;
+   END_VAR
+
+   VAR_OUTPUT 
+      StartSync : Bool;
+      InSync { ExternalWritable := 'False'} : Bool;
+      Busy { ExternalWritable := 'False'} : Bool;
+      CommandAborted { ExternalWritable := 'False'} : Bool;
+      Error { ExternalWritable := 'False'} : Bool;
+      ErrorId { ExternalWritable := 'False'} : Word;
+      EndOfProfile : Word;
+   END_VAR
+
+   VAR 
+      instMC {InstructionName := 'MC_CAMIN'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_CAMIN;
+      statExecuteOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statAxis { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DB_ANY;
+      statAxisType { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statMaster { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DB_ANY;
+      statMasterType { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      ERROR_INVALID_TECHNOLOGY_OBJECT : Word := 16#8002;
+      IDLE : Int := 0;
+      INVALID_AXIS : Int := -1;
+      INVALID_MASTER : Int := -2;
+      EXTERNAL_ENCODER : Int := 1;
+      POSITIONING_AXIS : Int := 3;
+      SYNCHRONOUS_AXIS : Int := 4;
+      PROXY : Int := 5;
+   END_VAR
+
+
+BEGIN
+	REGION HEADER
+	    //================================================================================
+	    // SIEMENS AG
+	    // (c)Copyright 2020 All Rights Reserved
+	    //--------------------------------------------------------------------------------
+	    // Library: LAnyAxis 
+	    // Tested with: S7-1515T-2 PN
+	    // Engineering: TIA Portal V16
+	    // Restrictions: -
+	    // Requirements: S7-1500T FW 2.8.1
+	    // Functionality: Conversion DB_ANY --> TO_Axis
+	    // Support: tech.team.motioncontrol@siemens.com
+	    // Note: Parameter comments are only available in language 'English (United States)'
+	    //--------------------------------------------------------------------------------
+	    // Change log table:
+	    // Version  Date        Expert in charge  Changes applied
+	    // 01.00.00 10.03.2020  RS                First released version
+	    //================================================================================
+	END_REGION
+	
+	REGION EXECUTE
+	    IF #Execute AND NOT #statExecuteOld THEN
+	        // Copy parameter
+	        
+	        #instMC.MasterOffset := #MasterOffset;
+	        #instMC.SlaveOffset := #SlaveOffset;
+	        #instMC.MasterScaling := #MasterScaling;
+	        #instMC.SlaveScaling := #SlaveScaling;
+	        #instMC.MasterSyncPosition := #MasterSyncPosition;
+	        #instMC.SyncProfileReference := #SyncProfileReference;
+	        #instMC.MasterStartDistance := #MasterStartDistance;
+	        #instMC.Acceleration := #Acceleration;
+	        #instMC.Deceleration := #Deceleration;
+	        #instMC.Jerk := #Jerk;
+	        #instMC.ApplicationMode := #ApplicationMode;
+	        #instMC.SyncDirection := #SyncDirection;
+	        
+	        // Check axis type
+	        CASE TypeOfDB(#Slave) OF
+	            TO_SYNCHRONOUSAXIS:
+	                #statAxisType := #SYNCHRONOUS_AXIS;
+	                #statAxis := #Slave;
+	                
+	                // Check master type
+	                CASE TypeOfDB(#Master) OF
+	                    TO_POSITIONINGAXIS:
+	                        #statMasterType := #POSITIONING_AXIS;
+	                        #statMaster := #Master;
+	                        
+	                    TO_SYNCHRONOUSAXIS:
+	                        #statMasterType := #SYNCHRONOUS_AXIS;
+	                        #statMaster := #Master;
+	                        
+	                    TO_EXTERNALENCODER:
+	                        #statMasterType := #EXTERNAL_ENCODER;
+	                        #statMaster := #Master;
+	                        
+	                    ELSE
+	                        // Invalid master
+	                        #statMasterType := #INVALID_AXIS;
+	                        #statMaster := 0;
+	                        
+	                        #statAxisType := #INVALID_MASTER;
+	                END_CASE;
+	                
+	            ELSE
+	                #statAxisType := #INVALID_AXIS;
+	                #statAxis := 0;
+	        END_CASE;
+	        
+	    ELSIF NOT #Execute AND (#statAxisType < #IDLE) THEN
+	        #statAxisType := #IDLE;
+	        
+	        // Outputs
+	        #InSync := FALSE;
+	        #Busy := FALSE;
+	        #CommandAborted := FALSE;
+	        #Error := FALSE;
+	        #ErrorId := 16#0000;
+	    END_IF;
+	    
+	    // Edge detection
+	    #statExecuteOld := #Execute;
+	END_REGION
+	
+	CASE #statAxisType OF
+	    #IDLE:
+	        ;
+	        
+	    #SYNCHRONOUS_AXIS:
+	        REGION VALID_AXIS
+	            // Inputs
+	            #instMC.Execute := #Execute;
+	            
+	            // Call of MC instruction
+	            CASE #statMasterType OF
+	                #POSITIONING_AXIS:
+	                    "LAnyAxis_UnpubCamInMasterPosAxis"(slave := #statAxis,
+	                                                       master := #statMaster,
+	                                                       cam := #Cam,
+	                                                        instMC := #instMC);
+	                #SYNCHRONOUS_AXIS:
+	                    "LAnyAxis_UnpubCamInMasterSyncAxis"(slave := #statAxis,
+	                                                        master := #statMaster,
+	                                                        cam := #Cam,
+	                                                         instMC := #instMC);
+	                #EXTERNAL_ENCODER:
+	                    "LAnyAxis_UnpubCamInMasterExtEncoder"(slave := #statAxis,
+	                                                          master := #statMaster,
+	                                                          cam := #Cam,
+	                                                           instMC := #instMC);
+	                    
+	            END_CASE;
+	            
+	            // Outputs
+	            #InSync := #instMC.InSync;
+	            #Busy := #instMC.Busy;
+	            #CommandAborted := #instMC.CommandAborted;
+	            #Error := #instMC.Error;
+	            #ErrorId := #instMC.ErrorId;
+	            
+	            // Status of MC instruction
+	            IF NOT #instMC.Busy
+	                AND NOT #instMC.CommandAborted
+	                AND NOT #instMC.Error
+	            THEN
+	                // Not active
+	                #statAxisType := #IDLE;
+	            END_IF;
+	        END_REGION
+	        
+	    ELSE
+	        REGION INVALID_TECHNOLOGY_OBJECT
+	            // Outputs
+	            #InSync := FALSE;
+	            #Busy := FALSE;
+	            #CommandAborted := FALSE;
+	            #Error := TRUE;
+	            #ErrorId := #ERROR_INVALID_TECHNOLOGY_OBJECT;
+	        END_REGION
+	END_CASE;
+END_FUNCTION_BLOCK
+

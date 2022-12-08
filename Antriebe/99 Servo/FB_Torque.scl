@@ -1,0 +1,202 @@
+﻿FUNCTION_BLOCK "FB_Torque"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_LowerAxisNumber : Int;
+      i_UpperAxisNumber : Int;
+      i_ScreenNumber : Int;
+      i_HMIServoNumber : Int;
+      i_HMIResetTorque : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Axes : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of DB_ANY;
+      iq_AxesTorque : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of "UDT_ServoMoment";
+      iq_OmacData : "UDT_OMAC_GlobalData";
+      iq_Machineconfiguration : "UDT_Machineconfiguration";
+   END_VAR
+
+   VAR 
+      r_trig_ServoWert {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      TorqueRange { S7_SetPoint := 'False'} : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of "LAnyAxis_MC_TorqueRange";
+   END_VAR
+
+   VAR_TEMP 
+      temp_LowerAxisNumber : Int;
+      temp_UpperAxisNumber : Int;
+      temp_ScrennNumber : Int;
+      temp_HMIServoNumber : Int;
+      temp_HMIResetTorque : Bool;
+      temp_Achse : Int;
+      temp_DB_Nr : UInt;
+   END_VAR
+
+
+BEGIN
+	REGION MAP INPUITS
+	    #temp_LowerAxisNumber := #i_LowerAxisNumber;
+	    #temp_UpperAxisNumber := #i_UpperAxisNumber;
+	    #temp_ScrennNumber := #i_ScreenNumber;
+	    #temp_HMIServoNumber := #i_HMIServoNumber;
+	    #temp_HMIResetTorque := #i_HMIResetTorque;
+	END_REGION
+	
+	REGION SEND DATA TO AXIS
+	    FOR #temp_Achse := #temp_LowerAxisNumber TO #temp_UpperAxisNumber BY 1 DO
+	        #temp_DB_Nr := DB_ANY_TO_UINT(#iq_Axes[#temp_Achse]);
+	        IF #temp_DB_Nr > 0 THEN
+	            #TorqueRange[#temp_Achse](Axis := #iq_Axes[#temp_Achse],
+	                                      Enable := NOT #iq_OmacData.IdleStateActive OR #i_ScreenNumber = 381,
+	                                    UpperLimit := #iq_AxesTorque[#temp_Achse]."Max Drehmoment Soll",
+	                                    LowerLimit := #iq_AxesTorque[#temp_Achse]."Min Drehmoment Soll");
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION READ ALL AXES 
+	    FOR #temp_Achse := #temp_LowerAxisNumber TO #temp_UpperAxisNumber BY 1 DO
+	        #temp_DB_Nr := DB_ANY_TO_UINT(#iq_Axes[#temp_Achse]);
+	        IF #temp_DB_Nr > 0
+	        THEN
+	            "FC_TorqueActual"(Axis                       := #iq_Axes[#temp_Achse],
+	                              "Max. Drehmoment gemessen" := #iq_AxesTorque[#temp_Achse]."Max Drehmoment gemessen",
+	                              "Min. Drehmoment gemessen" := #iq_AxesTorque[#temp_Achse]."Min Drehmoment gemessen");
+	        END_IF;
+	    END_FOR;
+	END_REGION
+	
+	REGION Lese wirksames Drehmoment
+	      "FC_TorqueActive"(Axis              := #iq_Axes["NR_KARTONKETTE"],
+	                        StartAdress       := 1010,
+	                        Max_Torque_active => #iq_AxesTorque["NR_KARTONKETTE"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_KARTONKETTE"]."Min Drehmoment Ist");
+	   
+	      "FC_TorqueActive"(Axis              := #iq_Axes["NR_PRODUKTKETTE"],
+	                        StartAdress       := 1040,
+	                        Max_Torque_active => #iq_AxesTorque["NR_PRODUKTKETTE"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_PRODUKTKETTE"]."Min Drehmoment Ist");
+	    
+	      "FC_TorqueActive"(Axis              := #iq_Axes["NR_ROTATIONSABLEGER"],
+	                        StartAdress       := 1070,
+	                        Max_Torque_active => #iq_AxesTorque["NR_ROTATIONSABLEGER"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_ROTATIONSABLEGER"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_PRODUKTEINSCHUB"],
+	                        StartAdress := 1100,
+	                        Max_Torque_active => #iq_AxesTorque["NR_PRODUKTEINSCHUB"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_PRODUKTEINSCHUB"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_LASCHENEINLEGERLINKS"],
+	                        StartAdress := 1130,
+	                        Max_Torque_active => #iq_AxesTorque["NR_LASCHENEINLEGERLINKS"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_LASCHENEINLEGERLINKS"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_LASCHENEINLEGERRECHTS"],
+	                        StartAdress := 1160,
+	                        Max_Torque_active => #iq_AxesTorque["NR_LASCHENEINLEGERRECHTS"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_LASCHENEINLEGERRECHTS"]."Min Drehmoment Ist");
+	      
+	      IF #iq_Machineconfiguration."Adjustable Carton Chain"
+	      THEN
+	          "FC_TorqueActive"(Axis := #iq_Axes["NR_KARTONKETTE2"],
+	                            StartAdress := 2010,
+	                            Max_Torque_active => #iq_AxesTorque["NR_KARTONKETTE2"]."Max Drehmoment Ist",
+	                            Min_Torque_active => #iq_AxesTorque["NR_KARTONKETTE2"]."Min Drehmoment Ist");
+	      END_IF;
+	        
+	      IF #iq_Machineconfiguration."Adjustable Product Chain"
+	      THEN
+	          "FC_TorqueActive"(Axis := #iq_Axes["NR_PRODUKTKETTE2"],
+	                            StartAdress := 2040,
+	                            Max_Torque_active => #iq_AxesTorque["NR_PRODUKTKETTE2"]."Max Drehmoment Ist",
+	                            Min_Torque_active => #iq_AxesTorque["NR_PRODUKTKETTE2"]."Min Drehmoment Ist");
+	      END_IF;
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_1.2"],
+	                        StartAdress := 2070,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_1.1"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_1.1"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_1.2"],
+	                        StartAdress := 2100,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_1.2"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_1.2"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_1.3"],
+	                        StartAdress := 2130,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_1.3"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_1.3"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_2.1"],
+	                        StartAdress := 2160,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_2.1"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_2.1"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_2.2"],
+	                        StartAdress := 3010,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_2.2"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_2.2"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_2.3"],
+	                        StartAdress := 3040,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_2.3"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_2.3"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_VERTEILERWEICHE_1/2"],
+	                        StartAdress := 3070,
+	                        Max_Torque_active => #iq_AxesTorque["NR_VERTEILERWEICHE_1/2"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_VERTEILERWEICHE_1/2"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_3.1"],
+	                        StartAdress := 3100,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_3.1"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_3.1"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_3.2"],
+	                        StartAdress := 3130,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_3.2"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_3.2"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_3.3"],
+	                        StartAdress := 3160,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_3.3"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_3.3"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_4.1"],
+	                        StartAdress := 4010,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_4.1"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_4.1"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_4.2"],
+	                        StartAdress := 4040,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_4.2"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_4.2"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_STUFENABLEGER_4.3"],
+	                        StartAdress := 4070,
+	                        Max_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_4.3"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_STUFENABLEGER_4.3"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_VERTEILERWEICHE_3/4"],
+	                        StartAdress := 3100,
+	                        Max_Torque_active => #iq_AxesTorque["NR_VERTEILERWEICHE_3/4"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_VERTEILERWEICHE_3/4"]."Min Drehmoment Ist");
+	      
+	      "FC_TorqueActive"(Axis := #iq_Axes["NR_ZUSAMMENFUEHRUNG"],
+	                        StartAdress := 3130,
+	                        Max_Torque_active => #iq_AxesTorque["NR_ZUSAMMENFUEHRUNG"]."Max Drehmoment Ist",
+	                        Min_Torque_active => #iq_AxesTorque["NR_ZUSAMMENFUEHRUNG"]."Min Drehmoment Ist");
+	      
+	END_REGION
+	
+	//Aufgezeichnete Werte zurücksetzen
+	REGION RESET
+	    IF #temp_HMIResetTorque AND #temp_HMIServoNumber > 0 THEN
+	        #iq_AxesTorque["HMI".Multiplex.ServoNr]."Max Drehmoment gemessen" := 0.0;
+	        #iq_AxesTorque["HMI".Multiplex.ServoNr]."Min Drehmoment gemessen" := 0.0;
+	    END_IF;
+	END_REGION
+	
+	
+END_FUNCTION_BLOCK
+

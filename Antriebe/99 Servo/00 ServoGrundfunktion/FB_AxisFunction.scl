@@ -1,0 +1,201 @@
+﻿FUNCTION_BLOCK "FB_AxisFunction"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis : DB_ANY;
+      PowerEnable : Bool;   // Achse einschalten
+      eStop : Bool;   // Not-Halt
+      Reset : Bool;   // Fehler quittieren
+      StartVelocity : Bool;   // Starte Achse mit Geschwindigkeitsvorgabe
+      Halt : Bool;   // Halte Achse an
+      ActiveDriveNo : Bool;   // Aktiviere ManualMode
+      Velocity : LReal;   // Geschwindigkeitsvorgabe
+      Referencemode { S7_PredefinedAssignment := '7'} : Int := 7;   // 0 - Istposition setzen, 7 - Absolutwertgeberjustage
+   END_VAR
+
+   VAR_OUTPUT 
+      Ready : Bool;
+      Referenziert : Bool;
+      Error : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      AchsData : "UDT_ServoData";
+      ManualControl : "UDT_ServoControl";
+      StatusError : "UDT_ServoStatusError";
+   END_VAR
+
+   VAR 
+      f_trig_ManualMode {InstructionName := 'F_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : F_TRIG;
+      r_trig_StartVelocity {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      MC_Power : "LAnyAxis_MC_Power";
+      MC_Reset : "LAnyAxis_MC_Reset";
+      MC_Home : "LAnyAxis_MC_Home";
+      MC_MoveVelocity : "LAnyAxis_MC_MoveVelocity";
+      MC_MoveAbsolut { S7_SetPoint := 'False'} : "LAnyAxis_MC_MoveAbsolute";
+      MC_MoveJog { S7_SetPoint := 'False'} : "LAnyAxis_MC_MoveJog";
+      MC_Halt { S7_SetPoint := 'False'} : "LAnyAxis_MC_Halt";
+      TON_Home {InstructionName := 'TON_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TON_TIME;
+      Velocity_alt { S7_SetPoint := 'True'} : LReal;
+      Trigger_Velocity : Bool;
+      "ManualHalt wird ausgeführt" : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tmp : Bool;
+   END_VAR
+
+
+BEGIN
+	REGION StatusError
+	    "FC_StatusError"(Axis := #Axis,
+	                     ServoStatusError := #StatusError);
+	END_REGION
+	
+	REGION MC_POWER
+	    #MC_Power(Axis:=#Axis,
+	              Enable:=#PowerEnable,
+	              StartMode:=1,
+	              StopMode:=0);
+	END_REGION
+	
+	REGION MC_RESET
+	    #MC_Reset(Axis:=#Axis,
+	              Execute:=#Reset);
+	END_REGION
+	
+	REGION MC_HOME
+	    #TON_Home(IN := #ManualControl.Manual."Homing Start",
+	              PT := t#2s);
+	    
+	    IF #StatusError."Status Achse - Simulation aktiv"
+	    THEN
+	        #MC_Home.Mode := 0;
+	    ELSE
+	        #MC_Home.Mode := #Referencemode;
+	    END_IF;
+	    
+	    #MC_Home(Axis:=#Axis,
+	             Execute:=#TON_Home.Q AND #ActiveDriveNo AND NOT #MC_Power.Status,
+	             Position:=#ManualControl.Manual."Position Homing");
+	    
+	END_REGION
+	
+	REGION MC_Velocity
+	    #r_trig_StartVelocity(CLK := #StartVelocity AND NOT #ActiveDriveNo);
+	    
+	    IF #Velocity <> #Velocity_alt
+	        OR #r_trig_StartVelocity.Q
+	    THEN
+	        #Velocity_alt := #Velocity;
+	        #Trigger_Velocity := true;
+	    END_IF;
+	    
+	    #MC_MoveVelocity(Axis:=#Axis,
+	                     Execute:=#StartVelocity AND NOT #ActiveDriveNo AND #Trigger_Velocity,
+	                     Velocity:=#Velocity,
+	                     Acceleration:=#AchsData.ACC,
+	                     Deceleration:=#AchsData.DC,
+	                     Jerk:=-1.0,
+	                     Direction:=1,
+	                     Current:=false,
+	                     PositionControlled:=true);
+	   
+	    IF #MC_MoveVelocity.InVelocity
+	    THEN
+	        #Trigger_Velocity := false;
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION ManualMode
+	    #f_trig_ManualMode(CLK := #MC_Power.Status AND #ActiveDriveNo);
+	    
+	    IF #f_trig_ManualMode.Q
+	    THEN
+	        #"ManualHalt wird ausgeführt" := true;
+	    END_IF;
+	    
+	    IF #ActiveDriveNo
+	        OR #"ManualHalt wird ausgeführt"
+	    THEN
+	        //Move Absolute nur nutzbar wenn entsprechende Achse auch angeschlossen ist
+	        #MC_MoveAbsolut(Axis := #Axis,
+	                        Execute := #ManualControl.Manual."Positionieren Start" AND #ActiveDriveNo,
+	                        Position := #ManualControl.Manual.Position,
+	                        Velocity := #ManualControl.Manual.Vel,
+	                        Acceleration := #ManualControl.Manual.ACC,
+	                        Deceleration := #ManualControl.Manual.DC,
+	                        Jerk := -1.0,
+	                        Direction := 1);
+	
+	        
+	        #MC_MoveJog(Axis := #Axis,
+	                    JogForward := #ManualControl.Manual."Jog Plus" AND #ActiveDriveNo,
+	                    JogBackward := #ManualControl.Manual."Jog Minus" AND #ActiveDriveNo,
+	                    Velocity := #ManualControl.Manual.Vel,
+	                    Acceleration := #ManualControl.Manual.ACC,
+	                    Deceleration := #ManualControl.Manual.DC,
+	                    Jerk := -1.0,
+	                    PositionControlled := true);
+	        
+	       
+	    END_IF;
+	END_REGION
+	
+	REGION MC_Halt
+	    
+	    //Bremsrampe festlegen, bei E-Stop anhalten in 0.4 Sekunden, ansonsten Dynamikparameter verwenden
+	    //
+	    IF #eStop
+	    THEN
+	        #MC_Halt.Deceleration := #Velocity / 0.4;
+	    ELSE
+	        #MC_Halt.Deceleration := #AchsData.DC;
+	    END_IF;
+	    
+	    //Bremsrampe aus dem dem Handbetrieb übernehmen
+	    IF #ActiveDriveNo
+	    THEN
+	        #MC_Halt.Deceleration := #ManualControl.Manual.DC;
+	    END_IF;
+	    
+	    #MC_Halt(Axis := #Axis,
+	             Execute := (#MC_Power.Status AND ((#ActiveDriveNo
+	             AND (NOT #ManualControl.Manual."Positionieren Start"
+	             AND NOT #ManualControl.Manual."Homing Start"
+	             AND NOT #ManualControl.Manual."Jog Plus"
+	             AND NOT #ManualControl.Manual."Jog Minus")
+	             OR #"ManualHalt wird ausgeführt")
+	             OR (#PowerEnable AND NOT #ActiveDriveNo AND #Halt AND NOT #StatusError."Status Bewegung - Stillstand"))
+	             OR (#eStop AND NOT #StatusError."Status Bewegung - Stillstand"))
+	             AND NOT #MC_Halt.Error,
+	             Deceleration := #MC_Halt.Deceleration,
+	             Jerk := -1.0,
+	             AbortAcceleration := true);
+	    
+	    IF #MC_Halt.Done
+	    THEN
+	        #"ManualHalt wird ausgeführt" := false;
+	    END_IF;
+	END_REGION
+	
+	REGION OUTPUTS
+	    IF #MC_Power.Error
+	        OR #MC_Reset.Error
+	        OR #MC_Home.Error
+	        OR #MC_MoveVelocity.Error
+	        OR #MC_MoveAbsolut.Error
+	        OR #MC_MoveJog.Error
+	        OR #MC_Halt.Error
+	    THEN
+	        #Error := true;
+	    ELSE
+	        #Error := false;
+	    END_IF;
+	    
+	    #Ready := #MC_Power.Status;
+	    #Referenziert := #StatusError."Status Achse - Referenziert";
+	END_REGION
+END_FUNCTION_BLOCK
+

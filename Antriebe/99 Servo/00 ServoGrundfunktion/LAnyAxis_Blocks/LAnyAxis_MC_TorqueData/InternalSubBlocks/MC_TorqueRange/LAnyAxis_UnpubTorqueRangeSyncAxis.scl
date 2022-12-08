@@ -1,0 +1,31 @@
+﻿FUNCTION "LAnyAxis_UnpubTorqueRangeSyncAxis" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AnyAxis
+VERSION : 1.0
+   VAR_INPUT 
+      axis {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      UpperLimit : LReal;
+      LowerLimit : LReal;
+   END_VAR
+
+   VAR_IN_OUT 
+      instMC {InstructionName := 'MC_TORQUERANGE'; LibVersion := '6.0'} : MC_TORQUERANGE;
+   END_VAR
+
+
+BEGIN
+	// Call of MC_Instruction
+	// 
+	IF NOT #axis.Actor.InverseDirection
+	THEN
+	    #instMC(Axis       := #axis,
+	            UpperLimit := #UpperLimit,
+	            LowerLimit := #LowerLimit);
+	ELSE
+	    #instMC(Axis       := #axis,
+	            UpperLimit := - #LowerLimit,
+	            LowerLimit := - #UpperLimit);
+	END_IF;
+END_FUNCTION
+

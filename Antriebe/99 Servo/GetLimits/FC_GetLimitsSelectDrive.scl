@@ -1,0 +1,81 @@
+﻿FUNCTION "FC_GetLimitsSelectDrive" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Axis : DB_ANY;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_ServoLimits : "UDT_ServoLimits";
+   END_VAR
+
+   VAR_TEMP 
+      temp_AxisType : Int;
+      temp_Axis : DB_ANY;
+      temp_ServoLimits : "UDT_ServoLimits";
+   END_VAR
+
+   VAR CONSTANT 
+      ERROR_INVALID_TECHNOLOGY_OBJECT : Word := 16#8002;
+      IDLE : Int := 0;
+      INVALID_AXIS : Int := -1;
+      EXTERNAL_ENCODER : Int := 1;
+      POSITIONING_AXIS : Int := 3;
+      SYNCHRONOUS_AXIS : Int := 4;
+   END_VAR
+
+
+BEGIN
+	REGION GET AXIS TYPE        
+	        // Check axis type
+	        CASE TypeOfDB(#i_Axis) OF
+	            TO_POSITIONINGAXIS:
+	                #temp_AxisType := #POSITIONING_AXIS;
+	                #temp_Axis := #i_Axis;
+	                
+	            TO_SYNCHRONOUSAXIS:
+	                #temp_AxisType := #SYNCHRONOUS_AXIS;
+	                #temp_Axis := #i_Axis;
+	                
+	            TO_EXTERNALENCODER:
+	                #temp_AxisType := #EXTERNAL_ENCODER;
+	                #temp_Axis := #i_Axis;
+	                
+	            ELSE
+	                #temp_AxisType := #INVALID_AXIS;
+	                #temp_Axis := 0;
+	        END_CASE;
+	        
+	END_REGION
+	
+	CASE #temp_AxisType OF
+	    #IDLE:
+	        ;
+	        
+	    #POSITIONING_AXIS,
+	    #SYNCHRONOUS_AXIS,
+	    #EXTERNAL_ENCODER:
+	        REGION VALID_AXIS            
+	            // Call of MC instruction
+	            CASE #temp_AxisType OF
+	                #POSITIONING_AXIS:
+	                    "FC_GetLimitsPosAxis"(i_Axis:=#temp_Axis,
+	                                          iq_ServoLimits:=#temp_ServoLimits);
+	                    
+	                #SYNCHRONOUS_AXIS:
+	                    "FC_GetLimitsSyncAxis"(i_Axis := #temp_Axis,
+	                                           iq_ServoLimits := #temp_ServoLimits);
+	                    
+	                #EXTERNAL_ENCODER:
+	                    "FC_GetLimitsExtAxis"(i_Axis := #temp_Axis,
+	                                           iq_ServoLimits := #temp_ServoLimits);
+	                    
+	           END_CASE;
+	       END_REGION
+	END_CASE;
+	
+	REGION OUTPUT
+	    #iq_ServoLimits := #temp_ServoLimits;
+	END_REGION
+END_FUNCTION
+

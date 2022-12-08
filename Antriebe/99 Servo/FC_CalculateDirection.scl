@@ -1,0 +1,82 @@
+﻿FUNCTION "FC_CalculateDirection" : Int
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_MasterPosition : LReal;
+      i_SlavePosition : LReal;
+      i_Modulo : LReal;
+      i_Offset : LReal;
+   END_VAR
+
+   VAR_OUTPUT 
+      q_ActualDistance : LReal;
+   END_VAR
+
+   VAR_TEMP 
+      temp_MasterPosition : LReal;
+      temp_SlavePosition : LReal;
+      temp_Modulo : LReal;
+      temp_Offset : LReal;
+      temp_ActualDistanceRaw : LReal;
+      temp_ActualDistance : LReal;
+      temp_Direction : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      POSITIVE : Int := 1;
+      NEGATIVE : Int := 2;
+      SHORTEST_WAY : Int := 3;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FC calculates the sync direction
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   12.08.2022    TK / SK             Created by TK and implementet in Siemens by SK
+	//===============================================================================================
+	
+	REGION MAP INPUTS
+	    #temp_MasterPosition := #i_MasterPosition;
+	    #temp_SlavePosition := #i_SlavePosition;
+	    #temp_Modulo := #i_Modulo;
+	    #temp_Offset := #i_Offset;
+	END_REGION
+	
+	REGION LOGIC
+	    REGION DISTANCE
+	        // calculate current distance
+	        #temp_ActualDistanceRaw := #temp_SlavePosition - #temp_MasterPosition;
+	        // Position negativ >> limit distance to modulo and positive value
+	        IF #temp_ActualDistanceRaw < 0.0 THEN
+	            #temp_ActualDistance := #temp_ActualDistanceRaw + #temp_Modulo;
+	        ELSE
+	            #temp_ActualDistance := DINT_TO_LREAL(LREAL_TO_DINT(#temp_ActualDistanceRaw * 100.0) MOD LREAL_TO_DINT(#temp_Modulo * 100.0)) / 100.0;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION DIRECTION
+	        // distance less then 5
+	        IF ABS(#temp_ActualDistance - #temp_Offset) < 5 THEN
+	            #temp_Direction := #SHORTEST_WAY;
+	            // distance close to modulo  
+	        ELSIF ABS(#temp_ActualDistance - #temp_Offset) > (#temp_Modulo - 5) THEN
+	            #temp_Direction := #SHORTEST_WAY;
+	        ELSIF #temp_Offset > #temp_ActualDistance THEN
+	            #temp_Direction := #POSITIVE;
+	        ELSIF #temp_Offset < #temp_ActualDistance THEN
+	            #temp_Direction := #NEGATIVE;
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION OUTPUT
+	    #q_ActualDistance := #temp_ActualDistance;
+	    #FC_CalculateDirection := #temp_Direction;
+	END_REGION
+END_FUNCTION
+

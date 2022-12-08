@@ -1,0 +1,161 @@
+﻿FUNCTION_BLOCK "LAnyAxis_MC_MoveVelocity"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AnyAxis
+VERSION : 1.0
+   VAR_INPUT 
+      Axis : DB_ANY;
+      Execute : Bool;
+      Velocity : LReal := 100.0;
+      Acceleration : LReal := -1.0;
+      Deceleration : LReal := -1.0;
+      Jerk : LReal := -1.0;
+      Direction : Int;
+      Current : Bool;
+      PositionControlled : Bool := TRUE;
+   END_VAR
+
+   VAR_OUTPUT 
+      InVelocity { ExternalWritable := 'False'} : Bool;
+      Busy { ExternalWritable := 'False'} : Bool;
+      CommandAborted { ExternalWritable := 'False'} : Bool;
+      Error { ExternalWritable := 'False'} : Bool;
+      ErrorId { ExternalWritable := 'False'} : Word;
+   END_VAR
+
+   VAR 
+      instMC {InstructionName := 'MC_MOVEVELOCITY'; LibVersion := '6.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : MC_MOVEVELOCITY;
+      statExecuteOld { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statAxis { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DB_ANY;
+      statAxisType { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      ERROR_INVALID_TECHNOLOGY_OBJECT : Word := 16#8002;
+      IDLE : Int := 0;
+      INVALID_AXIS : Int := -1;
+      SPEED_AXIS : Int := 2;
+      POSITIONING_AXIS : Int := 3;
+      SYNCHRONOUS_AXIS : Int := 4;
+   END_VAR
+
+
+BEGIN
+	REGION HEADER
+	    //================================================================================
+	    // SIEMENS AG
+	    // (c)Copyright 2020 All Rights Reserved
+	    //--------------------------------------------------------------------------------
+	    // Library: LAnyAxis 
+	    // Tested with: S7-1515-2 PN
+	    // Engineering: TIA Portal V16
+	    // Restrictions: -
+	    // Requirements: S7-1500 FW 2.8.1
+	    // Functionality: Conversion DB_ANY --> TO_Axis
+	    // Support: tech.team.motioncontrol@siemens.com
+	    // Note: Parameter comments are only available in language 'English (United States)'
+	    //--------------------------------------------------------------------------------
+	    // Change log table:
+	    // Version  Date        Expert in charge  Changes applied
+	    // 01.00.00 10.03.2020  RS                First released version
+	    //================================================================================
+	END_REGION
+	
+	REGION EXECUTE
+	    IF #Execute AND NOT #statExecuteOld THEN
+	        // Copy parameter
+	        #instMC.Velocity := #Velocity;
+	        #instMC.Acceleration := #Acceleration;
+	        #instMC.Deceleration := #Deceleration;
+	        #instMC.Jerk := #Jerk;
+	        #instMC.Direction := #Direction;
+	        #instMC.Current := #Current;
+	        #instMC.PositionControlled := #PositionControlled;
+	        
+	        // Check axis type
+	        CASE TypeOfDB(#Axis) OF
+	            TO_POSITIONINGAXIS:
+	                #statAxisType := #POSITIONING_AXIS;
+	                #statAxis := #Axis;
+	                
+	            TO_SYNCHRONOUSAXIS:
+	                #statAxisType := #SYNCHRONOUS_AXIS;
+	                #statAxis := #Axis;
+	                
+	            TO_SPEEDAXIS:
+	                #statAxisType := #SPEED_AXIS;
+	                #statAxis := #Axis;
+	                
+	            ELSE
+	                #statAxisType := #INVALID_AXIS;
+	                #statAxis := 0;
+	        END_CASE;
+	        
+	    ELSIF NOT #Execute AND (#statAxisType = #INVALID_AXIS) THEN
+	        #statAxisType := #IDLE;
+	        
+	        // Outputs
+	        #InVelocity := FALSE;
+	        #Busy := FALSE;
+	        #CommandAborted := FALSE;
+	        #Error := FALSE;
+	        #ErrorId := 16#0000;
+	    END_IF;
+	    
+	    // Edge detection
+	    #statExecuteOld := #Execute;
+	END_REGION
+	
+	CASE #statAxisType OF
+	    #IDLE:
+	        ;
+	        
+	    #POSITIONING_AXIS,
+	    #SYNCHRONOUS_AXIS,
+	    #SPEED_AXIS:
+	        REGION VALID_AXIS
+	            // Inputs
+	            #instMC.Execute := #Execute;
+	            
+	            // Call of MC instruction
+	            CASE #statAxisType OF
+	                #POSITIONING_AXIS:
+	                    "LAnyAxis_UnpubMoveVelocityPosAxis"(axis := #statAxis,
+	                                                        instMC := #instMC);
+	                #SYNCHRONOUS_AXIS:
+	                    "LAnyAxis_UnpubMoveVelocitySyncAxis"(axis := #statAxis,
+	                                                         instMC := #instMC);
+	                #SPEED_AXIS:
+	                    "LAnyAxis_UnpubMoveVelocitySpeedAxis"(axis := #statAxis,
+	                                                          instMC := #instMC);
+	            END_CASE;
+	            
+	            // Outputs
+	            #InVelocity := #instMC.InVelocity;
+	            #Busy := #instMC.Busy;
+	            #CommandAborted := #instMC.CommandAborted;
+	            #Error := #instMC.Error;
+	            #ErrorId := #instMC.ErrorId;
+	            
+	            // Status of MC instruction
+	            IF NOT #instMC.Busy
+	                AND NOT #instMC.CommandAborted
+	                AND NOT #instMC.Error
+	            THEN
+	                // Not active
+	                #statAxisType := #IDLE;
+	            END_IF;
+	        END_REGION
+	        
+	    ELSE
+	        REGION INVALID_AXIS
+	            // Outputs
+	            #InVelocity := FALSE;
+	            #Busy := FALSE;
+	            #CommandAborted := FALSE;
+	            #Error := TRUE;
+	            #ErrorId := #ERROR_INVALID_TECHNOLOGY_OBJECT;
+	        END_REGION
+	END_CASE;
+END_FUNCTION_BLOCK
+

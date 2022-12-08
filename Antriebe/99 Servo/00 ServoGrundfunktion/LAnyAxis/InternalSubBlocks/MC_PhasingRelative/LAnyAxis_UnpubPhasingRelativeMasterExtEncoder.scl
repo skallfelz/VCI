@@ -1,0 +1,21 @@
+﻿FUNCTION "LAnyAxis_UnpubPhasingRelativeMasterExtEncoder" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'tech.team.motioncontrol@siemens.com'
+FAMILY : AnyAxis
+VERSION : 1.0
+   VAR_INPUT 
+      slave {InstructionName := 'TO_SynchronousAxis'; LibVersion := '6.0'} : TO_SynchronousAxis;
+      master {InstructionName := 'TO_ExternalEncoder'; LibVersion := '6.0'} : TO_ExternalEncoder;
+   END_VAR
+
+   VAR_IN_OUT 
+      instMC {InstructionName := 'MC_PHASINGRELATIVE'; LibVersion := '6.0'} : MC_PHASINGRELATIVE;
+   END_VAR
+
+
+BEGIN
+	// Call of MC_Instruction
+	#instMC(Master := #master,
+	        Slave := #slave);
+END_FUNCTION
+

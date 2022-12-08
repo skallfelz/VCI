@@ -1,0 +1,99 @@
+﻿FUNCTION "FC_StatusError" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Axis : DB_ANY;
+   END_VAR
+
+   VAR_IN_OUT 
+      ServoStatusError : "UDT_ServoStatusError";
+   END_VAR
+
+   VAR_TEMP 
+      StatusWord : DWord;
+      ErrorWord : DWord;
+      WarningWord : DWord;
+      Ret_VAL_1 : Word;
+   END_VAR
+
+
+BEGIN
+	//Mappen des Statusword und Errorword
+	//
+	#Ret_VAL_1 := "LAnyAxis_StatusWord"(axis:=#Axis, statusWord=>#StatusWord);
+	#Ret_VAL_1 := "LAnyAxis_ErrorWord"(axis := #Axis, ErrorWord => #ErrorWord);
+	#Ret_VAL_1 := "LAnyAxis_WarningWord"(axis := #Axis, WarningWord => #WarningWord);
+	
+	//Status Achse
+	#ServoStatusError."Status Achse - Simulation aktiv" := #StatusWord.%X25;
+	#ServoStatusError."Status Achse - Freigegeben" := #StatusWord.%X0;
+	#ServoStatusError."Status Achse - Lagegeregelter Betrieb" := #StatusWord.%X28;
+	#ServoStatusError."Status Achse - Referenziert" := #StatusWord.%X5;
+	#ServoStatusError."Status Achse - Fehler" := #StatusWord.%X1;
+	#ServoStatusError."Status Achse - Restart aktiv" := #StatusWord.%X2;
+	#ServoStatusError."Status Achse - Achssteuertafel aktiv" := #StatusWord.%X4;
+	//#ServoStatusError."Status Achse - Antrieb bereit" := #StatusDrive.InOperation;
+	//#ServoStatusError."Status Achse - Geberistwerte gültig" := #StatusSensor[1].State;
+	//#ServoStatusError."Status Achse - Aktiver Geber" := #OperativeSensor;
+	#ServoStatusError."Status Achse - Restart erforderlich" := #StatusWord.%X3;
+	
+	//Status Endschalter
+	#ServoStatusError."Status Endschalter - Neg. SW-Endschalter angefahren" := #StatusWord.%X15;
+	#ServoStatusError."Status Endschalter - Pos. SW-Endschalter angefahren" := #StatusWord.%X16;
+	#ServoStatusError."Status Endschalter - Neg. HW-Endschalter angefahren" := #StatusWord.%X17;
+	#ServoStatusError."Status Endschalter - Pos. HW-Endschalter angefahren" := #StatusWord.%X18;
+	
+	//Status Bewegung
+	#ServoStatusError."Status Bewegung - Done" := #StatusWord.%X6;
+	#ServoStatusError."Status Bewegung - Referenzierauftrag" := #StatusWord.%X11;
+	#ServoStatusError."Status Bewegung - Tippen" := #StatusWord.%X9;
+	#ServoStatusError."Status Bewegung - Geschwindigkeitsvorgabe" := #StatusWord.%X10;
+	#ServoStatusError."Status Bewegung - Positionierauftrag" := #StatusWord.%X8;
+	#ServoStatusError."Status Bewegung - Konstante Geschwindigkeit" := #StatusWord.%X12;
+	#ServoStatusError."Status Bewegung - Stillstand" := #StatusWord.%X7;
+	#ServoStatusError."Status Bewegung - Beschleunigen" := #StatusWord.%X13;
+	#ServoStatusError."Status Bewegung - Verzögern" := #StatusWord.%X14;
+	#ServoStatusError."Status Bewegung - Momentenbegrenzung aktiv" := #StatusWord.%X27;
+	//#ServoStatusError."Status Bewegung - Stoppauftrag aktiv"        := #StatusWord2.%X0;
+	
+	//Status Gleichlauf
+	#ServoStatusError."Status Gleichlauf - Aufsynchronisieren" := #StatusWord.%X21;
+	#ServoStatusError."Status Gleichlauf - Synchron" := #StatusWord.%X22;
+	//#ServoStatusError."Status Gleichlauf - Aufsynchroniseren wartend"   := #StatusSynchronizedMotion.WaitingFunctionState;
+	//#ServoStatusError."Status Gleichlauf - Additiver Leitwert aktiv" := #StatusSynchronizedMotion.StatusWord.%X4;
+	#ServoStatusError."Status Gleichlauf - Überlagertes Profil" := #StatusWord.%X23;
+	
+	//Fehler
+	#ServoStatusError."Fehler - System" := #ErrorWord.%X0;
+	#ServoStatusError."Fehler - Konfiguration" := #ErrorWord.%X1;
+	#ServoStatusError."Fehler - Anwenderprogramm" := #ErrorWord.%X2;
+	#ServoStatusError."Fehler - Antrieb" := #ErrorWord.%X4;
+	#ServoStatusError."Fehler - Geber" := #ErrorWord.%X5;
+	#ServoStatusError."Fehler - Datenaustausch" := #ErrorWord.%X7;
+	#ServoStatusError."Fehler - Peripherie" := #ErrorWord.%X13;
+	#ServoStatusError."Fehler - Auftrag abgewiesen" := #ErrorWord.%X3;
+	#ServoStatusError."Fehler - Referenzieren" := #ErrorWord.%X10;
+	#ServoStatusError."Fehler - Positionieren" := #ErrorWord.%X12;
+	#ServoStatusError."Fehler - Dynamikbegrenzung" := #ErrorWord.%X6;
+	#ServoStatusError."Fehler - Schleppfehler" := #ErrorWord.%X11;
+	#ServoStatusError."Fehler - SW-Endschalter" := #ErrorWord.%X8;
+	#ServoStatusError."Fehler - HW-Endschalter" := #ErrorWord.%X9;
+	#ServoStatusError."Fehler - Adaptieren" := #ErrorWord.%X15;
+	#ServoStatusError."Fehler - Aufsynchronisieren" := #ErrorWord.%X14;
+	
+	//Warnung
+	#ServoStatusError."Warnungen - Konfiguration" := #WarningWord.%X1;
+	#ServoStatusError."Warnungen - Auftrag abgewiesen" := #WarningWord.%X3;
+	#ServoStatusError."Warnungen - Dynamikbegrenzung" := #WarningWord.%X6;
+	#ServoStatusError."Warnungen - Aufsynchronisieren" := #WarningWord.%X14;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+END_FUNCTION
+
