@@ -105,7 +105,7 @@ VERSION : 0.1
       SA : USInt := 7;
       SU : USInt := 1;
       MANUAL : USInt := 8;
-      STATUS_NOCALL : Word := 16#0;
+      STATUS_NOCALL : Word := 16#0000;
       STATUS_START_PROCESS : Word := 16#7000;
       STATUS_BUSY : Word := 16#7001;
       STATUS_DONE : Word := 16#7002;
@@ -140,7 +140,7 @@ BEGIN
 	REGION TRIGGER DELETE
 	    #inst_RTrigDelete(CLK := #temp_BtnDelete);
 	END_REGION
-	    
+	
 	REGION STATE MACHINE
 	    CASE #stat_FBStateMachine OF
 	        #FB_STATE_IDLE:
@@ -351,7 +351,7 @@ BEGIN
 	    END_CASE;
 	END_REGION
 	
-	REGION CALL FUNCTIONS
+	REGION CALL FUNCTION
 	    REGION FILEWRITEC
 	        #inst_FileWriteC(REQ := #stat_TriggerExport,
 	                         Offset := 0,
@@ -365,7 +365,7 @@ BEGIN
 	                        Data := #stat_DestImport);
 	    END_REGION
 	    REGION FILEDELETE
-	        #inst_FileDelete(REQ:=#stat_TriggerDelete);
+	        #inst_FileDelete(REQ := #stat_TriggerDelete);
 	    END_REGION
 	END_REGION
 	
@@ -380,7 +380,7 @@ BEGIN
 	        END_IF;
 	        
 	        #inst_TON_ExportDone(IN := #stat_StatusExportHMI >= 2,
-	                            PT := t#5s);
+	                             PT := t#5s);
 	        IF #inst_TON_ExportDone.Q THEN
 	            #stat_StatusExportHMI := 0;
 	        END_IF;
@@ -399,7 +399,7 @@ BEGIN
 	        END_IF;
 	        
 	        #inst_TON_ImportDone(IN := #stat_StatusImportHMI >= 2 AND #stat_StatusImportHMI < 4,
-	                            PT := t#5s);
+	                             PT := t#5s);
 	        IF #inst_TON_ImportDone.Q THEN
 	            #stat_StatusImportHMI := 0;
 	        END_IF;
@@ -410,13 +410,13 @@ BEGIN
 	
 	REGION RELOAD
 	    #inst_TP_Reload(IN := #stat_StatusImportHMI = 2,
-	                   PT := t#500ms);
+	                    PT := t#500ms);
 	    
 	    #stat_ReloadData := #inst_TP_Reload.Q;
 	END_REGION
 	
 	REGION OUTPUTS
-	    IF #stat_Status = #STATUS_DONE AND (#stat_Done = FALSE)THEN
+	    IF #stat_Status = #STATUS_DONE AND (#stat_Done = FALSE) THEN
 	        #stat_Done := TRUE;
 	        #stat_Busy := FALSE;
 	        #stat_Error := FALSE;
