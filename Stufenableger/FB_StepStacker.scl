@@ -1,0 +1,489 @@
+﻿FUNCTION_BLOCK "FB_StepStacker"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_Enable : Bool;
+      i_Sensor : Bool;
+      i_ProductPocketEmpty : Bool;
+      i_CamRelease : "UDT_CamData";
+      i_SafetyDoor : Bool;
+      i_AxisStage1 : DB_ANY;
+      i_AxisStage2 : DB_ANY;
+      i_AxisStage3 : DB_ANY;
+      i_TimeOpenStage1 : Time;
+      i_TimeOpenStage2 : Time;
+      i_TimeOpenStage3 : Time;
+      i_TimeCloseStage1 : Time;
+      i_TimeCloseStage2 : Time;
+      i_TimeCloseStage3 : Time;
+      i_MaxNumberOfProducts : DInt;
+      i_PosTrackingregister : Int;
+      i_PosMoveOpen { S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Int := 2;
+      i_PosMoveClose { S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Int := 1;
+      i_MasterAxis : Int;
+   END_VAR
+
+   VAR_OUTPUT 
+      q_done : Bool;
+      q_busy : Bool;
+      q_error : Bool;
+      q_status : Word;
+      q_errorID : Word;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Formatdata : "UDT_Formatdata";
+      iq_TrackingRegister : Array[0.."TRACKING_UPPER_REGISTER_LIMT"] of "UDT_TrackingRegister";
+      iq_ActualData : Array["LOWERAXISNUMBER".."UPPERAXISNUMBER"] of "UDT_ServoActualData";
+   END_VAR
+
+   VAR 
+      stat_EnableOld : Bool;
+      stat_done : Bool;
+      stat_busy : Bool;
+      stat_error : Bool;
+      stat_Status : Word;
+      stat_errorID : Word;
+      stat_FBStateMachine : Int;
+      stat_NumberOfProductsInStage1 : Int;
+      stat_NumberOfProductsInStage2 : Int;
+      stat_NumberOfProductsInStage3 : Int;
+      inst_MCMOVEABSOLUTEStage1 { S7_SetPoint := 'False'} : "LAnyAxis_MC_MoveAbsolute";
+      inst_MCMOVEABSOLUTEStage2 { S7_SetPoint := 'False'} : "LAnyAxis_MC_MoveAbsolute";
+      inst_MCMOVEABSOLUTEStage3 { S7_SetPoint := 'False'} : "LAnyAxis_MC_MoveAbsolute";
+      stat_TONOpenStage1 {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONOpenStage2 {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONOpenStage3 {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONCloseStage1 {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONCloseStage2 {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONCloseStage3 {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_PositionStage1 : "UDT_Positions";
+      stat_PositionStage2 : "UDT_Positions";
+      stat_PositionStage3 : "UDT_Positions";
+      stat_RTrigSensor {InstructionName := 'R_TRIG'; LibVersion := '1.0'} : R_TRIG;
+      stat_FTrigSensor {InstructionName := 'F_TRIG'; LibVersion := '1.0'} : F_TRIG;
+      stat_CamReleaseState : "UDT_CamState";
+      stat_Stage1StartOpen { S7_SetPoint := 'True'} : Bool;
+      stat_Stage1StartClose : Bool;
+      stat_Stage2StartOpen : Bool;
+      stat_Stage2StartClose : Bool;
+      stat_Stage3StartOpen : Bool;
+      stat_Stage3StartClose : Bool;
+      stat_Stage1StartInit : Bool;
+      stat_Stage2StartInit : Bool;
+      stat_Stage3StartInit : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      temp_AxisStage1 : DB_ANY;
+      temp_AxisStage2 : DB_ANY;
+      temp_AxisStage3 : DB_ANY;
+      temp_NumberAxisStage1 : Int;
+      temp_NumberAxisStage2 : Int;
+      temp_NumberAxisStage3 : Int;
+      temp_Enable : Bool;
+      temp_SafetyDoor : Bool;
+      temp_TimeOpenStage1 : Time;
+      temp_TimeOpenStage2 : Time;
+      temp_TimeOpenStage3 : Time;
+      temp_TimeCloseStage1 : Time;
+      temp_TimeCloseStage2 : Time;
+      temp_TimeCloseStage3 : Time;
+      temp_MaxNumberOfProducts : DInt;
+      temp_Sensor : Bool;
+      temp_CamRelease : "UDT_CamData";
+      temp_ProductPocketEmpty : Bool;
+      temp_Stage1IsOpen : Bool;
+      temp_Stage1IsClosed : Bool;
+      temp_Stage2IsOpen : Bool;
+      temp_Stage2IsClosed : Bool;
+      temp_Stage3IsOpen : Bool;
+      temp_Stage3IsClosed : Bool;
+      temp_AllStagesOccupied : Bool;
+      temp_PosTrackingregister : Int;
+      temp_PosMoveOpen : Int;
+      temp_PosMoveClose : Int;
+      temp_MasterAxis : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      FB_STATE_NO_PROCESS : Int := 0;
+      FB_STATE_START_PROCESSING : Int := 1;
+      FB_STATE_INIT : Int := 2;
+      FB_STATE_WAIT_FOR_PRODUCT : Int := 10;
+      FB_STATE_ERROR : Int := 999;
+      STATUS_EXECUTION_FINISHED : Word := 16#0000;
+      STATUS_NO_CALL : Word := 16#7000;
+      STATUS_FIRST_CALL : Word := 16#7001;
+      STATUS_SUBSEQUENT_CALL : Word := 16#7002;
+      ERROR_MOVE_STAGE_1 : Word := 16#8001;
+      ERROR_MOVE_STAGE_2 : Word := 16#8002;
+      ERROR_MOVE_STAGE_3 : Word := 16#8003;
+      POSITIVE_DIRECTION : Int := 1;
+      NEGATIVE_DIRECTION : Int := 2;
+      SHORTEST_WAY : Int := 3;
+      TOLERANCE : LReal := 5.0;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// Description missing
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 00.00.10   29.04.2022    SK                  Alpha release version (not working)
+	// 00.01.00   06.07.2022    SK                  Beta release, no error handling
+	// 00.01.10   11.08.2022    SK                  Maping of outputs done, busy, error, etc.
+	// 00.01.20   19.10.2022    SK                  Adding CamState for Product release, change datatype of i_CamRelease to UDT_CamData
+	//                                              Adding MasterAxis for Cam Generation
+	//===============================================================================================
+	
+	REGION MAP INPUTS
+	    #temp_AxisStage1 := #i_AxisStage1;
+	    #temp_AxisStage2 := #i_AxisStage2;
+	    #temp_AxisStage3 := #i_AxisStage3;
+	    
+	    #temp_Enable := #i_Enable;
+	    #temp_Sensor := #i_Sensor;
+	    #temp_ProductPocketEmpty := #i_ProductPocketEmpty;
+	    #temp_CamRelease := #i_CamRelease;
+	    #temp_SafetyDoor := #i_SafetyDoor;
+	    
+	    #temp_TimeOpenStage1 := #i_TimeOpenStage1;
+	    #temp_TimeOpenStage2 := #i_TimeOpenStage2;
+	    #temp_TimeOpenStage3 := #i_TimeOpenStage3;
+	    
+	    #temp_TimeCloseStage1 := #i_TimeCloseStage1;
+	    #temp_TimeCloseStage2 := #i_TimeCloseStage2;
+	    #temp_TimeCloseStage3 := #i_TimeCloseStage3;
+	    
+	    //Set lower limit to 1
+	    IF #i_MaxNumberOfProducts < 1 THEN
+	        #temp_MaxNumberOfProducts := 1;
+	    ELSE
+	        #temp_MaxNumberOfProducts := #i_MaxNumberOfProducts;
+	    END_IF;
+	    
+	    #temp_PosTrackingregister := #i_PosTrackingregister;
+	    #temp_PosMoveOpen := #i_PosMoveOpen;
+	    #temp_PosMoveClose := #i_PosMoveClose;
+	END_REGION
+	
+	REGION GET STAGE NUMBERS
+	    #temp_NumberAxisStage1 := UINT_TO_INT(DB_ANY_TO_UINT(#temp_AxisStage1));
+	    #temp_NumberAxisStage2 := UINT_TO_INT(DB_ANY_TO_UINT(#temp_AxisStage2));
+	    #temp_NumberAxisStage3 := UINT_TO_INT(DB_ANY_TO_UINT(#temp_AxisStage3));
+	END_REGION
+	
+	REGION GENERATE CAM STATE
+	    IF #temp_MasterAxis <> 0 THEN
+	        "FC_CamDecoding"(i_CamOn := #temp_CamRelease.On,
+	                         i_CamOff := #temp_CamRelease.Off,
+	                         i_Position := #iq_ActualData[#temp_MasterAxis].ActualPosition,
+	                         iq_CamState := #stat_CamReleaseState);
+	    END_IF;
+	END_REGION
+	    
+	
+	REGION EXIT IF STAGE IS 0
+	    IF (#temp_NumberAxisStage1 OR #temp_NumberAxisStage2 OR #temp_NumberAxisStage3) = 0
+	    THEN
+	        RETURN;
+	    END_IF;
+	END_REGION
+	
+	REGION ENABLING/DISABLING
+	    IF (#temp_Enable = TRUE) AND (#stat_Status = #STATUS_NO_CALL) THEN // Enable FB
+	        // First call; initialize FB
+	        #stat_busy := TRUE;
+	        #stat_error := FALSE;
+	        #stat_Status := #STATUS_FIRST_CALL;
+	        #stat_errorID := 16#0000;
+	        
+	        #stat_FBStateMachine := #FB_STATE_START_PROCESSING; // State machine - start processing
+	        
+	        
+	    ELSIF (#temp_Enable = FALSE) AND (#stat_EnableOld = TRUE) THEN // Disable FB 
+	        #stat_FBStateMachine := #FB_STATE_NO_PROCESS;
+	        
+	    ELSIF (#stat_Status = #STATUS_FIRST_CALL) THEN // Set status identifier of subsequent call
+	        #stat_Status := #STATUS_SUBSEQUENT_CALL;
+	    END_IF;
+	    
+	    // Edge detection 'enable' input
+	    #stat_EnableOld := #temp_Enable;
+	END_REGION ENABLING/DISABLING
+	
+	REGION TIMES / FLAGS
+	    #stat_TONOpenStage1(IN := (#stat_NumberOfProductsInStage1 >= 1),
+	                        PT := #temp_TimeOpenStage1);
+	    
+	    #stat_TONOpenStage2(IN := (#stat_NumberOfProductsInStage2 >= #temp_MaxNumberOfProducts),
+	                        PT := #temp_TimeOpenStage2);
+	    
+	    #stat_TONOpenStage3(IN := (#stat_NumberOfProductsInStage3 >= #temp_MaxNumberOfProducts),
+	                        PT := #temp_TimeOpenStage3);
+	    
+	    #stat_TONCloseStage1(IN := #temp_Stage1IsOpen,
+	                         PT := #temp_TimeCloseStage1);
+	    
+	    #stat_TONCloseStage2(IN := #temp_Stage2IsOpen,
+	                         PT := #temp_TimeCloseStage2);
+	    
+	    #stat_TONCloseStage3(IN := #temp_Stage3IsOpen,
+	                         PT := #temp_TimeCloseStage3);
+	    
+	    #stat_RTrigSensor(CLK := #temp_Sensor AND #temp_SafetyDoor);
+	    #stat_FTrigSensor(CLK := #temp_Sensor AND #temp_SafetyDoor);
+	END_REGION
+	
+	REGION IS OPENED / CLOSED
+	    #temp_Stage1IsClosed := (#iq_Formatdata.Position[#temp_NumberAxisStage1, 1].Position - #TOLERANCE) < #iq_ActualData[#temp_NumberAxisStage1].ActualPosition AND (#iq_Formatdata.Position[#temp_NumberAxisStage1, 1].Position + #TOLERANCE) > #iq_ActualData[#temp_NumberAxisStage1].ActualPosition;
+	    #temp_Stage1IsOpen := (#iq_Formatdata.Position[#temp_NumberAxisStage1, 2].Position - #TOLERANCE) < #iq_ActualData[#temp_NumberAxisStage1].ActualPosition AND (#iq_Formatdata.Position[#temp_NumberAxisStage1, 2].Position + #TOLERANCE) > #iq_ActualData[#temp_NumberAxisStage1].ActualPosition;
+	    #temp_Stage2IsClosed := (#iq_Formatdata.Position[#temp_NumberAxisStage2, 1].Position - #TOLERANCE) < #iq_ActualData[#temp_NumberAxisStage2].ActualPosition AND (#iq_Formatdata.Position[#temp_NumberAxisStage2, 1].Position + #TOLERANCE) > #iq_ActualData[#temp_NumberAxisStage2].ActualPosition;
+	    #temp_Stage2IsOpen := (#iq_Formatdata.Position[#temp_NumberAxisStage2, 2].Position - #TOLERANCE) < #iq_ActualData[#temp_NumberAxisStage2].ActualPosition AND (#iq_Formatdata.Position[#temp_NumberAxisStage2, 2].Position + #TOLERANCE) > #iq_ActualData[#temp_NumberAxisStage2].ActualPosition;
+	    #temp_Stage3IsClosed := (#iq_Formatdata.Position[#temp_NumberAxisStage3, 1].Position - #TOLERANCE) < #iq_ActualData[#temp_NumberAxisStage3].ActualPosition AND (#iq_Formatdata.Position[#temp_NumberAxisStage3, 1].Position + #TOLERANCE) > #iq_ActualData[#temp_NumberAxisStage3].ActualPosition;
+	    #temp_Stage3IsOpen := (#iq_Formatdata.Position[#temp_NumberAxisStage3, 2].Position - #TOLERANCE) < #iq_ActualData[#temp_NumberAxisStage3].ActualPosition AND (#iq_Formatdata.Position[#temp_NumberAxisStage3, 2].Position + #TOLERANCE) > #iq_ActualData[#temp_NumberAxisStage3].ActualPosition;
+	    
+	    #temp_AllStagesOccupied := #stat_NumberOfProductsInStage1 >= 1 AND #stat_NumberOfProductsInStage2 >= 1 AND #stat_NumberOfProductsInStage3 >= #temp_MaxNumberOfProducts;
+	END_REGION
+	
+	REGION STATE MACHINE
+	    
+	    CASE #stat_FBStateMachine OF
+	        #FB_STATE_NO_PROCESS:
+	            REGION STATE_NO_PROCESS
+	                #stat_Stage1StartClose := FALSE;
+	                #stat_Stage2StartClose := FALSE;
+	                #stat_Stage3StartClose := FALSE;
+	                #stat_Stage1StartOpen := FALSE;
+	                #stat_Stage2StartOpen := FALSE;
+	                #stat_Stage3StartOpen := FALSE;
+	            END_REGION
+	        #FB_STATE_START_PROCESSING:
+	            REGION STATE_START_PROCESSING
+	                ;
+	            END_REGION
+	        #FB_STATE_INIT:
+	            REGION STATE_INIT         
+	                //Stage 1 opening and Stage 2/3 are closeing
+	                #stat_PositionStage1 := #iq_Formatdata.Position[#temp_NumberAxisStage1, #temp_PosMoveOpen];
+	                #stat_PositionStage2 := #iq_Formatdata.Position[#temp_NumberAxisStage2, #temp_PosMoveClose];
+	                #stat_PositionStage3 := #iq_Formatdata.Position[#temp_NumberAxisStage3, #temp_PosMoveClose];
+	                
+	                #stat_Stage1StartInit := TRUE;
+	                #stat_Stage2StartInit := TRUE;
+	                #stat_Stage3StartInit := TRUE;
+	                
+	                IF #inst_MCMOVEABSOLUTEStage1.Done
+	                    AND #inst_MCMOVEABSOLUTEStage2.Done
+	                    AND #inst_MCMOVEABSOLUTEStage3.Done
+	                THEN
+	                    #stat_Stage1StartInit := FALSE;
+	                    #stat_Stage2StartInit := FALSE;
+	                    #stat_Stage3StartInit := FALSE;
+	                    
+	                    #stat_FBStateMachine := #FB_STATE_WAIT_FOR_PRODUCT;
+	                END_IF;
+	            END_REGION
+	        #FB_STATE_WAIT_FOR_PRODUCT:
+	            REGION STATE_WAIT_FOR_PRODUCT
+	                REGION OPEN/CLOSE STAGE 1
+	                    //Count
+	                    IF #stat_FTrigSensor.Q AND (#temp_Stage1IsOpen)
+	                    THEN
+	                        #stat_NumberOfProductsInStage2 += 1;
+	                    ELSIF #stat_FTrigSensor.Q AND (#temp_Stage1IsClosed)
+	                    THEN
+	                        #stat_NumberOfProductsInStage1 += 1;
+	                    END_IF;
+	                    
+	                    //Open
+	                    IF #stat_TONOpenStage1.Q
+	                        AND #stat_NumberOfProductsInStage2 < #temp_MaxNumberOfProducts
+	                        AND NOT #temp_Sensor
+	                        AND #temp_Stage2IsClosed
+	                    THEN
+	                        #stat_PositionStage1 := #iq_Formatdata.Position[#temp_NumberAxisStage1, #temp_PosMoveOpen];
+	                        #stat_Stage1StartOpen := TRUE;
+	                    END_IF;
+	                    
+	                    IF #inst_MCMOVEABSOLUTEStage1.Done AND #stat_Stage1StartOpen
+	                    THEN
+	                        #stat_NumberOfProductsInStage2 := #stat_NumberOfProductsInStage2 + #stat_NumberOfProductsInStage1;
+	                        #stat_NumberOfProductsInStage1 := 0;
+	                        #stat_Stage1StartOpen := FALSE;
+	                    END_IF;
+	                    
+	                    //Close
+	                    IF #stat_NumberOfProductsInStage2 >= #temp_MaxNumberOfProducts
+	                        AND #temp_Sensor
+	                    THEN
+	                        #stat_PositionStage1 := #iq_Formatdata.Position[#temp_NumberAxisStage1, #temp_PosMoveClose];
+	                        #stat_Stage1StartClose := TRUE;
+	                    END_IF;
+	                    
+	                    IF #inst_MCMOVEABSOLUTEStage1.Done AND #stat_Stage1StartClose
+	                    THEN
+	                        #stat_Stage1StartClose := FALSE;
+	                    END_IF;
+	                END_REGION
+	                
+	                REGION OPEN/CLOSE STAGE 2
+	                    //Open
+	                    IF #stat_TONOpenStage2.Q
+	                        AND #stat_NumberOfProductsInStage3 = 0
+	                        AND NOT #temp_Sensor
+	                        AND #temp_Stage3IsClosed
+	                    THEN
+	                        #stat_PositionStage2 := #iq_Formatdata.Position[#temp_NumberAxisStage2, #temp_PosMoveOpen];
+	                        #stat_Stage2StartOpen := TRUE;
+	                    END_IF;
+	                    
+	                    IF #inst_MCMOVEABSOLUTEStage2.Done AND #stat_Stage2StartOpen
+	                    THEN
+	                        #stat_NumberOfProductsInStage3 := #stat_NumberOfProductsInStage2 + #stat_NumberOfProductsInStage3;
+	                        #stat_NumberOfProductsInStage2 := 0;
+	                        #stat_Stage2StartOpen := FALSE;
+	                    END_IF;
+	                    
+	                    //Close
+	                    IF #stat_TONCloseStage2.Q
+	                        AND NOT #stat_Stage2StartOpen
+	                    THEN
+	                        #stat_PositionStage2 := #iq_Formatdata.Position[#temp_NumberAxisStage2, #temp_PosMoveClose];
+	                        #stat_Stage2StartClose := TRUE;
+	                    END_IF;
+	                    
+	                    IF #inst_MCMOVEABSOLUTEStage2.Done AND #stat_Stage2StartClose
+	                    THEN
+	                        #stat_Stage2StartClose := FALSE;
+	                    END_IF;
+	                END_REGION
+	                
+	                REGION OPEN/CLOSE STAGE 3
+	                    //Open
+	                    IF #stat_TONOpenStage3.Q
+	                        AND #stat_CamReleaseState.active
+	                        AND (#temp_ProductPocketEmpty OR #temp_AllStagesOccupied)
+	                    THEN
+	                        #stat_PositionStage3 := #iq_Formatdata.Position[#temp_NumberAxisStage3, #temp_PosMoveOpen];
+	                        #stat_Stage3StartOpen := TRUE;
+	                        #iq_TrackingRegister[#temp_PosTrackingregister]."Product present" := true;
+	                        
+	                        IF #stat_NumberOfProductsInStage3 = #temp_MaxNumberOfProducts THEN
+	                            #iq_TrackingRegister[#temp_PosTrackingregister]."Product ok" := true;
+	                        END_IF;
+	                    END_IF;
+	                    
+	                    IF #inst_MCMOVEABSOLUTEStage3.Done AND #stat_Stage3StartOpen
+	                    THEN
+	                        #stat_NumberOfProductsInStage3 := 0;
+	                        #stat_Stage3StartOpen := FALSE;
+	                    END_IF;
+	                    
+	                    //Close
+	                    IF #stat_TONCloseStage3.Q
+	                        AND NOT #stat_Stage3StartOpen
+	                    THEN
+	                        #stat_PositionStage3 := #iq_Formatdata.Position[#temp_NumberAxisStage3, #temp_PosMoveClose];
+	                        #stat_Stage3StartClose := TRUE;
+	                    END_IF;
+	                    
+	                    IF #inst_MCMOVEABSOLUTEStage3.Done AND #stat_Stage3StartClose
+	                    THEN
+	                        #stat_Stage3StartClose := FALSE;
+	                    END_IF;
+	                END_REGION
+	            END_REGION
+	            
+	        #FB_STATE_ERROR:
+	            REGION STATE_ERROR
+	                ;
+	            END_REGION
+	        ELSE
+	            ;
+	    END_CASE;
+	    
+	END_REGION
+	
+	REGION CALL FUNCTIONS
+	    REGION MOVE STAGE 1
+	        #inst_MCMOVEABSOLUTEStage1(Axis := #temp_AxisStage1,
+	                                   Execute := #stat_Stage1StartClose OR #stat_Stage1StartOpen OR #stat_Stage1StartInit,
+	                                   Position := #stat_PositionStage1.Position,
+	                                   Velocity := #stat_PositionStage1.Vel,
+	                                   Acceleration := #stat_PositionStage1.ACC,
+	                                   Deceleration := #stat_PositionStage1.DC,
+	                                   Jerk := -1.0,
+	                                   Direction := #SHORTEST_WAY);
+	        
+	        //Error Handling
+	        IF #inst_MCMOVEABSOLUTEStage1.Error THEN
+	            #stat_Status := #ERROR_MOVE_STAGE_1;
+	            #stat_errorID := #inst_MCMOVEABSOLUTEStage1.ErrorId;
+	        END_IF;
+	    END_REGION
+	    REGION MOVE STAGE 2
+	        #inst_MCMOVEABSOLUTEStage2(Axis := #temp_AxisStage2,
+	                                   Execute := #stat_Stage2StartClose OR #stat_Stage2StartOpen OR #stat_Stage2StartInit,
+	                                   Position := #stat_PositionStage2.Position,
+	                                   Velocity := #stat_PositionStage2.Vel,
+	                                   Acceleration := #stat_PositionStage2.ACC,
+	                                   Deceleration := #stat_PositionStage2.DC,
+	                                   Jerk := -1.0,
+	                                   Direction := #SHORTEST_WAY);
+	        
+	        //Error Handling
+	        IF #inst_MCMOVEABSOLUTEStage2.Error THEN
+	            #stat_Status := #ERROR_MOVE_STAGE_2;
+	            #stat_errorID := #inst_MCMOVEABSOLUTEStage2.ErrorId;
+	        END_IF;
+	    END_REGION
+	    REGION MOVE STAGE 3
+	        #inst_MCMOVEABSOLUTEStage3(Axis := #temp_AxisStage3,
+	                                   Execute := #stat_Stage3StartClose OR #stat_Stage3StartOpen OR #stat_Stage3StartInit,
+	                                   Position := #stat_PositionStage3.Position,
+	                                   Velocity := #stat_PositionStage3.Vel,
+	                                   Acceleration := #stat_PositionStage3.ACC,
+	                                   Deceleration := #stat_PositionStage3.DC,
+	                                   Jerk := -1.0,
+	                                   Direction := #SHORTEST_WAY);
+	        
+	        //Error Handling
+	        IF #inst_MCMOVEABSOLUTEStage3.Error THEN
+	            #stat_Status := #ERROR_MOVE_STAGE_3;
+	            #stat_errorID := #inst_MCMOVEABSOLUTEStage3.ErrorId;
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION OUTPUTS
+	    IF (#stat_Status = #STATUS_EXECUTION_FINISHED) AND (#stat_done = FALSE) THEN
+	        #stat_done := TRUE;
+	        #stat_busy := FALSE;
+	        #stat_error := FALSE;
+	        #stat_FBStateMachine := #FB_STATE_NO_PROCESS;
+	    ELSIF (#stat_Status.%X15 = TRUE) AND (#stat_error = FALSE) THEN // Error occurred (#statStatus is 16#8000 to 16#FFFF)
+	        #stat_done := FALSE;
+	        #stat_busy := FALSE;
+	        #stat_error := TRUE;
+	        #stat_FBStateMachine := #FB_STATE_NO_PROCESS;
+	    ELSIF (#temp_Enable = FALSE) AND ((#stat_done = TRUE) OR (#stat_error = TRUE) OR #stat_FBStateMachine = #FB_STATE_NO_PROCESS) THEN
+	        #stat_busy := false;
+	        #stat_done := false;
+	        #stat_error := false;
+	        #stat_Status := #STATUS_NO_CALL;
+	    END_IF;
+	    
+	    #q_done := #stat_done;
+	    #q_busy := #stat_busy;
+	    #q_error := #stat_error;
+	    #q_status := #stat_Status;
+	    #q_errorID := #stat_errorID;
+	END_REGION
+END_FUNCTION_BLOCK
+
