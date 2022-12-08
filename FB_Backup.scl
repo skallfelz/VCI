@@ -351,7 +351,7 @@ BEGIN
 	    END_CASE;
 	END_REGION
 	
-	REGION CALL FUNCTION
+	REGION CALL FUNCTIONS
 	    REGION FILEWRITEC
 	        #inst_FileWriteC(REQ := #stat_TriggerExport,
 	                         Offset := 0,
