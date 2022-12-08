@@ -1,0 +1,155 @@
+﻿FUNCTION "FC_Shift" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_StartValue : Variant;   // Nockenanfangswert
+      i_Shift : LReal;   // Wert um wie viel das Ende der Nocke verschoben werden soll
+      i_Modulo : Variant;   // Teilungsgröße der Anlage
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Shifted : Variant;   // Nockenendwert
+   END_VAR
+
+   VAR_TEMP 
+      temp_VariantStartValue : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantModulo : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantShift : Struct
+         "Int" : Int;
+         "Dint" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_ShiftedStartValue : LReal;
+      temp_Modulo : LReal;
+      temp_Shift : LReal;
+      temp_StartValue : LReal;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FC  to shift a variant to an variant by value
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   16.12.2021    EP                  First release version v1.0
+	// 01.00.01   07.01.2022    SK                  Change names
+	//===============================================================================================
+	REGION Convert Datatype
+	    REGION i_Modulo
+	        CASE TypeOf(#i_Modulo) OF
+	            Int:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Int");
+	                
+	                #temp_Modulo := INT_TO_LREAL(#temp_VariantModulo."Int");
+	            DInt:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Dint");
+	                
+	                #temp_Modulo := DINT_TO_LREAL(#temp_VariantModulo."Dint");
+	            Real:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."Real");
+	                
+	                #temp_Modulo := REAL_TO_LREAL(#temp_VariantModulo."Real");
+	            LReal:
+	                VariantGet(SRC := #i_Modulo,
+	                           DST => #temp_VariantModulo."LReal");
+	                
+	                #temp_Modulo := #temp_VariantModulo."LReal";
+	            ELSE
+	                #temp_Modulo := 0.0;
+	        END_CASE;
+	    END_REGION
+	    
+	    REGION i_StartValue
+	        CASE TypeOf(#i_StartValue) OF
+	            Int:
+	                VariantGet(SRC := #i_StartValue,
+	                           DST => #temp_VariantStartValue."Int");
+	                
+	                #temp_StartValue := INT_TO_LREAL(#temp_VariantStartValue."Int");
+	            DInt:
+	                VariantGet(SRC := #i_StartValue,
+	                           DST => #temp_VariantStartValue."Dint");
+	                
+	                #temp_StartValue := DINT_TO_LREAL(#temp_VariantStartValue."Dint");
+	            Real:
+	                VariantGet(SRC := #i_StartValue,
+	                           DST => #temp_VariantStartValue."Real");
+	                
+	                #temp_StartValue := REAL_TO_LREAL(#temp_VariantStartValue."Real");
+	            LReal:
+	                VariantGet(SRC := #i_StartValue,
+	                           DST => #temp_VariantStartValue."LReal");
+	                
+	                #temp_StartValue := #temp_VariantStartValue."LReal";
+	            ELSE
+	                #temp_StartValue := 0.0;
+	        END_CASE;
+	    END_REGION
+	END_REGION
+	
+	REGION Shift
+	    (/*Verschiebung StartWert*/)
+	    #temp_ShiftedStartValue := #temp_StartValue + #i_Shift;
+	    
+	    (/*Überwachung des Startwerts BY Modulo*/)
+	    IF #temp_ShiftedStartValue < 0
+	    THEN
+	        #temp_Shift := #temp_ShiftedStartValue + #temp_Modulo;
+	    ELSIF #temp_ShiftedStartValue > #temp_Modulo
+	    THEN
+	        #temp_Shift := #temp_ShiftedStartValue - #temp_Modulo;
+	    ELSIF #temp_ShiftedStartValue >= 0 AND #temp_ShiftedStartValue <= #temp_Modulo
+	    THEN
+	        #temp_Shift := #temp_ShiftedStartValue;
+	    END_IF;
+	END_REGION
+	
+	REGION Convert Datatype for Output
+	    CASE TypeOf(#iq_Shifted) OF
+	        Int:
+	            #temp_VariantShift."Int" := LREAL_TO_INT(#temp_Shift);
+	            
+	            VariantPut(SRC := #temp_VariantShift."Int",
+	                       DST := #iq_Shifted);
+	        DInt:
+	            #temp_VariantShift."Dint" := LREAL_TO_DINT(#temp_Shift);
+	            
+	            VariantPut(SRC := #temp_VariantShift."Dint",
+	                       DST := #iq_Shifted);
+	        Real:
+	            #temp_VariantShift."Real" := LREAL_TO_REAL(#temp_Shift);
+	            
+	            VariantPut(SRC := #temp_VariantShift."Real",
+	                       DST := #iq_Shifted);
+	        LReal:
+	            #temp_VariantShift."LReal" := #temp_Shift;
+	            
+	            VariantPut(SRC := #temp_VariantShift."LReal",
+	                       DST := #iq_Shifted);
+	        ELSE
+	            #temp_VariantShift."LReal" := #temp_Shift;
+	            
+	            VariantPut(SRC := #temp_VariantShift."LReal",
+	                       DST := #iq_Shifted);
+	    END_CASE;
+	END_REGION
+END_FUNCTION
+

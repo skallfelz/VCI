@@ -1,0 +1,145 @@
+﻿FUNCTION "FC_CamDecoding" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_CamOn : Variant;   // Nockenanfangswert
+      i_CamOff : Variant;   // Nockenendwert
+      i_ActualPosition : Variant;   // Aktueller Positionswert des Drehgeberwert
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_CamState : "UDT_CamState";
+   END_VAR
+
+   VAR_TEMP 
+      temp_VariantPosition : Struct
+         "Int" : Int;
+         "DInt" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantCamOn : Struct
+         "Int" : Int;
+         "DInt" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_VariantCamOff : Struct
+         "Int" : Int;
+         "DInt" : DInt;
+         "Real" : Real;
+         "LReal" : LReal;
+      END_STRUCT;
+      temp_ActualPosition : Real;
+      temp_CamOn : Real;
+      temp_CamOff : Real;
+      temp_CamState : "UDT_CamState";
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FC to generate to different states of a cam
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   14.04.2022    EP                  First release version v1.0
+	//===============================================================================================
+	REGION Detect datatypes
+	    CASE TypeOf(#i_CamOn) OF
+	        Int:
+	            VariantGet(SRC := #i_CamOn,
+	                       DST => #temp_VariantCamOn."Int");
+	            
+	            #temp_CamOn := INT_TO_REAL(#temp_VariantCamOn."Int");
+	        DInt:
+	            VariantGet(SRC := #i_CamOn,
+	                       DST => #temp_VariantCamOn."DInt");
+	            
+	            #temp_CamOn := DINT_TO_REAL(#temp_VariantCamOn."DInt");
+	        Real:
+	            VariantGet(SRC := #i_CamOn,
+	                       DST => #temp_VariantCamOn."Real");
+	            
+	            #temp_CamOn := #temp_VariantCamOn."Real";
+	        LReal:
+	            VariantGet(SRC := #i_CamOn,
+	                       DST => #temp_VariantCamOn."LReal");
+	            
+	            #temp_CamOn := LREAL_TO_REAL(#temp_VariantCamOn."LReal");
+	        ELSE
+	            #temp_CamOn := 0.0;
+	    END_CASE;
+	    
+	    CASE TypeOf(#i_CamOff) OF
+	        Int:
+	            VariantGet(SRC := #i_CamOff,
+	                       DST => #temp_VariantCamOff."Int");
+	            
+	            #temp_CamOff := INT_TO_REAL(#temp_VariantCamOff."Int");
+	        DInt:
+	            VariantGet(SRC := #i_CamOff,
+	                       DST => #temp_VariantCamOff."DInt");
+	            
+	            #temp_CamOff := DINT_TO_REAL(#temp_VariantCamOff."DInt");
+	        Real:
+	            VariantGet(SRC := #i_CamOff,
+	                       DST => #temp_VariantCamOff."Real");
+	            
+	            #temp_CamOff := #temp_VariantCamOff."Real";
+	        LReal:
+	            VariantGet(SRC := #i_CamOff,
+	                       DST => #temp_VariantCamOff."LReal");
+	            
+	            #temp_CamOff := LREAL_TO_REAL(#temp_VariantCamOff."LReal");
+	        ELSE
+	            #temp_CamOff := 0.0;
+	    END_CASE;
+	    
+	    CASE TypeOf(#i_ActualPosition) OF
+	        Int:
+	            VariantGet(SRC := #i_ActualPosition,
+	                       DST => #temp_VariantPosition."Int");
+	            
+	            #temp_ActualPosition := INT_TO_REAL(#temp_VariantPosition."Int");
+	        DInt:
+	            VariantGet(SRC := #i_ActualPosition,
+	                       DST => #temp_VariantPosition."DInt");
+	            
+	            #temp_ActualPosition := DINT_TO_REAL(#temp_VariantPosition."DInt");
+	        Real:
+	            VariantGet(SRC := #i_ActualPosition,
+	                       DST => #temp_VariantPosition."Real");
+	            
+	            #temp_ActualPosition := #temp_VariantPosition."Real";
+	        LReal:
+	            VariantGet(SRC := #i_ActualPosition,
+	                       DST => #temp_VariantPosition."LReal");
+	            
+	            #temp_ActualPosition := LREAL_TO_REAL(#temp_VariantPosition."LReal");
+	        ELSE
+	            #temp_ActualPosition := 0.0;
+	    END_CASE;
+	END_REGION
+	
+	REGION Generate Cam
+	    #temp_CamState.Active := (#temp_CamOn < #temp_CamOff AND #temp_ActualPosition > #temp_CamOn AND #temp_ActualPosition < #temp_CamOff)
+	    OR (#temp_CamOn > #temp_CamOff AND (#temp_ActualPosition > #temp_CamOn OR #temp_ActualPosition < #temp_CamOff));
+	END_REGION
+	
+	REGION Generate rising edge
+	    #temp_CamState.RisingTrig := #temp_CamState.Active AND NOT #iq_CamState.Active;
+	END_REGION
+	
+	REGION Generate falling edge
+	    #temp_CamState.FallingTrig := NOT #temp_CamState.Active AND #iq_CamState.Active;
+	END_REGION
+	
+	REGION Output Cam
+	    #iq_CamState := #temp_CamState;
+	END_REGION
+END_FUNCTION
+

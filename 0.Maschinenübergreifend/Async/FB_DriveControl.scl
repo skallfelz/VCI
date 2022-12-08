@@ -1,0 +1,462 @@
+﻿FUNCTION_BLOCK "FB_DriveControl"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_LADDR : HW_IO;   // Hardware Interface der Profinetschnittstelle
+      i_LADDRTelegramm : HW_IO;   // Hardware Interface des verwendeten Telegramms
+      i_StartMotion : Bool;   // Freigabe für das Antriebsgerät
+      i_Setpoint : DInt;   // Geschwindigkeitsvorgabe für das Antriebsgerät
+      i_Reset : Bool;   // Fehler des Antriebsgerätes Quittieren
+      i_Reverse : Bool;   // Drehrichtung des Antriebsgerätes umpolen
+      i_AdjustHMI : Int := 1000;   // Anpassung der HMI Vorgabe
+      i_Statusword : DWord;   // Statuswort
+      i_Manufactor : Int;   // Hersteller des Antriebsgerätes
+      i_SafetyOk : Bool;   // Sicherheitskreis ohne Fehler
+      i_MinimumFrequency : Real := 20.0;   // Minimalfrequenz des Antriebsgerätes
+   END_VAR
+
+   VAR_OUTPUT 
+      q_Warning : Bool;   // Antriebsgerät hat eine aktive Warnung
+      q_WarnCode : UInt;   // Aktiver Warncode des Antriebsgerätes
+      q_Error : Bool;   // Antriebsgerät hat einen aktiven Fehler
+      q_Errorcode : UInt;   // Aktiver Fehlercode des Antriebsgerätes
+      q_Ready : Bool;   // Antriebsgerät ist Betriebsbereit
+      q_InMotion : Bool;   // Antriebsgerät ist in Bewegung
+      q_Controlword : DWord;   // Steuerwort
+      q_ActualFrequency : Real;   // Aktuelle ausgegebene Frequenz
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_ActiveLADDR : HW_IO;   // Azyklische Kommunikation ist für diesen Motor freigegeben
+   END_VAR
+
+   VAR 
+      stat_FirstsCycle : Bool := True;
+      stat_Schrittkettencounter : Int;
+      stat_SchrittkettencounterNextStep : Int;
+      stat_SchrittkettencounterFirstScan : Bool;
+      stat_IAmActive : Bool;
+      stat_Errorcode { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;
+      stat_Warncode { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : UInt;
+      stat_ErrorCodeDanfoss { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DWord;
+      stat_WarnCodeDanfoss { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DWord;
+      inst_SINA_PARA_S { S7_SetPoint := 'False'} : "SINA_PARA_S";
+      inst_VLT_PROFI_FC_DIAGNOSTICS { S7_SetPoint := 'False'} : "VLT_PROFI_FC_DIAGNOSTICS";
+   END_VAR
+
+   VAR_TEMP 
+      temp_ReceiveSiemens : Struct
+         zsw1 : Struct
+            "Abweichung_Soll/Ist" : Bool;   // Drehzahl im Toleranzband
+            Führung_gefordert : Bool;   // SPS kann Steuerung übernehmen
+            Max_Drehzahl_erreicht : Bool;   // Drehzahl > Max.Drehzahl
+            "I, M, P-Grenze_erreicht" : Bool;   // Drehmoment > Max.Moment
+            Motorhaltbremse_offen : Bool;   // Bremse gelöst
+            Warnung_Übertemp_Motor : Bool;   // Temperatur > Max.Temperatur
+            Motor_dreht_vorwärts : Bool;   // 1= Rechtslauf 0=Linkslauf
+            Warnung_Überlast_Umrichter : Bool;   // Temperatur > Max.Temperatur
+            Einschaltbereit : Bool;   // 1= Energievers. eingeschaltet
+            Betriebsbereit : Bool;   // 1= Umrichter eingeschaltet mit EIN/AUS=1 , keine Stör.
+            Betrieb_freigegeben : Bool;   // 1= Motor folgt Sollwert
+            Störung_wirksam : Bool;   // 1= Stoerung
+            Austrudeln_aktiv : Bool;   // 1= Austrudeln nicht aktiv
+            Schnellhalt_aktiv : Bool;   // 1= Schnellhalt nicht aktiv
+            Einschaltsperre_aktiv : Bool;   // Ein mit pos. flanke von EIN_AUS1
+            Warnung_wirksam : Bool;   // 1= Warnung
+         END_STRUCT;
+         nIst : Int;   // Drehzahl-Istwert 16Bit
+         IIst : Int;
+         MdIst : Int;
+         Warn : Word;
+         Fault : Word;
+         SPare : Word;
+         SPare_1 : Word;
+      END_STRUCT;
+      temp_SendSiemens : Struct
+         STW1 : Struct
+            Tippen_Bit0 : Bool;
+            Tippen_Bit1 : Bool;
+            Führung_durch_PLC : Bool;
+            Richtungsumkehr_Sollwert : Bool;
+            Reserve : Bool;
+            Motorpotenziometer_erhöhen : Bool;
+            Motorpotenziometer_tiefer : Bool;
+            CDBit0 : Bool;
+            "Ein/Aus1" : Bool;   // 1=Ein; 0=Aus Rampe
+            "BB/Aus2" : Bool;   // 1=Ein; 0=Aus Motor trudelt aus
+            "BB/Aus3" : Bool;   // 1=Ein; 0=Aus Notrampe
+            Betrieb_freigeben : Bool;   // Betrieb freigeben (1=Impulsfreig. möglich)
+            Hochlaufgeber_freigeben : Bool;   // 1=HLG_Frg möglich
+            Hochlaufgeber_fortsetzen : Bool;   // 1=HLG folgt dem Sollwert
+            Drehzahlsollwert_freigeben : Bool;   // 1=Beschleunigung bis nSoll 0=Bremsen
+            Störung_quittieren : Bool;   // Störung quittieren
+         END_STRUCT;
+         Sollwert_Umrichter : Int;   // Drehzahl-Sollwert 16Bit
+         spare1_PCS7 : Int;
+         spare2_PCS7 : Int;
+         spare3_PCS7 : Int;
+         spare4_PCS7 : Int;
+         SPare : Int;
+         SPare_1 : Int;
+      END_STRUCT;
+      temp_ReceiveDanfoss : Struct
+         Steuerung_bereit : Bool;   // Danfoss Zustandswort 1, Steuerung ist bereit
+         Frequenzumrichter_bereit : Bool;   // Danfoss Zustandswort 1, Frequenzumrichter ist bereit
+         Motor_OK : Bool;   // Danfoss Zustandswort 1, Frequenzumrichter startet den Motor
+         Fehler_Abschaltung : Bool;   // Danfoss Zustandswort 1, Fehler mit Abschaltung
+         Fehler_keine_Abschaltung : Bool;   // Danfoss Zustandswort 1, Fehler ohne Abschaltung
+         Reserviert : Bool;   // Danfoss Zustandswort 1, Reserviert
+         Abschaltblockierung : Bool;   // Danfoss Zustandswort 1, Frequenzumrichter ist abgeschaltet und blockiert
+         Warnung : Bool;   // Danfoss Zustandswort 1, Warnung
+         Sollwert_erreicht : Bool;   // Danfoss Zustandswort 1, Drehzahl entspricht Sollwert
+         Bussteuerung : Bool;   // Danfoss Zustandswort 1, Bussteuerung aktiv
+         Frequenz_innerhalb_Grenze : Bool;   // Danfoss Zustandswort 1, Frequenz innerhalb der Frequenzgrenzen
+         Motor_dreht : Bool;   // Danfoss Zustandswort 1, Motor in Betrieb
+         Übertemperatur_Umrichter : Bool;   // Danfoss Zustandswort 1, Übertemperatur des Frequenzumrichters, Automatischer Wiederanlauf
+         Spannung_Fehler : Bool;   // Danfoss Zustandswort 1, Zwischenkreisspannung ist zu hoch oder zu niedrig
+         Drehmomentgrenze_Fehler : Bool;   // Danfoss Zustandswort 1, Drehmomentgrenze wurde überschritten
+         Übertemperatur : Bool;   // Danfoss Zustandswort 1, Timer für thermischen Schutz hat 100% überschritten
+         aktuelle_Frequenz : Int;   // Danfoss Zustandswort 2, aktuelle Ausgangsfrequenz
+      END_STRUCT;
+      temp_SendDanfoss : Struct
+         Externe_Anwahl_lsb : Bool;   // Danfoss Steuerwort 1, Anwahl Festdrehzahl
+         Externe_Anwahl_msb : Bool;   // Danfoss Steuerwort 1, Anwahl Festdrehzahl
+         Bremse_öffnen : Bool;   // Danfoss Steuerwort 1, Bremse öffnen
+         kein_Freilauf : Bool;   // Danfoss Steuerwort 1, Motorfreilauf nicht aktiv
+         kein_Schnellstop : Bool;   // Danfoss Steuerwort 1, Schnellstop nicht aktiv
+         Rampe_verwenden : Bool;   // Danfoss Steuerwort 1, Rampe verwenden
+         Start : Bool;   // Danfoss Steuerwort 1, Start
+         Reset : Bool;   // Danfoss Steuerwort 1, Reset
+         Festdrehzahl_JOG : Bool;   // Danfoss Steuerwort 1, Festdrehzahl JOG
+         Rampe_Anwahl : Bool;   // Danfoss Steuerwort 1, Anwahl Rampe 1 oder 2
+         Daten_gültig : Bool;   // Danfoss Steuerwort 1, Daten gültig
+         Relais_01_aktiv : Bool;   // Danfoss Steuerwort 1, Relais 01 aktiv
+         Relais_04_aktiv : Bool;   // Danfoss Steuerwort 1, Relais 02 aktiv
+         Auswahl_lsb : Bool;   // Danfoss Steuerwort 1, Anwahl Parametersatz
+         Auswahl_msb : Bool;   // Danfoss Steuerwort 1, Anwahl Parametersatz
+         Reversieren : Bool;   // Danfoss Steuerwort 1, Reversieren
+         Sollwert_Umrichter : Int;   // Danfoss Steuerwort 2, Sollwert Frequenzumrichter
+      END_STRUCT;
+      temp_Einschaltbereit : Bool;
+      temp_Betrieb_freigegeben : Bool;
+      temp_StartRun : Bool;
+      temp_Setpoint : DInt;
+      temp_Reset : Bool;
+      temp_Reverse : Bool;
+      temp_AdjustHMI : Int;
+      temp_Manufactor : Int;
+      temp_EmergencyStopOk : Bool;
+      temp_MinimumFrequency : Int;
+      temp_SetPointReal : Real;
+      temp_Error : Bool;
+      temp_Warning : Bool;
+      temp_LADDR : HW_IO;
+      temp_LADDRTelegramm : HW_IO;
+      temp_ReturnReadFaultID : Int;
+      temp_ReturnWriteFaultID : Int;
+      temp_ActualFrequency : Real;
+   END_VAR
+
+   VAR CONSTANT 
+      SIEMENS : Int := 1;
+      DANFOSS : Int := 2;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB is to Control Asynchronous drives with Telegram 352
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   11.03.2022    EP                  First release version v1.0
+	// 01.00.01   18.03.2022    SK                  Implement SCL and first work to translate in english
+	// 01.00.02   14.04.2022    MB                  Warning and Fault Output adujustment with Saftey OK 
+	// 02.00.00   08.06.2022    MB                  Add Siemens Error/Warn code handling to the FunctionBlock 
+	// 02.01.00   02.09.2022    MB                  Add Danfoss Error/Warn code handling and some Regions for better overview
+	// 03.00.00   27.10.2022    MB                  Change control from Status/Control word to Hardware ID
+	// 30.01.00   31.10.2022    TK                  Add Busy function for acyclic communication
+	//===============================================================================================
+	REGION Nothing else to avoid runtime peaks  
+	    (/*Mit CPU Neustart Schrittkette initialisieren*/)
+	    IF #stat_FirstsCycle THEN
+	        #stat_Schrittkettencounter := 0;
+	        #stat_SchrittkettencounterNextStep := 0;
+	        #stat_FirstsCycle := False;
+	        #stat_IAmActive := False;
+	        #iq_ActiveLADDR := 0;
+	        RETURN;
+	    END_IF;
+	END_REGION
+	
+	REGION MAP INPUTS
+	    #temp_LADDR := #i_LADDR;
+	    #temp_LADDRTelegramm := #i_LADDRTelegramm;
+	    #temp_StartRun := #i_StartMotion;
+	    #temp_Setpoint := #i_Setpoint;
+	    #temp_Reset := #i_Reset;
+	    #temp_Reverse := #i_Reverse;
+	    #temp_AdjustHMI := #i_AdjustHMI;
+	    #temp_Manufactor := #i_Manufactor;
+	    #temp_EmergencyStopOk := #i_SafetyOk;
+	    #temp_MinimumFrequency := REAL_TO_INT(#i_MinimumFrequency * 16384.0 / 100.0);
+	END_REGION
+	
+	REGION SELECT MANUFACTOR
+	    REGION SIEMENS
+	        IF #temp_Manufactor = #SIEMENS
+	        THEN
+	            (/*Umrichter Daten auslesen Siemens*/)
+	            #temp_ReceiveSiemens.zsw1.Störung_wirksam := 0;
+	            #temp_ReturnReadFaultID := DPRD_DAT(LADDR := #temp_LADDRTelegramm, RECORD => #temp_ReceiveSiemens);
+	            #temp_Einschaltbereit := #temp_ReceiveSiemens.zsw1.Einschaltbereit;
+	            #temp_Betrieb_freigegeben := #temp_ReceiveSiemens.zsw1.Betrieb_freigegeben;
+	            #temp_ActualFrequency := INT_TO_REAL(#temp_ReceiveSiemens.nIst * 100 / 16384);
+	            
+	            (/*Fehler zusammenfassen Siemens*/)
+	            #temp_Error := #temp_ReceiveSiemens.zsw1.Störung_wirksam AND #temp_EmergencyStopOk;
+	            
+	            (/*Warnungen zusammenfassen Siemens*/)
+	            #temp_Warning := (#temp_ReceiveSiemens.zsw1.Warnung_wirksam OR #temp_ReceiveSiemens.zsw1.Warnung_Übertemp_Motor OR #temp_ReceiveSiemens.zsw1.Warnung_Überlast_Umrichter) AND #temp_EmergencyStopOk;
+	            
+	            (/*Initialisierung*/)
+	            #temp_SendSiemens.STW1."BB/Aus2" := True;
+	            #temp_SendSiemens.STW1."BB/Aus3" := True;
+	            #temp_SendSiemens.STW1.Hochlaufgeber_freigeben := True;
+	            #temp_SendSiemens.STW1.Hochlaufgeber_fortsetzen := True;
+	            #temp_SendSiemens.STW1.Motorpotenziometer_erhöhen := False;
+	            #temp_SendSiemens.STW1.Motorpotenziometer_tiefer := False;
+	            
+	        END_IF;
+	        
+	        (/*Start / Stop Siemens Umformer*/)
+	        IF #temp_StartRun AND NOT #temp_Error
+	        THEN
+	            #temp_SendSiemens.STW1."Ein/Aus1" := True;
+	            #temp_SendSiemens.STW1.Drehzahlsollwert_freigeben := True;
+	            #temp_SendSiemens.STW1.Betrieb_freigeben := True;
+	            
+	            IF NOT #temp_Reverse
+	            THEN
+	                (/*Sollwert Skalieren*/)
+	                #temp_SetPointReal := DINT_TO_REAL(#temp_Setpoint);
+	                #temp_SetPointReal := #temp_SetPointReal * 16384 / 1000;
+	                #temp_SetPointReal := #temp_SetPointReal * #temp_AdjustHMI / 1000;
+	                #temp_SendSiemens.Sollwert_Umrichter := REAL_TO_INT(#temp_SetPointReal);
+	                #temp_SendSiemens.STW1.Richtungsumkehr_Sollwert := False;
+	                
+	                (/*Minimumfrequenz 20Hz*/)
+	                IF #temp_SendSiemens.Sollwert_Umrichter > 16384
+	                THEN
+	                    #temp_SendSiemens.Sollwert_Umrichter := 16384;
+	                ELSIF #temp_SendSiemens.Sollwert_Umrichter < #temp_MinimumFrequency
+	                THEN
+	                    #temp_SendSiemens.Sollwert_Umrichter := #temp_MinimumFrequency;
+	                END_IF;
+	                
+	            ELSIF #temp_Reverse
+	            THEN
+	                (/*Sollwert Skallieren*/)
+	                #temp_SetPointReal := DINT_TO_REAL(#temp_Setpoint);
+	                #temp_SetPointReal := #temp_SetPointReal * 16384 / 1000;
+	                #temp_SetPointReal := #temp_SetPointReal * #temp_AdjustHMI / 1000;
+	                #temp_SendSiemens.Sollwert_Umrichter := REAL_TO_INT(#temp_SetPointReal);
+	                #temp_SendSiemens.STW1.Richtungsumkehr_Sollwert := True;
+	                
+	                (/*Minimumfrequenz 20Hz*/)
+	                IF #temp_SendSiemens.Sollwert_Umrichter > 16384
+	                THEN
+	                    #temp_SendSiemens.Sollwert_Umrichter := 16384;
+	                ELSIF #temp_SendSiemens.Sollwert_Umrichter < #temp_MinimumFrequency
+	                THEN
+	                    #temp_SendSiemens.Sollwert_Umrichter := #temp_MinimumFrequency;
+	                END_IF;
+	            END_IF;
+	        ELSE
+	            #temp_SendSiemens.STW1."Ein/Aus1" := False;
+	            #temp_SendSiemens.STW1.Drehzahlsollwert_freigeben := False;
+	            #temp_SendSiemens.STW1.Betrieb_freigeben := False;
+	            
+	            IF #temp_Reset
+	            THEN
+	                #temp_SendSiemens.STW1.Störung_quittieren := 1;
+	            END_IF;
+	            
+	        END_IF;
+	        (/*Daten an Umrichter senden Siemens*/)
+	        #temp_ReturnWriteFaultID := DPWR_DAT(LADDR := #temp_LADDRTelegramm, RECORD := #temp_SendSiemens);
+	    END_REGION
+	    
+	    
+	    REGION DANFOSS
+	        IF #temp_Manufactor = #DANFOSS
+	        THEN
+	            (/*Umrichter Daten auslesen Danfoss*/)
+	            #temp_ReturnReadFaultID := DPRD_DAT(LADDR := #temp_LADDRTelegramm, RECORD => #temp_ReceiveDanfoss);
+	            
+	            #temp_Einschaltbereit := #temp_ReceiveDanfoss.Frequenzumrichter_bereit;
+	            #temp_Betrieb_freigegeben := #temp_ReceiveDanfoss.Motor_dreht;
+	            #temp_ActualFrequency := INT_TO_REAL(#temp_ReceiveDanfoss.aktuelle_Frequenz);
+	            
+	            (/*Fehler zusammenfassen Danfoss*/)
+	            #temp_Error := (#temp_ReceiveDanfoss.Fehler_keine_Abschaltung OR #temp_ReceiveDanfoss.Abschaltblockierung OR #temp_ReceiveDanfoss.Fehler_Abschaltung OR
+	            #temp_ReceiveDanfoss.Drehmomentgrenze_Fehler OR #temp_ReceiveDanfoss.Spannung_Fehler) AND #temp_EmergencyStopOk;
+	            
+	            (/*Warnungen zusammenfassen Danfoss*/)
+	            #temp_Warning := (#temp_ReceiveDanfoss.Warnung OR #temp_ReceiveDanfoss.Übertemperatur) AND #temp_EmergencyStopOk;
+	            
+	            (/*Initialisierung*/)
+	            #temp_SendDanfoss.kein_Schnellstop := True;
+	            #temp_SendDanfoss.Rampe_verwenden := True;
+	            #temp_SendDanfoss.kein_Freilauf := True;
+	            #temp_SendDanfoss.kein_Schnellstop := True;
+	            #temp_SendDanfoss.Externe_Anwahl_lsb := True;
+	            #temp_SendDanfoss.Rampe_Anwahl := True;
+	            #temp_SendDanfoss.Daten_gültig := True;
+	        END_IF;
+	        
+	        (/*Start / Stop Danfoss Umformer*/)
+	        IF #temp_StartRun AND NOT #temp_Error
+	        THEN
+	            #temp_SendDanfoss.Start := True;
+	            #temp_SendDanfoss.Bremse_öffnen := True;
+	            IF NOT #temp_Reverse
+	            THEN
+	                (/*Sollwert Skalieren*/)
+	                #temp_SetPointReal := DINT_TO_REAL(#temp_Setpoint);
+	                #temp_SetPointReal := #temp_SetPointReal * 16384 / 1000;
+	                #temp_SetPointReal := #temp_SetPointReal * #temp_AdjustHMI / 1000;
+	                #temp_SendDanfoss.Sollwert_Umrichter := REAL_TO_INT(#temp_SetPointReal);
+	                #temp_SendDanfoss.Reversieren := False;
+	                
+	                (/*Minimumfrequenz 20Hz*/)
+	                IF #temp_SendDanfoss.Sollwert_Umrichter > 16384
+	                THEN
+	                    #temp_SendDanfoss.Sollwert_Umrichter := 16384;
+	                ELSIF #temp_SendDanfoss.Sollwert_Umrichter < #temp_MinimumFrequency
+	                THEN
+	                    #temp_SendDanfoss.Sollwert_Umrichter := #temp_MinimumFrequency;
+	                END_IF;
+	                
+	            ELSIF #temp_Reverse
+	            THEN
+	                (/*Sollwert Skallieren*/)
+	                #temp_SetPointReal := DINT_TO_REAL(#temp_Setpoint);
+	                #temp_SetPointReal := #temp_SetPointReal * 16384 / 1000;
+	                #temp_SetPointReal := #temp_SetPointReal * #temp_AdjustHMI / 1000;
+	                #temp_SendDanfoss.Sollwert_Umrichter := REAL_TO_INT(#temp_SetPointReal);
+	                #temp_SendDanfoss.Reversieren := True;
+	                
+	                (/*Minimumfrequenz 20Hz*/)
+	                IF #temp_SendDanfoss.Sollwert_Umrichter > 16384
+	                THEN
+	                    #temp_SendDanfoss.Sollwert_Umrichter := 16384;
+	                ELSIF #temp_SendDanfoss.Sollwert_Umrichter < #temp_MinimumFrequency
+	                THEN
+	                    #temp_SendDanfoss.Sollwert_Umrichter := #temp_MinimumFrequency;
+	                END_IF;
+	            END_IF;
+	        ELSE
+	            #temp_SendDanfoss.Start := False;
+	            #temp_SendDanfoss.Bremse_öffnen := False;
+	            IF #temp_Reset
+	            THEN
+	                #temp_SendDanfoss.Reset := 1;
+	            END_IF;
+	            
+	        END_IF;
+	        (/*Daten an Umrichter senden Danfoss*/)
+	        #temp_ReturnWriteFaultID := DPWR_DAT(LADDR := #temp_LADDRTelegramm, RECORD := #temp_SendDanfoss);
+	    END_REGION
+	END_REGION
+	
+	REGION Busy of the Functionblock for Acycliccommunication
+	    IF #iq_ActiveLADDR = 0 THEN
+	        #iq_ActiveLADDR := #temp_LADDR;
+	        #stat_IAmActive := 1;
+	    ELSIF #iq_ActiveLADDR = #temp_LADDR THEN
+	        #stat_IAmActive := 1;
+	    ELSIF #iq_ActiveLADDR <> #temp_LADDR THEN
+	        #stat_IAmActive := 0;
+	    END_IF;
+	END_REGION
+	
+	REGION ERROR/WARNCODE HANDLING
+	    REGION SIEMENS
+	        (/*Um die Funktionalität zu nutzen, muss das  SIEMENS Telegramm 352 verwendete werden und dieses muss um 2 Wörter verlängert werden*/)
+	        IF #temp_Manufactor = #SIEMENS THEN
+	            (/*Mit Sprung in Schritt Flanke erzeugen*/)
+	            #stat_SchrittkettencounterFirstScan := #stat_Schrittkettencounter <> #stat_SchrittkettencounterNextStep;
+	            (/*Pro Zyklus nur ein Schritt erlauben*/)
+	            #stat_Schrittkettencounter := #stat_SchrittkettencounterNextStep;
+	            
+	            (/*Initialisierung Bausteinparameter*/)
+	            #inst_SINA_PARA_S.i_ReadWrite := 0; (/*0 = Lesen; 1 = Schreiben*/)
+	            #inst_SINA_PARA_S.i_Index := 0; (/*0= Standardmäßig automatische Auswahl des richtigen Profidrive-Telegramms*/)
+	            #inst_SINA_PARA_S.i_AxisNo := 1; (/*Achse muss auf 1 gesetzt werden, wenn kein Mehrachssystem vorhanden ist*/)
+	            #inst_SINA_PARA_S.i_HardwareId := #temp_LADDR; (/*Zu diagnostizierendes Gerät*/)
+	            
+	            (/*FB Aufruf*/)
+	            #inst_SINA_PARA_S();
+	            
+	            IF #stat_Schrittkettencounter = 0 AND NOT #inst_SINA_PARA_S.q_Busy AND #stat_IAmActive THEN (/*FB mit Parameter für Störung versorgen*/)
+	                #inst_SINA_PARA_S.i_Parameter := 2131;
+	                #inst_SINA_PARA_S.i_Start := True;
+	                #stat_SchrittkettencounterNextStep := 10;
+	                #stat_IAmActive := True;
+	            END_IF;
+	            
+	            IF #stat_Schrittkettencounter = 10 AND #inst_SINA_PARA_S.q_Done THEN (/*Wenn Done dann Störcode weg schreiben*/)
+	                #stat_Errorcode := REAL_TO_UINT(#inst_SINA_PARA_S.q_ValueRead1); (/*Nur ValRead1 liefert Error/WarnCode konvertiert zu Uint für  Panel*/)
+	                #inst_SINA_PARA_S.i_Start := False;
+	                #stat_SchrittkettencounterNextStep := 20;
+	            END_IF;
+	            
+	            IF #stat_Schrittkettencounter = 20 AND NOT #inst_SINA_PARA_S.q_Busy AND #stat_IAmActive THEN (/*FB mit Parameter für Warnung versorgen*/)
+	                #inst_SINA_PARA_S.i_Parameter := 2132;
+	                #inst_SINA_PARA_S.i_Start := True;
+	                #stat_SchrittkettencounterNextStep := 30;
+	            END_IF;
+	            
+	            IF #stat_Schrittkettencounter = 30 AND #inst_SINA_PARA_S.q_Done THEN (/*Wenn Done dann Warncode weg schreiben*/)
+	                #stat_Warncode := REAL_TO_UINT(#inst_SINA_PARA_S.q_ValueRead1); (/*Nur ValRead1 liefert Error/WarnCode konvertiert zu Uint für  Panel*/)
+	                #inst_SINA_PARA_S.i_Start := False;
+	                #stat_SchrittkettencounterNextStep := 40;
+	            END_IF;
+	            
+	            IF #stat_Schrittkettencounter = 40 THEN (/*Schrittkette neu starten*/)
+	                #stat_SchrittkettencounterNextStep := 0;
+	                IF #iq_ActiveLADDR = #temp_LADDR THEN
+	                    #iq_ActiveLADDR := 0;
+	                    #stat_IAmActive := 0;
+	                END_IF;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION DANFOSS
+	        (/*Um die Funktionalität zu nutzen, muss der Parameter 8-07 auf [2] gesetzt werden*/)
+	        IF #temp_Manufactor = #DANFOSS THEN
+	            #inst_VLT_PROFI_FC_DIAGNOSTICS(i_LADDR := #temp_LADDR,(/*Unterstützt Profibus und Profinet Gerät wird intern ausgelsen und automatisch umgestellt*/)
+	                                           ALARM_1 => #stat_ErrorCodeDanfoss,
+	                                           WARNING_1 => #stat_WarnCodeDanfoss);
+	            #stat_Errorcode := DWORD_TO_UINT(#stat_ErrorCodeDanfoss);
+	            #stat_Warncode := DWORD_TO_UINT(#stat_WarnCodeDanfoss);
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_Warning := #temp_Warning;
+	    #q_WarnCode := #stat_Warncode;
+	    #q_Error := #temp_Error;
+	    #q_Errorcode := #stat_Errorcode;
+	    #q_Ready := #temp_Einschaltbereit;
+	    #q_InMotion := #temp_Betrieb_freigegeben;
+	    #q_ActualFrequency := #temp_ActualFrequency;
+	END_REGION
+END_FUNCTION_BLOCK
+

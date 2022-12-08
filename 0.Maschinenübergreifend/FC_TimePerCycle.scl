@@ -1,0 +1,71 @@
+﻿FUNCTION "FC_TimePerCycle" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_LimitPercent { S7_PredefinedAssignment := 'FALSE'} : Bool;   // Prozentvorgabe limitieren
+      i_Speed : Int;   // Taktzahl
+      i_Percent : Real;   // Prozentvorgabe
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Time : Time;   // Berechneter Zeitwert
+   END_VAR
+
+   VAR_TEMP 
+      temp_LimitPercent : Bool;
+      temp_Speed : Int;
+      temp_Percent : Real;
+      temp_SpeedReal : Real;
+      temp_SpeedMinimum : Real;
+      temp_TimeReal : Real;
+   END_VAR
+
+   VAR CONSTANT 
+      MINIMUM_SPEED : Real := 10.0;
+      MINIMUM_PERCENT : Real := 10.0;
+      MAXIMUM_PERCENT : Real := 500.0;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FC calculates the time per cycle depending on INPUT i_Percent and i_Speed
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   11.03.2022    EP                  First release version v1.0
+	// 01.00.01   14.03.2022    SK                  Switch to SCL and English  
+	// 01.00.02   15.03.2022    SK                  Add an input to enable/disable percent limiting
+	//===============================================================================================
+	REGION MAP INPUTS
+	    #temp_LimitPercent := #i_LimitPercent;
+	    #temp_Speed := #i_Speed;
+	    #temp_Percent := #i_Percent;
+	END_REGION
+	
+	REGION LIMIT MINIMUM SPEED
+	    IF INT_TO_REAL(#temp_Speed) < #MINIMUM_SPEED THEN
+	        #temp_SpeedReal := #MINIMUM_SPEED;
+	    ELSE
+	        #temp_SpeedReal := INT_TO_REAL(#temp_Speed);
+	    END_IF;
+	END_REGION
+	
+	REGION LIMIT PERCENT
+	    IF #temp_LimitPercent THEN
+	        IF #temp_Percent < #MINIMUM_PERCENT THEN
+	            #temp_Percent := #MINIMUM_PERCENT;
+	        ELSIF #temp_Percent > #MAXIMUM_PERCENT THEN
+	            #temp_Percent := #MAXIMUM_PERCENT;
+	        END_IF;
+	    END_IF;
+	END_REGION
+	        
+	REGION CALCULATE TIME   
+	    #iq_Time := REAL_TO_DINT(((60.0 / #temp_SpeedReal) * 10.0) * #temp_Percent);
+	END_REGION
+END_FUNCTION
+

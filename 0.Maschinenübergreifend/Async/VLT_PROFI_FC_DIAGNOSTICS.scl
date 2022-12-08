@@ -1,0 +1,159 @@
+﻿FUNCTION_BLOCK "VLT_PROFI_FC_DIAGNOSTICS"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : Danfoss_Drives
+VERSION : 1.12
+   VAR_INPUT 
+      i_LADDR : HW_IO;
+   END_VAR
+
+   VAR_OUTPUT 
+      CH_ERR_TYP : Word;
+      ALARM_1 : DWord;
+      WARNING_1 : DWord;
+   END_VAR
+
+   VAR 
+      RALRM_Instance {InstructionName := 'RALRM'; LibVersion := '1.0'; S7_SetPoint := 'False'} : RALRM;
+      Static_1 : Struct
+         AlarmMode : Int := 2;
+         AlarmCheckID : HW_IO := 0;
+         AlarmStatus : DWord;
+         AlarmFromID : HW_IO;
+         AlarmReceived : Bool;
+         AlarmMaxLength : UInt;
+         AlarmLength : UInt;
+         TI_DiagnosticInterrupt {InstructionName := 'TI_DiagnosticInterrupt'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TI_DiagnosticInterrupt;
+         Additional_Diag : Struct
+            Header : Struct
+               BlockType : Word;
+               BlockLength : UInt;
+               "Version" : Word;
+               InterruptType : UInt;
+               API : DWord;
+               SlotNumber : UInt;
+               SubSlotNumber : UInt;
+               ModulSpecInfo : DWord;
+               SubModulSpecInfo : DWord;
+               InterruptSpecifier : DWord;
+            END_STRUCT;
+            addInfo : Struct
+               FormatIdentifier : Word;
+               ChannelNumber : Word;
+               ChannelErrorType : Byte;
+               DataFormat : Byte;
+               ErrorCode : Word;
+            END_STRUCT;
+         END_STRUCT;
+      END_STRUCT;
+      AINFOManufacture : Struct
+         W0_block_type : Word;
+         W2_block_length : Word;
+         W4_version : Word;
+         W6_interrupt_type : Word;
+         D8_API : DWord;
+         W12_comp_slot_num : Word;
+         W14_submodule_slot_num : Word;
+         D16_module_ID : DWord;
+         D20_submodule_ID : DWord;
+         W24_interrupt_specifer : Word;
+         W26_Add_W0_format_ID : Word;
+         D28_AlarmWord : DWord;
+         D32_WarnWord : DWord;
+         D36_PdriveWarnWord : DWord;
+         D38_extended_info : DWord;
+      END_STRUCT;
+      SlaveType : Int;
+      ProfibusAlarm : DWord;
+      ProfibusWarning : DWord;
+      TempAlarm : DWord;
+      TempWarning : DWord;
+      Profibus_slave : Bool;
+      Profinet_slave : Bool;
+   END_VAR
+
+
+BEGIN
+	//-------------------------------------------------------------------------------------------------------------
+	// VLT_PROFI_FC_DIAGNOSTICS: Rev. V1.12
+	// Valid for S7-1200 and S7-1500 Type CPU's.
+	// Block handles communication with a VLT frequency converter. Either Trough PROFINET OR PROFIBUS.
+	// Can be done in HW config of S7, on the Drive LCP or MCT10.
+	//-------------------------------------------------------------------------------------------------------------
+	
+	#Static_1.AlarmCheckID := #i_LADDR;                         //Hardware identifier of the module to Alarm check ID
+	
+	//RALRM is used to Read manufacture specific alarms
+	
+	#RALRM_Instance(MODE := #Static_1.AlarmMode,                   //Mode
+	           F_ID := #Static_1.AlarmCheckID,                //Hardware identifier of the module
+	           MLEN := #Static_1.AlarmMaxLength,              //Maximum length of the interrupt information to be received in bytes
+	           NEW => #Static_1.AlarmReceived,                //New interrupt was received
+	           STATUS => #Static_1.AlarmStatus,               //Error code
+	           ID => #Static_1.AlarmFromID,                   //Hardware identifier of the module from which the interrupt was received
+	           LEN => #Static_1.AlarmLength,                  //Length of the received interrupt information
+	           TINFO := #Static_1.TI_DiagnosticInterrupt,     //Target range for OB start and management information
+	           AINFO := #AINFOManufacture);                   //Target range for header information and additional interrupt information
+	
+	// Identify the Profibus or Profinet slave
+	
+	#SlaveType := #Static_1.TI_DiagnosticInterrupt.slv_prfl; //slv_prfl to slave type
+	
+	IF #SlaveType = 3 THEN      //Profibus slave (Byte#16#0011)
+	    #Profibus_slave := 1;
+	    #Profinet_slave := 0;
+	END_IF;
+	
+	IF #SlaveType = 8 THEN      //Profinet IO (Byte#16#1000)
+	    #Profibus_slave := 0;
+	    #Profinet_slave := 1;
+	END_IF;
+	
+	//Extract error information for PROFINET IO
+	IF #Profinet_slave AND #Static_1.AlarmReceived AND (#AINFOManufacture.W6_interrupt_type = 16#0001) THEN
+	    IF (#AINFOManufacture.W26_Add_W0_format_ID = 16#7FFF) THEN
+	        #ALARM_1 := #AINFOManufacture.D28_AlarmWord;        // Profinet IO Alarm word
+	        #WARNING_1 := #AINFOManufacture.D32_WarnWord;       // Profinet IO Warning word
+	        #Static_1.AlarmReceived := 0;
+	    END_IF;
+	    IF (#AINFOManufacture.W26_Add_W0_format_ID = 16#8000) THEN
+	        #CH_ERR_TYP := DWORD_TO_WORD(SHR(IN := (#AINFOManufacture.D32_WarnWord), N := 16)); // Channel Error Type
+	        #Static_1.AlarmReceived := 0;
+	    END_IF;
+	END_IF;
+	
+	//Extract error information for PROFIBUS slave
+	IF #Profibus_slave AND #Static_1.AlarmReceived AND #AINFOManufacture.W2_block_length = 16#0001 THEN
+	    #ProfibusAlarm := #AINFOManufacture.W4_version;
+	    #ProfibusAlarm := SHL(IN := (#ProfibusAlarm), N := 16);
+	    #TempAlarm := #AINFOManufacture.W6_interrupt_type;
+	    #ALARM_1 := #ProfibusAlarm OR #TempAlarm;       // Profibus Alarm Word
+	    #Static_1.AlarmReceived := 0;
+	    
+	    #ProfibusWarning := #AINFOManufacture.W12_comp_slot_num;
+	    #ProfibusWarning := SHL(IN := (#ProfibusWarning), N := 16);
+	    #TempWarning := #AINFOManufacture.W14_submodule_slot_num;
+	    #WARNING_1 := #ProfibusWarning OR #TempWarning;     //Profibus "WARNING" Word
+	    #Static_1.AlarmReceived := 0;
+	END_IF;
+	
+	// Clear the PROFINET Alarm/Warning data if alarm is reset
+	IF #Static_1.AlarmReceived THEN
+	    IF #AINFOManufacture.W6_interrupt_type = 16#000C THEN
+	        #CH_ERR_TYP := 0;
+	        #ALARM_1 := 0;
+	        #WARNING_1 := 0;
+	        #Static_1.AlarmReceived := 0;
+	    END_IF;
+	END_IF;
+	// Clear the PROFIBUS Alarm/Warning data if alarm is reset
+	IF #Static_1.AlarmReceived THEN
+	    IF #AINFOManufacture.W2_block_length = 2 THEN
+	        #CH_ERR_TYP := 0;
+	        #ALARM_1 := 0;
+	        #WARNING_1 := 0;
+	        #Static_1.AlarmReceived := 0;
+	    END_IF;
+	END_IF;
+	
+END_FUNCTION_BLOCK
+

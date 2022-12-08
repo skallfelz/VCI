@@ -1,0 +1,1520 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T07:31:23.3714066Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.FB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <HeaderAuthor>EconoPak GmbH</HeaderAuthor>
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Input" />
+  <Section Name="Output">
+    <Member Name="q_TimerSwitch" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="de-DE">Status Zeitschaltuhr 1= Heizen 0= Absenktemperatur</MultiLanguageText><MultiLanguageText Lang="en-GB">Status Time Switch 1= Heating 0= Temperature lowering</MultiLanguageText><MultiLanguageText Lang="fi-FI">Tila Aikakytkin 1= Lämmitys 0= Lämpötilan lasku</MultiLanguageText><MultiLanguageText Lang="fr-FR">Statut Interrupteur horaire 1= chauffage 0= abaissement de la température</MultiLanguageText><MultiLanguageText Lang="nl-NL">Status Tijdschakelaar 1= Verwarming 0= Temperatuurverlaging</MultiLanguageText><MultiLanguageText Lang="pl-PL">Status Przełącznik czasowy 1= Ogrzewanie 0= Obniżenie temperatury</MultiLanguageText><MultiLanguageText Lang="ru-RU">Статус Переключатель времени 1= нагрев 0= понижение температуры</MultiLanguageText><MultiLanguageText Lang="es-ES">Estado Interruptor de tiempo 1= Calefacción 0= Bajada de temperatura</MultiLanguageText></Comment></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="iq_TimerSwitchHMIData" Datatype="&quot;UDT_TimerSwitch&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="SelectionList" Datatype="Int" />
+          <Member Name="SelectionListWeeklyOn" Datatype="USInt" />
+          <Member Name="SelectionListWeeklyOff" Datatype="USInt" />
+          <Member Name="MoOn" Datatype="DTL" Version="1.0" />
+          <Member Name="MoOff" Datatype="DTL" Version="1.0" />
+          <Member Name="TuesOn" Datatype="DTL" Version="1.0" />
+          <Member Name="TuesOff" Datatype="DTL" Version="1.0" />
+          <Member Name="WedOn" Datatype="DTL" Version="1.0" />
+          <Member Name="WedOff" Datatype="DTL" Version="1.0" />
+          <Member Name="ThursOn" Datatype="DTL" Version="1.0" />
+          <Member Name="ThursOff" Datatype="DTL" Version="1.0" />
+          <Member Name="FriOn" Datatype="DTL" Version="1.0" />
+          <Member Name="FriOff" Datatype="DTL" Version="1.0" />
+          <Member Name="SatOn" Datatype="DTL" Version="1.0" />
+          <Member Name="SatOff" Datatype="DTL" Version="1.0" />
+          <Member Name="SunOn" Datatype="DTL" Version="1.0" />
+          <Member Name="SunOff" Datatype="DTL" Version="1.0" />
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="inst_TimerSwitch" Datatype="&quot;LGF_TimerSwitch&quot;" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="onMonth" Datatype="USInt" /><Member Name="onDay" Datatype="USInt" /><Member Name="onWeekday" Datatype="USInt" /><Member Name="onHour" Datatype="USInt" /><Member Name="onMinute" Datatype="USInt" /><Member Name="offMonth" Datatype="USInt" /><Member Name="offDay" Datatype="USInt" /><Member Name="offWeekday" Datatype="USInt" /><Member Name="offHour" Datatype="USInt" /><Member Name="offMinute" Datatype="USInt" /><Member Name="mode" Datatype="USInt" /></Section><Section Name="Output"><Member Name="signal" Datatype="Bool" /><Member Name="actLocalTime" Datatype="DTL" Version="1.0" /><Member Name="error" Datatype="Bool" /><Member Name="status" Datatype="Word" /><Member Name="subFunctionStatus" Datatype="Word" /></Section><Section Name="InOut" /><Section Name="Static" /></Sections></Member>
+  </Section>
+  <Section Name="Temp" />
+  <Section Name="Constant" />
+</Sections></Interface>
+      <IsIECCheckEnabled>false</IsIECCheckEnabled>
+      <IsRetainMemResEnabled>false</IsRetainMemResEnabled>
+      <MemoryLayout>Optimized</MemoryLayout>
+      <MemoryReserve>100</MemoryReserve>
+      <Name>FB_Timerswitch</Name>
+      <Number>103</Number>
+      <ProgrammingLanguage>FBD</ProgrammingLanguage>
+      <SetENOAutomatically>true</SetENOAutomatically>
+      <UDABlockProperties />
+      <UDAEnableTagReadback>false</UDAEnableTagReadback>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><FlgNet xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v4">
+  <Parts>
+    <Call UId="21">
+      <CallInfo Name="LGF_TimerSwitch" BlockType="FB">
+        <Instance Scope="LocalVariable" UId="22">
+          <Component Name="inst_TimerSwitch" />
+        </Instance>
+        <Parameter Name="onMonth" Section="Input" Type="USInt" />
+        <Parameter Name="onDay" Section="Input" Type="USInt" />
+        <Parameter Name="onWeekday" Section="Input" Type="USInt" />
+        <Parameter Name="onHour" Section="Input" Type="USInt" />
+        <Parameter Name="onMinute" Section="Input" Type="USInt" />
+        <Parameter Name="offMonth" Section="Input" Type="USInt" />
+        <Parameter Name="offDay" Section="Input" Type="USInt" />
+        <Parameter Name="offWeekday" Section="Input" Type="USInt" />
+        <Parameter Name="offHour" Section="Input" Type="USInt" />
+        <Parameter Name="offMinute" Section="Input" Type="USInt" />
+        <Parameter Name="mode" Section="Input" Type="USInt" />
+        <Parameter Name="signal" Section="Output" Type="Bool" />
+        <Parameter Name="actLocalTime" Section="Output" Type="DTL" />
+        <Parameter Name="error" Section="Output" Type="Bool" />
+        <Parameter Name="status" Section="Output" Type="Word" />
+        <Parameter Name="subFunctionStatus" Section="Output" Type="Word" />
+      </CallInfo>
+    </Call>
+  </Parts>
+  <Wires>
+    <Wire UId="40">
+      <OpenCon UId="23" />
+      <NameCon UId="21" Name="en" />
+    </Wire>
+    <Wire UId="41">
+      <OpenCon UId="24" />
+      <NameCon UId="21" Name="onMonth" />
+    </Wire>
+    <Wire UId="42">
+      <OpenCon UId="25" />
+      <NameCon UId="21" Name="onDay" />
+    </Wire>
+    <Wire UId="43">
+      <OpenCon UId="26" />
+      <NameCon UId="21" Name="onWeekday" />
+    </Wire>
+    <Wire UId="44">
+      <OpenCon UId="27" />
+      <NameCon UId="21" Name="onHour" />
+    </Wire>
+    <Wire UId="45">
+      <OpenCon UId="28" />
+      <NameCon UId="21" Name="onMinute" />
+    </Wire>
+    <Wire UId="46">
+      <OpenCon UId="29" />
+      <NameCon UId="21" Name="offMonth" />
+    </Wire>
+    <Wire UId="47">
+      <OpenCon UId="30" />
+      <NameCon UId="21" Name="offDay" />
+    </Wire>
+    <Wire UId="48">
+      <OpenCon UId="31" />
+      <NameCon UId="21" Name="offWeekday" />
+    </Wire>
+    <Wire UId="49">
+      <OpenCon UId="32" />
+      <NameCon UId="21" Name="offHour" />
+    </Wire>
+    <Wire UId="50">
+      <OpenCon UId="33" />
+      <NameCon UId="21" Name="offMinute" />
+    </Wire>
+    <Wire UId="51">
+      <OpenCon UId="34" />
+      <NameCon UId="21" Name="mode" />
+    </Wire>
+    <Wire UId="52">
+      <NameCon UId="21" Name="signal" />
+      <OpenCon UId="35" />
+    </Wire>
+    <Wire UId="53">
+      <NameCon UId="21" Name="actLocalTime" />
+      <OpenCon UId="36" />
+    </Wire>
+    <Wire UId="54">
+      <NameCon UId="21" Name="error" />
+      <OpenCon UId="37" />
+    </Wire>
+    <Wire UId="55">
+      <NameCon UId="21" Name="status" />
+      <OpenCon UId="38" />
+    </Wire>
+    <Wire UId="56">
+      <NameCon UId="21" Name="subFunctionStatus" />
+      <OpenCon UId="39" />
+    </Wire>
+  </Wires>
+</FlgNet></NetworkSource>
+          <ProgrammingLanguage>FBD</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="4" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="5" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="6" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="7" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text>Zeitschaltuhr</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="8" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3">
+  <Token Text="CASE" UId="21" />
+  <Blank Num="1" UId="22" />
+  <Access Scope="LocalVariable" UId="23">
+    <Symbol UId="24">
+      <Component Name="iq_TimerSwitchHMIData" UId="25" />
+      <Token Text="." UId="26" />
+      <Component Name="SelectionList" UId="27" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="28" />
+  <Token Text="OF" UId="29" />
+  <NewLine Num="1" UId="30" />
+  <Blank Num="8" UId="31" />
+  <NewLine Num="1" UId="32" />
+  <Blank Num="4" UId="33" />
+  <Access Scope="LiteralConstant" UId="34">
+    <Constant UId="35">
+      <ConstantValue UId="37">2</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="38" />
+  <Blank Num="2" UId="39" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="40">
+    <Text UId="41">Montag bis Freitag</Text>
+  </LineComment>
+  <NewLine Num="1" UId="42" />
+  <Blank Num="8" UId="43" />
+  <Access Scope="LocalVariable" UId="44">
+    <Symbol UId="45">
+      <Component Name="inst_TimerSwitch" UId="46" />
+      <Token Text="." UId="47" />
+      <Component Name="mode" UId="48" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="49" />
+  <Token Text=":=" UId="50" />
+  <Blank Num="1" UId="51" />
+  <Access Scope="LiteralConstant" UId="52">
+    <Constant UId="53">
+      <ConstantValue UId="55">5</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="56" />
+  <NewLine Num="1" UId="57" />
+  <Blank Num="8" UId="58" />
+  <Access Scope="LocalVariable" UId="59">
+    <Symbol UId="60">
+      <Component Name="inst_TimerSwitch" UId="61" />
+      <Token Text="." UId="62" />
+      <Component Name="onHour" UId="63" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="64" />
+  <Token Text=":=" UId="65" />
+  <Blank Num="1" UId="66" />
+  <Access Scope="LocalVariable" UId="67">
+    <Symbol UId="68">
+      <Component Name="iq_TimerSwitchHMIData" UId="69" />
+      <Token Text="." UId="70" />
+      <Component Name="MoOn" UId="71" />
+      <Token Text="." UId="72" />
+      <Component Name="HOUR" UId="73" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="74" />
+  <NewLine Num="1" UId="75" />
+  <Blank Num="8" UId="76" />
+  <Access Scope="LocalVariable" UId="77">
+    <Symbol UId="78">
+      <Component Name="inst_TimerSwitch" UId="79" />
+      <Token Text="." UId="80" />
+      <Component Name="onMinute" UId="81" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="82" />
+  <Token Text=":=" UId="83" />
+  <Blank Num="1" UId="84" />
+  <Access Scope="LocalVariable" UId="85">
+    <Symbol UId="86">
+      <Component Name="iq_TimerSwitchHMIData" UId="87" />
+      <Token Text="." UId="88" />
+      <Component Name="MoOn" UId="89" />
+      <Token Text="." UId="90" />
+      <Component Name="MINUTE" UId="91" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="92" />
+  <NewLine Num="1" UId="93" />
+  <Blank Num="8" UId="94" />
+  <Access Scope="LocalVariable" UId="95">
+    <Symbol UId="96">
+      <Component Name="inst_TimerSwitch" UId="97" />
+      <Token Text="." UId="98" />
+      <Component Name="offHour" UId="99" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="100" />
+  <Token Text=":=" UId="101" />
+  <Blank Num="1" UId="102" />
+  <Access Scope="LocalVariable" UId="103">
+    <Symbol UId="104">
+      <Component Name="iq_TimerSwitchHMIData" UId="105" />
+      <Token Text="." UId="106" />
+      <Component Name="MoOff" UId="107" />
+      <Token Text="." UId="108" />
+      <Component Name="HOUR" UId="109" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="110" />
+  <NewLine Num="1" UId="111" />
+  <Blank Num="8" UId="112" />
+  <Access Scope="LocalVariable" UId="113">
+    <Symbol UId="114">
+      <Component Name="inst_TimerSwitch" UId="115" />
+      <Token Text="." UId="116" />
+      <Component Name="offMinute" UId="117" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="118" />
+  <Token Text=":=" UId="119" />
+  <Blank Num="1" UId="120" />
+  <Access Scope="LocalVariable" UId="121">
+    <Symbol UId="122">
+      <Component Name="iq_TimerSwitchHMIData" UId="123" />
+      <Token Text="." UId="124" />
+      <Component Name="MoOff" UId="125" />
+      <Token Text="." UId="126" />
+      <Component Name="MINUTE" UId="127" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="128" />
+  <NewLine Num="1" UId="129" />
+  <Blank Num="8" UId="130" />
+  <NewLine Num="1" UId="131" />
+  <Blank Num="4" UId="132" />
+  <Access Scope="LiteralConstant" UId="133">
+    <Constant UId="134">
+      <ConstantValue UId="136">3</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="137" />
+  <Blank Num="2" UId="138" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="139">
+    <Text UId="140">Montag bis Sonntag</Text>
+  </LineComment>
+  <NewLine Num="1" UId="141" />
+  <Blank Num="8" UId="142" />
+  <Access Scope="LocalVariable" UId="143">
+    <Symbol UId="144">
+      <Component Name="inst_TimerSwitch" UId="145" />
+      <Token Text="." UId="146" />
+      <Component Name="mode" UId="147" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="148" />
+  <Token Text=":=" UId="149" />
+  <Blank Num="1" UId="150" />
+  <Access Scope="LiteralConstant" UId="151">
+    <Constant UId="152">
+      <ConstantValue UId="154">1</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="155" />
+  <NewLine Num="1" UId="156" />
+  <Blank Num="8" UId="157" />
+  <Access Scope="LocalVariable" UId="158">
+    <Symbol UId="159">
+      <Component Name="inst_TimerSwitch" UId="160" />
+      <Token Text="." UId="161" />
+      <Component Name="onHour" UId="162" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="163" />
+  <Token Text=":=" UId="164" />
+  <Blank Num="1" UId="165" />
+  <Access Scope="LocalVariable" UId="166">
+    <Symbol UId="167">
+      <Component Name="iq_TimerSwitchHMIData" UId="168" />
+      <Token Text="." UId="169" />
+      <Component Name="MoOn" UId="170" />
+      <Token Text="." UId="171" />
+      <Component Name="HOUR" UId="172" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="173" />
+  <NewLine Num="1" UId="174" />
+  <Blank Num="8" UId="175" />
+  <Access Scope="LocalVariable" UId="176">
+    <Symbol UId="177">
+      <Component Name="inst_TimerSwitch" UId="178" />
+      <Token Text="." UId="179" />
+      <Component Name="onMinute" UId="180" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="181" />
+  <Token Text=":=" UId="182" />
+  <Blank Num="1" UId="183" />
+  <Access Scope="LocalVariable" UId="184">
+    <Symbol UId="185">
+      <Component Name="iq_TimerSwitchHMIData" UId="186" />
+      <Token Text="." UId="187" />
+      <Component Name="MoOn" UId="188" />
+      <Token Text="." UId="189" />
+      <Component Name="MINUTE" UId="190" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="191" />
+  <NewLine Num="1" UId="192" />
+  <Blank Num="8" UId="193" />
+  <Access Scope="LocalVariable" UId="194">
+    <Symbol UId="195">
+      <Component Name="inst_TimerSwitch" UId="196" />
+      <Token Text="." UId="197" />
+      <Component Name="offHour" UId="198" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="199" />
+  <Token Text=":=" UId="200" />
+  <Blank Num="1" UId="201" />
+  <Access Scope="LocalVariable" UId="202">
+    <Symbol UId="203">
+      <Component Name="iq_TimerSwitchHMIData" UId="204" />
+      <Token Text="." UId="205" />
+      <Component Name="MoOff" UId="206" />
+      <Token Text="." UId="207" />
+      <Component Name="HOUR" UId="208" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="209" />
+  <NewLine Num="1" UId="210" />
+  <Blank Num="8" UId="211" />
+  <Access Scope="LocalVariable" UId="212">
+    <Symbol UId="213">
+      <Component Name="inst_TimerSwitch" UId="214" />
+      <Token Text="." UId="215" />
+      <Component Name="offMinute" UId="216" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="217" />
+  <Token Text=":=" UId="218" />
+  <Blank Num="1" UId="219" />
+  <Access Scope="LocalVariable" UId="220">
+    <Symbol UId="221">
+      <Component Name="iq_TimerSwitchHMIData" UId="222" />
+      <Token Text="." UId="223" />
+      <Component Name="MoOff" UId="224" />
+      <Token Text="." UId="225" />
+      <Component Name="MINUTE" UId="226" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="227" />
+  <NewLine Num="1" UId="228" />
+  <Blank Num="8" UId="229" />
+  <NewLine Num="1" UId="230" />
+  <Blank Num="4" UId="231" />
+  <Access Scope="LiteralConstant" UId="232">
+    <Constant UId="233">
+      <ConstantValue UId="235">4</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="236" />
+  <Blank Num="2" UId="237" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="238">
+    <Text UId="239">Wöchentlich</Text>
+  </LineComment>
+  <NewLine Num="1" UId="240" />
+  <Blank Num="8" UId="241" />
+  <Access Scope="LocalVariable" UId="242">
+    <Symbol UId="243">
+      <Component Name="inst_TimerSwitch" UId="244" />
+      <Token Text="." UId="245" />
+      <Component Name="mode" UId="246" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="247" />
+  <Token Text=":=" UId="248" />
+  <Blank Num="1" UId="249" />
+  <Access Scope="LiteralConstant" UId="250">
+    <Constant UId="251">
+      <ConstantValue UId="253">2</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="254" />
+  <NewLine Num="1" UId="255" />
+  <Blank Num="8" UId="256" />
+  <Access Scope="LocalVariable" UId="257">
+    <Symbol UId="258">
+      <Component Name="inst_TimerSwitch" UId="259" />
+      <Token Text="." UId="260" />
+      <Component Name="onWeekday" UId="261" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="262" />
+  <Token Text=":=" UId="263" />
+  <Blank Num="1" UId="264" />
+  <Access Scope="LocalVariable" UId="265">
+    <Symbol UId="266">
+      <Component Name="iq_TimerSwitchHMIData" UId="267" />
+      <Token Text="." UId="268" />
+      <Component Name="SelectionListWeeklyOn" UId="269" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="270" />
+  <NewLine Num="1" UId="271" />
+  <Blank Num="8" UId="272" />
+  <Access Scope="LocalVariable" UId="273">
+    <Symbol UId="274">
+      <Component Name="inst_TimerSwitch" UId="275" />
+      <Token Text="." UId="276" />
+      <Component Name="offWeekday" UId="277" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="278" />
+  <Token Text=":=" UId="279" />
+  <Blank Num="1" UId="280" />
+  <Access Scope="LocalVariable" UId="281">
+    <Symbol UId="282">
+      <Component Name="iq_TimerSwitchHMIData" UId="283" />
+      <Token Text="." UId="284" />
+      <Component Name="SelectionListWeeklyOff" UId="285" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="286" />
+  <NewLine Num="1" UId="287" />
+  <Blank Num="8" UId="288" />
+  <Access Scope="LocalVariable" UId="289">
+    <Symbol UId="290">
+      <Component Name="inst_TimerSwitch" UId="291" />
+      <Token Text="." UId="292" />
+      <Component Name="onHour" UId="293" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="294" />
+  <Token Text=":=" UId="295" />
+  <Blank Num="1" UId="296" />
+  <Access Scope="LocalVariable" UId="297">
+    <Symbol UId="298">
+      <Component Name="iq_TimerSwitchHMIData" UId="299" />
+      <Token Text="." UId="300" />
+      <Component Name="MoOn" UId="301" />
+      <Token Text="." UId="302" />
+      <Component Name="HOUR" UId="303" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="304" />
+  <NewLine Num="1" UId="305" />
+  <Blank Num="8" UId="306" />
+  <Access Scope="LocalVariable" UId="307">
+    <Symbol UId="308">
+      <Component Name="inst_TimerSwitch" UId="309" />
+      <Token Text="." UId="310" />
+      <Component Name="onMinute" UId="311" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="312" />
+  <Token Text=":=" UId="313" />
+  <Blank Num="1" UId="314" />
+  <Access Scope="LocalVariable" UId="315">
+    <Symbol UId="316">
+      <Component Name="iq_TimerSwitchHMIData" UId="317" />
+      <Token Text="." UId="318" />
+      <Component Name="MoOn" UId="319" />
+      <Token Text="." UId="320" />
+      <Component Name="MINUTE" UId="321" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="322" />
+  <NewLine Num="1" UId="323" />
+  <Blank Num="8" UId="324" />
+  <Access Scope="LocalVariable" UId="325">
+    <Symbol UId="326">
+      <Component Name="inst_TimerSwitch" UId="327" />
+      <Token Text="." UId="328" />
+      <Component Name="offHour" UId="329" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="330" />
+  <Token Text=":=" UId="331" />
+  <Blank Num="1" UId="332" />
+  <Access Scope="LocalVariable" UId="333">
+    <Symbol UId="334">
+      <Component Name="iq_TimerSwitchHMIData" UId="335" />
+      <Token Text="." UId="336" />
+      <Component Name="MoOff" UId="337" />
+      <Token Text="." UId="338" />
+      <Component Name="HOUR" UId="339" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="340" />
+  <NewLine Num="1" UId="341" />
+  <Blank Num="8" UId="342" />
+  <Access Scope="LocalVariable" UId="343">
+    <Symbol UId="344">
+      <Component Name="inst_TimerSwitch" UId="345" />
+      <Token Text="." UId="346" />
+      <Component Name="offMinute" UId="347" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="348" />
+  <Token Text=":=" UId="349" />
+  <Blank Num="1" UId="350" />
+  <Access Scope="LocalVariable" UId="351">
+    <Symbol UId="352">
+      <Component Name="iq_TimerSwitchHMIData" UId="353" />
+      <Token Text="." UId="354" />
+      <Component Name="MoOff" UId="355" />
+      <Token Text="." UId="356" />
+      <Component Name="MINUTE" UId="357" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="358" />
+  <NewLine Num="1" UId="359" />
+  <Blank Num="8" UId="360" />
+  <NewLine Num="1" UId="361" />
+  <Blank Num="4" UId="362" />
+  <Access Scope="LiteralConstant" UId="363">
+    <Constant UId="364">
+      <ConstantValue UId="366">5</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="367" />
+  <Blank Num="2" UId="368" />
+  <LineComment Inserted="false" NoClosingBracket="false" UId="369">
+    <Text UId="370">Täglich</Text>
+  </LineComment>
+  <NewLine Num="1" UId="371" />
+  <Blank Num="8" UId="372" />
+  <Access Scope="LocalVariable" UId="373">
+    <Symbol UId="374">
+      <Component Name="inst_TimerSwitch" UId="375" />
+      <Token Text="." UId="376" />
+      <Component Name="mode" UId="377" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="378" />
+  <Token Text=":=" UId="379" />
+  <Blank Num="1" UId="380" />
+  <Access Scope="LiteralConstant" UId="381">
+    <Constant UId="382">
+      <ConstantValue UId="384">1</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=";" UId="385" />
+  <NewLine Num="1" UId="386" />
+  <Blank Num="8" UId="387" />
+  <Token Text="CASE" UId="388" />
+  <Blank Num="1" UId="389" />
+  <Access Scope="LocalVariable" UId="390">
+    <Symbol UId="391">
+      <Component Name="inst_TimerSwitch" UId="392" />
+      <Token Text="." UId="393" />
+      <Component Name="actLocalTime" UId="394" />
+      <Token Text="." UId="395" />
+      <Component Name="WEEKDAY" UId="396" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="397" />
+  <Token Text="OF" UId="398" />
+  <NewLine Num="1" UId="399" />
+  <Blank Num="12" UId="400" />
+  <Access Scope="LiteralConstant" UId="401">
+    <Constant UId="402">
+      <ConstantValue UId="404">1</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="405" />
+  <NewLine Num="1" UId="406" />
+  <Blank Num="16" UId="407" />
+  <Access Scope="LocalVariable" UId="408">
+    <Symbol UId="409">
+      <Component Name="inst_TimerSwitch" UId="410" />
+      <Token Text="." UId="411" />
+      <Component Name="onHour" UId="412" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="413" />
+  <Token Text=":=" UId="414" />
+  <Blank Num="1" UId="415" />
+  <Access Scope="LocalVariable" UId="416">
+    <Symbol UId="417">
+      <Component Name="iq_TimerSwitchHMIData" UId="418" />
+      <Token Text="." UId="419" />
+      <Component Name="SunOn" UId="420" />
+      <Token Text="." UId="421" />
+      <Component Name="HOUR" UId="422" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="423" />
+  <NewLine Num="1" UId="424" />
+  <Blank Num="16" UId="425" />
+  <Access Scope="LocalVariable" UId="426">
+    <Symbol UId="427">
+      <Component Name="inst_TimerSwitch" UId="428" />
+      <Token Text="." UId="429" />
+      <Component Name="onMinute" UId="430" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="431" />
+  <Token Text=":=" UId="432" />
+  <Blank Num="1" UId="433" />
+  <Access Scope="LocalVariable" UId="434">
+    <Symbol UId="435">
+      <Component Name="iq_TimerSwitchHMIData" UId="436" />
+      <Token Text="." UId="437" />
+      <Component Name="SunOn" UId="438" />
+      <Token Text="." UId="439" />
+      <Component Name="MINUTE" UId="440" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="441" />
+  <NewLine Num="1" UId="442" />
+  <Blank Num="16" UId="443" />
+  <Access Scope="LocalVariable" UId="444">
+    <Symbol UId="445">
+      <Component Name="inst_TimerSwitch" UId="446" />
+      <Token Text="." UId="447" />
+      <Component Name="offHour" UId="448" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="449" />
+  <Token Text=":=" UId="450" />
+  <Blank Num="1" UId="451" />
+  <Access Scope="LocalVariable" UId="452">
+    <Symbol UId="453">
+      <Component Name="iq_TimerSwitchHMIData" UId="454" />
+      <Token Text="." UId="455" />
+      <Component Name="SunOff" UId="456" />
+      <Token Text="." UId="457" />
+      <Component Name="HOUR" UId="458" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="459" />
+  <NewLine Num="1" UId="460" />
+  <Blank Num="16" UId="461" />
+  <Access Scope="LocalVariable" UId="462">
+    <Symbol UId="463">
+      <Component Name="inst_TimerSwitch" UId="464" />
+      <Token Text="." UId="465" />
+      <Component Name="offMinute" UId="466" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="467" />
+  <Token Text=":=" UId="468" />
+  <Blank Num="1" UId="469" />
+  <Access Scope="LocalVariable" UId="470">
+    <Symbol UId="471">
+      <Component Name="iq_TimerSwitchHMIData" UId="472" />
+      <Token Text="." UId="473" />
+      <Component Name="SunOff" UId="474" />
+      <Token Text="." UId="475" />
+      <Component Name="MINUTE" UId="476" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="477" />
+  <NewLine Num="1" UId="478" />
+  <Blank Num="16" UId="479" />
+  <NewLine Num="1" UId="480" />
+  <Blank Num="12" UId="481" />
+  <Access Scope="LiteralConstant" UId="482">
+    <Constant UId="483">
+      <ConstantValue UId="485">2</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="486" />
+  <NewLine Num="1" UId="487" />
+  <Blank Num="16" UId="488" />
+  <Access Scope="LocalVariable" UId="489">
+    <Symbol UId="490">
+      <Component Name="inst_TimerSwitch" UId="491" />
+      <Token Text="." UId="492" />
+      <Component Name="onHour" UId="493" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="494" />
+  <Token Text=":=" UId="495" />
+  <Blank Num="1" UId="496" />
+  <Access Scope="LocalVariable" UId="497">
+    <Symbol UId="498">
+      <Component Name="iq_TimerSwitchHMIData" UId="499" />
+      <Token Text="." UId="500" />
+      <Component Name="MoOn" UId="501" />
+      <Token Text="." UId="502" />
+      <Component Name="HOUR" UId="503" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="504" />
+  <NewLine Num="1" UId="505" />
+  <Blank Num="16" UId="506" />
+  <Access Scope="LocalVariable" UId="507">
+    <Symbol UId="508">
+      <Component Name="inst_TimerSwitch" UId="509" />
+      <Token Text="." UId="510" />
+      <Component Name="onMinute" UId="511" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="512" />
+  <Token Text=":=" UId="513" />
+  <Blank Num="1" UId="514" />
+  <Access Scope="LocalVariable" UId="515">
+    <Symbol UId="516">
+      <Component Name="iq_TimerSwitchHMIData" UId="517" />
+      <Token Text="." UId="518" />
+      <Component Name="MoOn" UId="519" />
+      <Token Text="." UId="520" />
+      <Component Name="MINUTE" UId="521" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="522" />
+  <NewLine Num="1" UId="523" />
+  <Blank Num="16" UId="524" />
+  <Access Scope="LocalVariable" UId="525">
+    <Symbol UId="526">
+      <Component Name="inst_TimerSwitch" UId="527" />
+      <Token Text="." UId="528" />
+      <Component Name="offHour" UId="529" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="530" />
+  <Token Text=":=" UId="531" />
+  <Blank Num="1" UId="532" />
+  <Access Scope="LocalVariable" UId="533">
+    <Symbol UId="534">
+      <Component Name="iq_TimerSwitchHMIData" UId="535" />
+      <Token Text="." UId="536" />
+      <Component Name="MoOff" UId="537" />
+      <Token Text="." UId="538" />
+      <Component Name="HOUR" UId="539" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="540" />
+  <NewLine Num="1" UId="541" />
+  <Blank Num="16" UId="542" />
+  <Access Scope="LocalVariable" UId="543">
+    <Symbol UId="544">
+      <Component Name="inst_TimerSwitch" UId="545" />
+      <Token Text="." UId="546" />
+      <Component Name="offMinute" UId="547" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="548" />
+  <Token Text=":=" UId="549" />
+  <Blank Num="1" UId="550" />
+  <Access Scope="LocalVariable" UId="551">
+    <Symbol UId="552">
+      <Component Name="iq_TimerSwitchHMIData" UId="553" />
+      <Token Text="." UId="554" />
+      <Component Name="MoOff" UId="555" />
+      <Token Text="." UId="556" />
+      <Component Name="MINUTE" UId="557" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="558" />
+  <NewLine Num="1" UId="559" />
+  <Blank Num="16" UId="560" />
+  <NewLine Num="1" UId="561" />
+  <Blank Num="12" UId="562" />
+  <Access Scope="LiteralConstant" UId="563">
+    <Constant UId="564">
+      <ConstantValue UId="566">3</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="567" />
+  <NewLine Num="1" UId="568" />
+  <Blank Num="16" UId="569" />
+  <Access Scope="LocalVariable" UId="570">
+    <Symbol UId="571">
+      <Component Name="inst_TimerSwitch" UId="572" />
+      <Token Text="." UId="573" />
+      <Component Name="onHour" UId="574" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="575" />
+  <Token Text=":=" UId="576" />
+  <Blank Num="1" UId="577" />
+  <Access Scope="LocalVariable" UId="578">
+    <Symbol UId="579">
+      <Component Name="iq_TimerSwitchHMIData" UId="580" />
+      <Token Text="." UId="581" />
+      <Component Name="TuesOn" UId="582" />
+      <Token Text="." UId="583" />
+      <Component Name="HOUR" UId="584" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="585" />
+  <NewLine Num="1" UId="586" />
+  <Blank Num="16" UId="587" />
+  <Access Scope="LocalVariable" UId="588">
+    <Symbol UId="589">
+      <Component Name="inst_TimerSwitch" UId="590" />
+      <Token Text="." UId="591" />
+      <Component Name="onMinute" UId="592" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="593" />
+  <Token Text=":=" UId="594" />
+  <Blank Num="1" UId="595" />
+  <Access Scope="LocalVariable" UId="596">
+    <Symbol UId="597">
+      <Component Name="iq_TimerSwitchHMIData" UId="598" />
+      <Token Text="." UId="599" />
+      <Component Name="TuesOn" UId="600" />
+      <Token Text="." UId="601" />
+      <Component Name="MINUTE" UId="602" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="603" />
+  <NewLine Num="1" UId="604" />
+  <Blank Num="16" UId="605" />
+  <Access Scope="LocalVariable" UId="606">
+    <Symbol UId="607">
+      <Component Name="inst_TimerSwitch" UId="608" />
+      <Token Text="." UId="609" />
+      <Component Name="offHour" UId="610" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="611" />
+  <Token Text=":=" UId="612" />
+  <Blank Num="1" UId="613" />
+  <Access Scope="LocalVariable" UId="614">
+    <Symbol UId="615">
+      <Component Name="iq_TimerSwitchHMIData" UId="616" />
+      <Token Text="." UId="617" />
+      <Component Name="TuesOff" UId="618" />
+      <Token Text="." UId="619" />
+      <Component Name="HOUR" UId="620" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="621" />
+  <NewLine Num="1" UId="622" />
+  <Blank Num="16" UId="623" />
+  <Access Scope="LocalVariable" UId="624">
+    <Symbol UId="625">
+      <Component Name="inst_TimerSwitch" UId="626" />
+      <Token Text="." UId="627" />
+      <Component Name="offMinute" UId="628" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="629" />
+  <Token Text=":=" UId="630" />
+  <Blank Num="1" UId="631" />
+  <Access Scope="LocalVariable" UId="632">
+    <Symbol UId="633">
+      <Component Name="iq_TimerSwitchHMIData" UId="634" />
+      <Token Text="." UId="635" />
+      <Component Name="TuesOff" UId="636" />
+      <Token Text="." UId="637" />
+      <Component Name="MINUTE" UId="638" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="639" />
+  <NewLine Num="1" UId="640" />
+  <Blank Num="16" UId="641" />
+  <NewLine Num="1" UId="642" />
+  <Blank Num="12" UId="643" />
+  <Access Scope="LiteralConstant" UId="644">
+    <Constant UId="645">
+      <ConstantValue UId="647">4</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="648" />
+  <NewLine Num="1" UId="649" />
+  <Blank Num="16" UId="650" />
+  <Access Scope="LocalVariable" UId="651">
+    <Symbol UId="652">
+      <Component Name="inst_TimerSwitch" UId="653" />
+      <Token Text="." UId="654" />
+      <Component Name="onHour" UId="655" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="656" />
+  <Token Text=":=" UId="657" />
+  <Blank Num="1" UId="658" />
+  <Access Scope="LocalVariable" UId="659">
+    <Symbol UId="660">
+      <Component Name="iq_TimerSwitchHMIData" UId="661" />
+      <Token Text="." UId="662" />
+      <Component Name="WedOn" UId="663" />
+      <Token Text="." UId="664" />
+      <Component Name="HOUR" UId="665" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="666" />
+  <NewLine Num="1" UId="667" />
+  <Blank Num="16" UId="668" />
+  <Access Scope="LocalVariable" UId="669">
+    <Symbol UId="670">
+      <Component Name="inst_TimerSwitch" UId="671" />
+      <Token Text="." UId="672" />
+      <Component Name="onMinute" UId="673" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="674" />
+  <Token Text=":=" UId="675" />
+  <Blank Num="1" UId="676" />
+  <Access Scope="LocalVariable" UId="677">
+    <Symbol UId="678">
+      <Component Name="iq_TimerSwitchHMIData" UId="679" />
+      <Token Text="." UId="680" />
+      <Component Name="WedOn" UId="681" />
+      <Token Text="." UId="682" />
+      <Component Name="MINUTE" UId="683" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="684" />
+  <NewLine Num="1" UId="685" />
+  <Blank Num="16" UId="686" />
+  <Access Scope="LocalVariable" UId="687">
+    <Symbol UId="688">
+      <Component Name="inst_TimerSwitch" UId="689" />
+      <Token Text="." UId="690" />
+      <Component Name="offHour" UId="691" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="692" />
+  <Token Text=":=" UId="693" />
+  <Blank Num="1" UId="694" />
+  <Access Scope="LocalVariable" UId="695">
+    <Symbol UId="696">
+      <Component Name="iq_TimerSwitchHMIData" UId="697" />
+      <Token Text="." UId="698" />
+      <Component Name="WedOff" UId="699" />
+      <Token Text="." UId="700" />
+      <Component Name="HOUR" UId="701" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="702" />
+  <NewLine Num="1" UId="703" />
+  <Blank Num="16" UId="704" />
+  <Access Scope="LocalVariable" UId="705">
+    <Symbol UId="706">
+      <Component Name="inst_TimerSwitch" UId="707" />
+      <Token Text="." UId="708" />
+      <Component Name="offMinute" UId="709" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="710" />
+  <Token Text=":=" UId="711" />
+  <Blank Num="1" UId="712" />
+  <Access Scope="LocalVariable" UId="713">
+    <Symbol UId="714">
+      <Component Name="iq_TimerSwitchHMIData" UId="715" />
+      <Token Text="." UId="716" />
+      <Component Name="WedOff" UId="717" />
+      <Token Text="." UId="718" />
+      <Component Name="MINUTE" UId="719" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="720" />
+  <NewLine Num="1" UId="721" />
+  <Blank Num="16" UId="722" />
+  <NewLine Num="1" UId="723" />
+  <Blank Num="12" UId="724" />
+  <Access Scope="LiteralConstant" UId="725">
+    <Constant UId="726">
+      <ConstantValue UId="728">5</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="729" />
+  <NewLine Num="1" UId="730" />
+  <Blank Num="16" UId="731" />
+  <Access Scope="LocalVariable" UId="732">
+    <Symbol UId="733">
+      <Component Name="inst_TimerSwitch" UId="734" />
+      <Token Text="." UId="735" />
+      <Component Name="onHour" UId="736" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="737" />
+  <Token Text=":=" UId="738" />
+  <Blank Num="1" UId="739" />
+  <Access Scope="LocalVariable" UId="740">
+    <Symbol UId="741">
+      <Component Name="iq_TimerSwitchHMIData" UId="742" />
+      <Token Text="." UId="743" />
+      <Component Name="ThursOn" UId="744" />
+      <Token Text="." UId="745" />
+      <Component Name="HOUR" UId="746" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="747" />
+  <NewLine Num="1" UId="748" />
+  <Blank Num="16" UId="749" />
+  <Access Scope="LocalVariable" UId="750">
+    <Symbol UId="751">
+      <Component Name="inst_TimerSwitch" UId="752" />
+      <Token Text="." UId="753" />
+      <Component Name="onMinute" UId="754" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="755" />
+  <Token Text=":=" UId="756" />
+  <Blank Num="1" UId="757" />
+  <Access Scope="LocalVariable" UId="758">
+    <Symbol UId="759">
+      <Component Name="iq_TimerSwitchHMIData" UId="760" />
+      <Token Text="." UId="761" />
+      <Component Name="ThursOn" UId="762" />
+      <Token Text="." UId="763" />
+      <Component Name="MINUTE" UId="764" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="765" />
+  <NewLine Num="1" UId="766" />
+  <Blank Num="16" UId="767" />
+  <Access Scope="LocalVariable" UId="768">
+    <Symbol UId="769">
+      <Component Name="inst_TimerSwitch" UId="770" />
+      <Token Text="." UId="771" />
+      <Component Name="offHour" UId="772" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="773" />
+  <Token Text=":=" UId="774" />
+  <Blank Num="1" UId="775" />
+  <Access Scope="LocalVariable" UId="776">
+    <Symbol UId="777">
+      <Component Name="iq_TimerSwitchHMIData" UId="778" />
+      <Token Text="." UId="779" />
+      <Component Name="ThursOff" UId="780" />
+      <Token Text="." UId="781" />
+      <Component Name="HOUR" UId="782" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="783" />
+  <NewLine Num="1" UId="784" />
+  <Blank Num="16" UId="785" />
+  <Access Scope="LocalVariable" UId="786">
+    <Symbol UId="787">
+      <Component Name="inst_TimerSwitch" UId="788" />
+      <Token Text="." UId="789" />
+      <Component Name="offMinute" UId="790" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="791" />
+  <Token Text=":=" UId="792" />
+  <Blank Num="1" UId="793" />
+  <Access Scope="LocalVariable" UId="794">
+    <Symbol UId="795">
+      <Component Name="iq_TimerSwitchHMIData" UId="796" />
+      <Token Text="." UId="797" />
+      <Component Name="ThursOff" UId="798" />
+      <Token Text="." UId="799" />
+      <Component Name="MINUTE" UId="800" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="801" />
+  <NewLine Num="1" UId="802" />
+  <Blank Num="16" UId="803" />
+  <NewLine Num="1" UId="804" />
+  <Blank Num="12" UId="805" />
+  <Access Scope="LiteralConstant" UId="806">
+    <Constant UId="807">
+      <ConstantValue UId="809">6</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="810" />
+  <NewLine Num="1" UId="811" />
+  <Blank Num="16" UId="812" />
+  <Access Scope="LocalVariable" UId="813">
+    <Symbol UId="814">
+      <Component Name="inst_TimerSwitch" UId="815" />
+      <Token Text="." UId="816" />
+      <Component Name="onHour" UId="817" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="818" />
+  <Token Text=":=" UId="819" />
+  <Blank Num="1" UId="820" />
+  <Access Scope="LocalVariable" UId="821">
+    <Symbol UId="822">
+      <Component Name="iq_TimerSwitchHMIData" UId="823" />
+      <Token Text="." UId="824" />
+      <Component Name="FriOn" UId="825" />
+      <Token Text="." UId="826" />
+      <Component Name="HOUR" UId="827" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="828" />
+  <NewLine Num="1" UId="829" />
+  <Blank Num="16" UId="830" />
+  <Access Scope="LocalVariable" UId="831">
+    <Symbol UId="832">
+      <Component Name="inst_TimerSwitch" UId="833" />
+      <Token Text="." UId="834" />
+      <Component Name="onMinute" UId="835" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="836" />
+  <Token Text=":=" UId="837" />
+  <Blank Num="1" UId="838" />
+  <Access Scope="LocalVariable" UId="839">
+    <Symbol UId="840">
+      <Component Name="iq_TimerSwitchHMIData" UId="841" />
+      <Token Text="." UId="842" />
+      <Component Name="FriOn" UId="843" />
+      <Token Text="." UId="844" />
+      <Component Name="MINUTE" UId="845" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="846" />
+  <NewLine Num="1" UId="847" />
+  <Blank Num="16" UId="848" />
+  <Access Scope="LocalVariable" UId="849">
+    <Symbol UId="850">
+      <Component Name="inst_TimerSwitch" UId="851" />
+      <Token Text="." UId="852" />
+      <Component Name="offHour" UId="853" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="854" />
+  <Token Text=":=" UId="855" />
+  <Blank Num="1" UId="856" />
+  <Access Scope="LocalVariable" UId="857">
+    <Symbol UId="858">
+      <Component Name="iq_TimerSwitchHMIData" UId="859" />
+      <Token Text="." UId="860" />
+      <Component Name="FriOff" UId="861" />
+      <Token Text="." UId="862" />
+      <Component Name="HOUR" UId="863" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="864" />
+  <NewLine Num="1" UId="865" />
+  <Blank Num="16" UId="866" />
+  <Access Scope="LocalVariable" UId="867">
+    <Symbol UId="868">
+      <Component Name="inst_TimerSwitch" UId="869" />
+      <Token Text="." UId="870" />
+      <Component Name="offMinute" UId="871" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="872" />
+  <Token Text=":=" UId="873" />
+  <Blank Num="1" UId="874" />
+  <Access Scope="LocalVariable" UId="875">
+    <Symbol UId="876">
+      <Component Name="iq_TimerSwitchHMIData" UId="877" />
+      <Token Text="." UId="878" />
+      <Component Name="FriOff" UId="879" />
+      <Token Text="." UId="880" />
+      <Component Name="MINUTE" UId="881" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="882" />
+  <NewLine Num="1" UId="883" />
+  <Blank Num="16" UId="884" />
+  <NewLine Num="1" UId="885" />
+  <Blank Num="12" UId="886" />
+  <Access Scope="LiteralConstant" UId="887">
+    <Constant UId="888">
+      <ConstantValue UId="890">7</ConstantValue>
+    </Constant>
+  </Access>
+  <Token Text=":" UId="891" />
+  <NewLine Num="1" UId="892" />
+  <Blank Num="16" UId="893" />
+  <Access Scope="LocalVariable" UId="894">
+    <Symbol UId="895">
+      <Component Name="inst_TimerSwitch" UId="896" />
+      <Token Text="." UId="897" />
+      <Component Name="onHour" UId="898" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="899" />
+  <Token Text=":=" UId="900" />
+  <Blank Num="1" UId="901" />
+  <Access Scope="LocalVariable" UId="902">
+    <Symbol UId="903">
+      <Component Name="iq_TimerSwitchHMIData" UId="904" />
+      <Token Text="." UId="905" />
+      <Component Name="SatOn" UId="906" />
+      <Token Text="." UId="907" />
+      <Component Name="HOUR" UId="908" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="909" />
+  <NewLine Num="1" UId="910" />
+  <Blank Num="16" UId="911" />
+  <Access Scope="LocalVariable" UId="912">
+    <Symbol UId="913">
+      <Component Name="inst_TimerSwitch" UId="914" />
+      <Token Text="." UId="915" />
+      <Component Name="onMinute" UId="916" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="917" />
+  <Token Text=":=" UId="918" />
+  <Blank Num="1" UId="919" />
+  <Access Scope="LocalVariable" UId="920">
+    <Symbol UId="921">
+      <Component Name="iq_TimerSwitchHMIData" UId="922" />
+      <Token Text="." UId="923" />
+      <Component Name="SatOn" UId="924" />
+      <Token Text="." UId="925" />
+      <Component Name="MINUTE" UId="926" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="927" />
+  <NewLine Num="1" UId="928" />
+  <Blank Num="16" UId="929" />
+  <Access Scope="LocalVariable" UId="930">
+    <Symbol UId="931">
+      <Component Name="inst_TimerSwitch" UId="932" />
+      <Token Text="." UId="933" />
+      <Component Name="offHour" UId="934" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="935" />
+  <Token Text=":=" UId="936" />
+  <Blank Num="1" UId="937" />
+  <Access Scope="LocalVariable" UId="938">
+    <Symbol UId="939">
+      <Component Name="iq_TimerSwitchHMIData" UId="940" />
+      <Token Text="." UId="941" />
+      <Component Name="SatOff" UId="942" />
+      <Token Text="." UId="943" />
+      <Component Name="HOUR" UId="944" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="945" />
+  <NewLine Num="1" UId="946" />
+  <Blank Num="16" UId="947" />
+  <Access Scope="LocalVariable" UId="948">
+    <Symbol UId="949">
+      <Component Name="inst_TimerSwitch" UId="950" />
+      <Token Text="." UId="951" />
+      <Component Name="offMinute" UId="952" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="953" />
+  <Token Text=":=" UId="954" />
+  <Blank Num="1" UId="955" />
+  <Access Scope="LocalVariable" UId="956">
+    <Symbol UId="957">
+      <Component Name="iq_TimerSwitchHMIData" UId="958" />
+      <Token Text="." UId="959" />
+      <Component Name="SatOff" UId="960" />
+      <Token Text="." UId="961" />
+      <Component Name="MINUTE" UId="962" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="963" />
+  <NewLine Num="1" UId="964" />
+  <Blank Num="8" UId="965" />
+  <Token Text="END_CASE" UId="966" />
+  <Token Text=";" UId="967" />
+  <NewLine Num="1" UId="968" />
+  <Token Text="END_CASE" UId="969" />
+  <Token Text=";" UId="970" />
+</StructuredText></NetworkSource>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="9" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="A" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="B" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text>Auswahl Funktion</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <SW.Blocks.CompileUnit ID="D" CompositionName="CompileUnits">
+        <AttributeList>
+          <NetworkSource><StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v3">
+  <Token Text="IF" UId="21" />
+  <Blank Num="1" UId="22" />
+  <Access Scope="LocalVariable" UId="23">
+    <Symbol UId="24">
+      <Component Name="iq_TimerSwitchHMIData" UId="25" />
+      <Token Text="." UId="26" />
+      <Component Name="SelectionList" UId="27" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="28" />
+  <Token Text="&lt;=" UId="29" />
+  <Blank Num="1" UId="30" />
+  <Access Scope="LiteralConstant" UId="31">
+    <Constant UId="32">
+      <ConstantValue UId="34">1</ConstantValue>
+    </Constant>
+  </Access>
+  <NewLine Num="1" UId="35" />
+  <Token Text="THEN" UId="36" />
+  <NewLine Num="1" UId="37" />
+  <Blank Num="4" UId="38" />
+  <Access Scope="LocalVariable" UId="39">
+    <Symbol UId="40">
+      <Component Name="q_TimerSwitch" UId="41" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="42" />
+  <Token Text=":=" UId="43" />
+  <Blank Num="1" UId="44" />
+  <Access Scope="LocalVariable" UId="45">
+    <Symbol UId="46">
+      <Component Name="iq_TimerSwitchHMIData" UId="47" />
+      <Token Text="." UId="48" />
+      <Component Name="SelectionList" UId="49" />
+      <Token Text="." UId="50" />
+      <Token Text="%X0" UId="51" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="52" />
+  <NewLine Num="1" UId="53" />
+  <Token Text="ELSE" UId="54" />
+  <NewLine Num="1" UId="55" />
+  <Blank Num="4" UId="56" />
+  <Access Scope="LocalVariable" UId="57">
+    <Symbol UId="58">
+      <Component Name="q_TimerSwitch" UId="59" />
+    </Symbol>
+  </Access>
+  <Blank Num="1" UId="60" />
+  <Token Text=":=" UId="61" />
+  <Blank Num="1" UId="62" />
+  <Access Scope="LocalVariable" UId="63">
+    <Symbol UId="64">
+      <Component Name="inst_TimerSwitch" UId="65" />
+      <Token Text="." UId="66" />
+      <Component Name="signal" UId="67" />
+    </Symbol>
+  </Access>
+  <Token Text=";" UId="68" />
+  <NewLine Num="1" UId="69" />
+  <Token Text="END_IF" UId="70" />
+  <Token Text=";" UId="71" />
+</StructuredText></NetworkSource>
+          <ProgrammingLanguage>SCL</ProgrammingLanguage>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="E" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text />
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+          <MultilingualText ID="10" CompositionName="Title">
+            <ObjectList>
+              <MultilingualTextItem ID="11" CompositionName="Items">
+                <AttributeList>
+                  <Culture>de-DE</Culture>
+                  <Text>Ansteuerung Ausgang Zeitschaltuhr</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.Blocks.CompileUnit>
+      <MultilingualText ID="12" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="13" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.FB>
+</Document>

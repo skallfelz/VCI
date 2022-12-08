@@ -1,0 +1,48 @@
+﻿FUNCTION_BLOCK "FB_SwitchOnOff"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      "i_BtnOn/Off" : Bool;   // Schaltfläche Funktion Ein / Ausschalten
+      i_SwitchOn : Bool;   // Funktion Aktivieren (Priorisiert)
+      i_SwitchOff : Bool;   // Funktion Deaktivieren (Priorisiert)
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_Function : Bool;   // Status der Funktion
+   END_VAR
+
+   VAR 
+      stat_Function : Bool;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB is for Switch On//Off System Functions
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   01.12.2021    EP                  First release version v1.0
+	// 01.00.01   17.08.2022    MB                  Switch to SCL change Language to English
+	//===============================================================================================
+	(/*Zurücksetzte Funktion*/)
+	IF #iq_Function AND NOT #"i_BtnOn/Off" THEN
+	    #stat_Function := 1;
+	END_IF;
+	
+	IF NOT #"i_BtnOn/Off" AND NOT #iq_Function THEN
+	    #stat_Function := 0;
+	END_IF;
+	(/*Setze Funktion*/)
+	IF (#"i_BtnOn/Off" AND #stat_Function) OR #i_SwitchOff THEN
+	    #iq_Function := 0;
+	END_IF;
+	
+	IF (#"i_BtnOn/Off" AND NOT #stat_Function) OR #i_SwitchOn THEN
+	    #iq_Function := 1;
+	END_IF;
+END_FUNCTION_BLOCK
+

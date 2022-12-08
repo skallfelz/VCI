@@ -1,0 +1,67 @@
+﻿FUNCTION_BLOCK "FB_OperatingHoursCounter"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_Start : Bool;   // Freigabe wann gezählt werden soll
+      i_Reset : Bool;   // Schaltfläche Betriebsdaten zurücksetzen
+      i_Clock1Hz : Bool;   // Taktmerker 1Hz
+   END_VAR
+
+   VAR_OUTPUT 
+      q_OperatingHours : "UDT_OperatingHours";
+   END_VAR
+
+   VAR RETAIN
+      stat_CounterValue : DInt;
+   END_VAR
+   VAR 
+      inst_RTrigOneSecond {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+   END_VAR
+
+   VAR_TEMP 
+      temp_Start : Bool;
+      temp_Reset : Bool;
+      temp_PulseOneSecond : Bool;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB  is for count up the operatinghours by seconds
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   14.04.2022    EP                  First release version v1.0
+	//===============================================================================================
+	REGION MAP INPUTS
+	    #temp_Start := #i_Start;
+	    #temp_Reset := #i_Reset;
+	    #temp_PulseOneSecond := #i_Clock1Hz;
+	END_REGION
+	
+	REGION CALCULATING
+	    #inst_RTrigOneSecond(CLK := #temp_Start AND #temp_PulseOneSecond);
+	
+	    IF #inst_RTrigOneSecond.Q
+	    THEN
+	        #stat_CounterValue := #stat_CounterValue + 1;
+	    END_IF;
+	END_REGION
+	
+	REGION RESET
+	    IF #temp_Reset
+	    THEN
+	        #stat_CounterValue := 0;
+	    END_IF;
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_OperatingHours.Hours := #stat_CounterValue / 3600;
+	    #q_OperatingHours.Minutes := DINT_TO_INT((#stat_CounterValue MOD 3600) / 60);
+	    #q_OperatingHours.Seconds := DINT_TO_INT(#stat_CounterValue MOD 60);
+	END_REGION
+END_FUNCTION_BLOCK
+

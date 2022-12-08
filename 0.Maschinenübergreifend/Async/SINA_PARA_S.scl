@@ -1,0 +1,1295 @@
+﻿FUNCTION_BLOCK "SINA_PARA_S"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : DRVDPS7
+FAMILY : DRIVES
+NAME : SINA_PAS
+VERSION : 5.1
+   VAR_INPUT 
+      i_Start { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Bool := 0;   // 0-->1 Start des gewählten azyklischen Auftrags
+      i_ReadWrite { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Bool := 0;   // 0 = Lesen; 1 = Schreiben
+      i_Parameter { CFC_Visible := 'true'; CFC_ForTest := 'true'} : UInt := 1;   // Parameternummer
+      i_Index { CFC_Visible := 'true'; CFC_ForTest := 'true'} : UInt := 0;   // Subindex (Number 1..65535)
+      i_ValueWrite1 { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Real := 0.0;   // Schreibwert vom Typ REAL
+      i_ValueWrite2 { CFC_Visible := 'true'; CFC_ForTest := 'true'} : DInt := 0;   // Schreibwert vom Typ DINT32
+      i_AxisNo { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Byte := 16#01;   // Antriebsnummer
+      i_HardwareId : HW_IO := 0;   // Hardware Identifer des Modul Acces Points / Istwertslots des zyklsichen Telegramms
+   END_VAR
+
+   VAR_OUTPUT 
+      q_Ready { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Bool := 0;   // Bereitschaftsrückmeldung für den Betrieb mit LAcycCom Bausteinen
+      q_Busy { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Bool := 0;   // Die Funktionsweise wird erläutert
+      q_Done { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Bool := 1;   // Arbeitsweise ohne Fehler beendet
+      q_ValueRead1 { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Real := 0.0;   // Gelesener Wert im Format REAL
+      q_ValueRead2 { CFC_Visible := 'true'; CFC_ForTest := 'true'} : DInt := 0;   // Gelesener Wert im Format DINT32
+      q_Format { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Byte := 16#00;   // Rückmeldung des Formats des gelesenen Parameters
+      q_ErrorNo { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Word := 16#0000;   // Fehlernummer nach Profidrive Profil
+      q_Error { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Bool := 0;   // 1 = Anzeige eines aufgetretenen Fehlers
+      q_ErrorId { CFC_Visible := 'true'; CFC_ForTest := 'true'} : DWord := 0;   // Störung der Betriebsart
+      q_DiagId { CFC_Visible := 'true'; CFC_ForTest := 'true'} : Word := 16#0000;   // Rückmeldeausgang der Systemfunktionen im Fehlerfall
+   END_VAR
+
+   VAR 
+      stat_SbWrError : Bool := 0;   // Fehler beim Schreiben mit SFB WRREC
+      stat_SbWrDone : Bool := 0;
+      stat_SbRdError : Bool := 0;   // Fehler beim Lesen mit dem SFB RDREC
+      stat_SbWrBusy : Bool := 0;   // Schreibaufgabe busy SFB 53 WRREC sind beschäftigt
+      stat_SbRdBusy : Bool := 0;   // Lese Auftrag busy SFB 52 RDREC sind beschäftigt
+      statSbWrStart : Bool := 0;   // Schreibauftrag starten
+      stat_SbRdStart : Bool := 0;   // Leseauftrag starten
+      stat_SbWrStart1 : Bool := 0;   // Schreibauftrag starten (erster Teil des Schreibbefehls)
+      stat_SbRdStart1 : Bool := 0;   // Leseauftrag starten (erster Teil des Lesebefehls)
+      stat_SbWrStart2 : Bool := 0;   // Schreibauftrag starten (zweiter Teil des Schreibbefehls)
+      stat_SbRdStart2 : Bool := 0;   // Leseauftrag starten (zweiter Teil des Lesebefehls)
+      stat_SbStart : Bool := 0;   // Positive Flanke von  "Start commando"
+      stat_SbReady : Bool := 0;   // Positive Flanke von "Ready"
+      stat_SbRead : Bool := 0;
+      stat_SbWrite : Bool := 0;
+      stat_SbParaNo : Bool := 0;   // Die Anzahl der Parameter welche Okay sind 
+      stat_SbBusy : Bool := 0;   // Die Funktionsweise wird erläutert
+      stat_SbError : Bool := 0;   // Fehler oder Störung aktiv
+      stat_SbDone : Bool := 0;   // Auftrag beendet
+      stat_SyFormat : Byte := 16#00;
+      stat_SyAxisNo : Byte := 0;   // Antriebsobjekt ID
+      stat_SiReqRef : Int := 0;   // Referenznummer der Auftrage
+      stat_SiErrorId : Int := 0;   // Function block fault Id
+      stat_SiErrorCount : Int := 0;   // Temporärer Fehlerzähler des Wiederholungsauftrags
+      stat_SiMaxErrCount : Int := 12500;   // max. temporary error counter
+      stat_SwParaError : Word := WORD#16#0000;   // Fehler eines Parameters
+      stat_SxReqParaMulti : Struct   // Telegramm for request/change parameter value, multi-parameter
+         sxHeader : Struct
+            syReqRef : Byte := 16#00;   // Anfrage-Referenz (Anfrage-ID, wird in der Antwort gespiegelt)
+            syReqId : Byte := 16#01;   // Anfrage ID 0x1=Lesen
+            syAxisNo : Byte := 16#00;
+            syParaNo : Byte := 16#00;   // Anzahl der Parameter (DEC: für einzelne Parameter=1)
+         END_STRUCT;
+         sxParaAdress : Struct   // Parameter address
+            syAttr : Byte := 16#10;
+            syElemNo : Byte := 16#01;   // Anzahl der Elemente (DEC: für einzelne Elemente=1)
+            siParaNo : UInt := 0;   // Nummer des Parameters (Nummer 1..65535)
+            siIndex : UInt := 0;   // Subindex (Number 1..65535)
+         END_STRUCT;
+      END_STRUCT;
+      stat_SxChaParaMulti : Struct   // Telegramm for change parameter value, multi-parameter
+         sxHeader : Struct
+            syReqRef : Byte := 16#00;   // Anfrage-Referenz (Anfrage-ID, wird in der Antwort gespiegelt)
+            syReqId : Byte := 16#02;   // Anfrage ID 0x2=Schreiben
+            syAxisNo : Byte := 16#00;
+            syParaNo : Byte := 16#00;   // Anzahl der Parameter (DEC: für einzelne Parameter=1)
+         END_STRUCT;
+         sxData : Array[1..12] of Byte;   // Parameteradresse (Attribut/Wert (BYTE), Anzahl der Elemente (BYTE), Parameternummer (2 BYTES), Subindex (2 BYTES), Parameterwert (Format/Fehler (BYTE), Anzahl der Werte/Wert des Fehlers (BYTE), Wert (BYTE oder WORD oder DWORD)
+      END_STRUCT;
+      stat_SxRespParaMulti : Struct   // Telegramm for response parameter value, multi-parameter
+         sxHeader : Struct
+            syReqRef : Byte := 16#00;   // Anfrage-Referenz (Anfrage-ID, wird in der Antwort gespiegelt)
+            syReqId : Byte := 16#00;   // Anfrage ID (0x1=Lesen | 0x2=Schreiben)
+            syAxisNo : Byte := 16#00;
+            syParaNo : Byte := 16#00;   // Anzahl der Parameter (DEC: für einzelne Parameter=1)
+         END_STRUCT;
+         sxData : Array[1..6] of Byte;   // Parameterwert (Format/Fehler (BYTE), Anzahl der Werte/Wert des Fehlers (BYTE), Wert (BYTE oder WORD oder DWORD)
+      END_STRUCT;
+      stat_SiLenHeader : Int := 4;   // Length of telegram of header
+      stat_SiLenParaMulti : Int := 6;   // Length of telegram of data for request and response
+      stat_SiLenChaPara : Int := 12;   // Length of telegram of data for change parameter Temporary variables
+      inst_RDREC_1 {InstructionName := 'RDREC'; LibVersion := '1.0'; S7_SetPoint := 'False'} : RDREC;
+      inst_WRREC_1 {InstructionName := 'WRREC'; LibVersion := '1.1'; S7_SetPoint := 'False'} : WRREC;
+   END_VAR
+
+   VAR_TEMP 
+      temp_piCount : Int;   // Frei verfügbare Zählervariable
+      piPointer : Int;   // Frei verfügbare Zeiger-Array-Variable
+      temp_piLenTele : Int;   // Length of telegram of buffer
+      temp_piRetSFC : Int;   // Status für die Fehleranalyse
+      temp_pwWordHigh : Word;   // Hilfsvariable von word
+      temp_pwWordLow : Word;   // Hilfsvariable von word
+      temp_pwWord1 : Word;   // Hilfsvariable von word
+      temp_pwWord2 : Word;   // Hilfsvariable von word
+      temp_pdDWordHigh : DWord;   // Hilfsvariable von dword
+      temp_pdDWordLow : DWord;   // Hilfsvariable von dword
+      temp_pdStatus : DWord;   // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code
+      temp_pbValidSFB : Bool;   // Status SFB
+      temp_piLenSFB : UInt;   // Status-Länge für SFB-Aufruf
+      temp_pwErrorNo : Word;   // Fehler Nummer
+   END_VAR
+
+
+BEGIN
+	//=============================================================================
+	//SIEMENS AG
+	//(c)Copyright 2017 All Rights Reserved
+	//-----------------------------------------------------------------------------
+	// Library: DriveLib
+	// Tested with: S7-1516-3 PN/DP V1.8
+	// Engineering: TIA Portal V14
+	// Restrictions: -
+	// Requirements: S7-1200 / S7-1500
+	// Functionality: read and write one parameter from/to a Sinamics
+	//
+	//=============================================================================
+	// Auftrag "Parameter lesen" bzw. Auftrag "Parameter schreiben" wird nicht mehr ausgeführt
+	IF NOT #stat_SbBusy THEN
+	  #stat_SbParaNo := TRUE;
+	  #stat_SyAxisNo := #i_AxisNo;
+	END_IF;
+	
+	// Starten 
+	IF #i_Start AND NOT #stat_SbStart AND NOT #stat_SbBusy THEN
+	  
+	  #stat_SbReady := False;
+	  #stat_SbError := False;
+	  #stat_SbBusy := False;
+	  
+	  // Auftrag "Parameter lesen" erkennen
+	  IF NOT #i_ReadWrite THEN
+	    #stat_SbRead := True;
+	    #statSbWrStart := True;
+	    #stat_SbRdStart := False;
+	    
+	    #stat_SbWrite := False;
+	    #stat_SbWrStart1 := False;
+	    #stat_SbRdStart1 := False;
+	    #stat_SbWrStart2 := False;
+	    #stat_SbRdStart2 := False;
+	    
+	    // Referenzauftragsnummer erzeugen
+	    #stat_SiReqRef := #stat_SiReqRef + 1;
+	    
+	    // bei Überschreitung wieder zurücksetzen und von vorne (Wertebereich von 0-255)
+	    IF #stat_SiReqRef > 255 THEN
+	      #stat_SiReqRef := 0;
+	    END_IF;
+	    
+	    // Auftrag "Parameter schreiben" erkennen
+	  ELSE
+	    #stat_SbWrite := True;
+	    #stat_SbWrStart1 := True;
+	    #stat_SbRdStart1 := False;
+	    #stat_SbWrStart2 := False;
+	    #stat_SbRdStart2 := False;
+	    
+	    #stat_SbRead := False;
+	    #statSbWrStart := False;
+	    #stat_SbRdStart := False;
+	    
+	    // Referenzauftragsnummer erzeugen
+	    #stat_SiReqRef := #stat_SiReqRef + 1;
+	    
+	    // bei Überschreitung wieder zurücksetzen und von vorne (Wertebereich von 0-255)
+	    IF #stat_SiReqRef > 255 THEN
+	      #stat_SiReqRef := 0;
+	    END_IF;
+	  END_IF;
+	  
+	  // Fehler 4 und 5 wieder zurücknehmen
+	  IF (#stat_SiErrorId = 4) OR (#stat_SiErrorId = 5) THEN
+	    #stat_SbError := False;
+	    #stat_SiErrorId := 0;
+	  END_IF;
+	END_IF;
+	
+	// "Start commando" Flanke merken
+	#stat_SbStart := #i_Start;
+	
+	// Abbrechen
+	IF NOT #i_Start THEN
+	  
+	  #stat_SiErrorCount := 0;
+	  // Schreib - oder Lesevorgang abbrechen
+	  #stat_SbRead := False;
+	  #statSbWrStart := False;
+	  #stat_SbRdStart := False;
+	  
+	  #stat_SbWrite := False;
+	  #stat_SbWrStart1 := False;
+	  #stat_SbRdStart1 := False;
+	  #stat_SbWrStart2 := False;
+	  #stat_SbRdStart2 := False;
+	  
+	  // Auftag ist noch beschäftigt => Fehler ausgeben
+	  IF #stat_SbBusy THEN
+	    #stat_SbError := True;
+	    #stat_SiErrorId := 4;
+	    #stat_SbBusy := False;
+	  END_IF;
+	END_IF;
+	
+	
+	// Auftrag "Parameter lesen" wurde ausgelöst
+	IF #stat_SbParaNo AND #stat_SbRead AND NOT #stat_SbWrite THEN
+	  
+	  // Auftrag "Parameter lesen" vorbereiten und abschicken
+	  IF #statSbWrStart THEN
+	    
+	    // Ablöschen des Sendepuffers
+	    // Parameternummer des Parameters 
+	    #stat_SxReqParaMulti.sxParaAdress.siParaNo := 0;
+	    
+	    // Subindex des Parameters
+	    #stat_SxReqParaMulti.sxParaAdress.siIndex := 0;
+	    
+	    // Auftrags-HEADER erstellen
+	    // Auftragsreferenz
+	    #stat_SxReqParaMulti.sxHeader.syReqRef := INT_TO_BYTE(#stat_SiReqRef);
+	    
+	    // Auftragskennung 0x01=Request Parameters
+	    #stat_SxReqParaMulti.sxHeader.syReqId := B#16#01;
+	    
+	    // Achse
+	    #stat_SxReqParaMulti.sxHeader.syAxisNo := #stat_SyAxisNo;
+	    
+	    // Anzahl Parameter        
+	    #stat_SxReqParaMulti.sxHeader.syParaNo := B#16#01;
+	    
+	    // Auftrags-PARAMETERADRESSE erstellen
+	    // Parameternummer des Parameters                                
+	    #stat_SxReqParaMulti.sxParaAdress.siParaNo := #i_Parameter;
+	    
+	    // Subindex des Parameters
+	    #stat_SxReqParaMulti.sxParaAdress.siIndex := #i_Index;
+	    
+	    // SCHREIBEN AZYKLISCH
+	    #temp_piLenTele := #stat_SiLenHeader + #stat_SiLenParaMulti;
+	    #inst_WRREC_1(REQ := True,                                // Startimpuls
+	             ID := #i_HardwareId,                         // Diagnoseadresse
+	             INDEX := 47,                                  // Rahmentyp
+	             LEN := INT_TO_UINT(#temp_piLenTele),             // maximale Länge
+	             DONE => #stat_SbWrDone,                           // Schreibauftrag beendet
+	             BUSY => #stat_SbWrBusy,                           // Slave beschäftigt
+	             ERROR => #stat_SbWrError,                          // Fehler beim Schreiben
+	             STATUS => #temp_pdStatus,                           // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code
+	             RECORD := #stat_SxReqParaMulti);                    // Zeiger auf zu schreibenen Datensatzes
+	    
+	    // Ausgänge setzen
+	    #stat_SbBusy := #stat_SbWrBusy;
+	    #stat_SbDone := #stat_SbWrDone;
+	    
+	    // Fehler auswerten
+	    IF #stat_SbWrError THEN
+	      
+	      // Fehlerstatus aus dem Doppelwort filtern und weitergeben                
+	      #temp_pwWord1 := DWORD_TO_WORD(SHR(IN := (#temp_pdStatus AND DW#16#FFFF00), N := 8));
+	      
+	      // Fehlerstatus setzen
+	      #stat_SiErrorId := 3;
+	      #q_DiagId := #temp_pwWord1;
+	      
+	      //Temporärer Fehler: #pdStatus = 80A7, 80B5, 80C0, 80C1, 80C2, 80C3 oder 80C4 zulassen und nocheinmal versuchen
+	      IF NOT (#temp_pwWord1 = DW#16#80A7) AND NOT (#temp_pwWord1 = DW#16#80B5) AND NOT (#temp_pwWord1 = DW#16#80C0) AND
+	        NOT (#temp_pwWord1 = DW#16#80C1) AND NOT (#temp_pwWord1 = DW#16#80C2) AND NOT (#temp_pwWord1 = DW#16#80C3) AND
+	        NOT (#temp_pwWord1 = DW#16#80C4) THEN
+	        
+	        // Wiederholungsauftrag wieder zurücknehmen 
+	        #statSbWrStart := False;
+	        #stat_SbRdStart := False;
+	        #stat_SbRead := False;
+	        
+	        // Fehler ausgeben 
+	        #stat_SbError := #stat_SbWrError;
+	        
+	      ELSE
+	        // Fehlerwiederholauftrag ??                   
+	        IF #stat_SiErrorCount = #stat_SiMaxErrCount THEN
+	          
+	          // Wiederholungsauftrag wieder zurücknehmen
+	          #statSbWrStart := False;
+	          #stat_SbRdStart := False;
+	          #stat_SbRead := False;
+	          
+	          //Fehlerzähler zurücksetzen
+	          #stat_SiErrorCount := 0;
+	          
+	          
+	          // Fehler ausgeben 
+	          #stat_SbError := #stat_SbWrError;
+	          
+	          // nix tun bis Zähler überläuft
+	        ELSE
+	          #stat_SiErrorCount := #stat_SiErrorCount + 1;
+	        END_IF;
+	      END_IF;
+	      
+	      // kein Fehler beim SCHEIBEN AZYKLISCH und Auftrag fertig 
+	    ELSIF NOT #stat_SbWrBusy AND #stat_SbWrDone THEN
+	      
+	      // Fehlerkennung zurücknehmen
+	      IF #stat_SiErrorId = 3 THEN
+	        #stat_SiErrorId := 0;
+	        #stat_SbError := False;
+	      END_IF;
+	      
+	      #q_DiagId := W#16#00;
+	      
+	      // Schreibauftrag fertig melden und Leseantrag anstossen
+	      #statSbWrStart := False;
+	      #stat_SbRdStart := True;
+	    END_IF;
+	  END_IF; // Auftrag "Parameter lesen" vorbereiten und abschicken
+	  
+	  // vom Auftrag "Parameter lesen" die Antwort abwarten und dann auswerten
+	  IF #stat_SbRdStart THEN
+	    
+	    // Ablöschen des Empfangspuffers
+	    #stat_SxRespParaMulti.sxHeader.syReqRef := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syReqId := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syAxisNo := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syParaNo := B#16#00;
+	    
+	    FOR #temp_piCount := 1 TO #stat_SiLenParaMulti DO
+	      #stat_SxRespParaMulti.sxData[#temp_piCount] := B#16#00;
+	    END_FOR;
+	    
+	    // LESEN AZYKLISCH
+	    #temp_piLenTele := #stat_SiLenHeader + #stat_SiLenParaMulti;
+	    #inst_RDREC_1(REQ := True,                                // Startimpuls
+	             ID := #i_HardwareId,                         // Diagnoseadresse        
+	             INDEX := 47,                                  // Rahmentyp           
+	             MLEN := INT_TO_UINT(#temp_piLenTele),             // maximale Länge
+	             VALID => #temp_pbValidSFB,                         // neuer Datensatz empfangen und gültig   
+	             BUSY => #stat_SbRdBusy,                           // Slave beschäftigt
+	             ERROR => #stat_SbRdError,                          // Fehler beim Schreiben
+	             STATUS => #temp_pdStatus,                           // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code 
+	             LEN => #temp_piLenSFB,                           // Länge des gelesenen Datensatzes
+	             RECORD := #stat_SxRespParaMulti);                   // Zeiger auf gelesenen Datensatz
+	    
+	    // Ausgänge setzen
+	    #stat_SbBusy := #stat_SbRdBusy;
+	    #stat_SbDone := #temp_pbValidSFB;
+	    
+	    // Fehler auswerten
+	    IF #stat_SbRdError THEN
+	      // Fehlerstatus aus dem Doppelwort filtern und weitergeben                
+	      #temp_pwWord1 := DWORD_TO_WORD(SHR(IN := (#temp_pdStatus AND DW#16#FFFF00), N := 8));
+	      
+	      // Fehlerstatus setzen
+	      #stat_SiErrorId := 3;
+	      #q_DiagId := #temp_pwWord1;
+	      
+	      //Temporärer Fehler: #pdStatus = 80A7, 80B5, 80C0, 80C1, 80C2, 80C3 oder 80C4 zulassen und nocheinmal versuchen
+	      IF NOT (#temp_pwWord1 = DW#16#80A7) AND NOT (#temp_pwWord1 = DW#16#80B5) AND NOT (#temp_pwWord1 = DW#16#80C0) AND
+	        NOT (#temp_pwWord1 = DW#16#80C1) AND NOT (#temp_pwWord1 = DW#16#80C2) AND NOT (#temp_pwWord1 = DW#16#80C3) AND
+	        NOT (#temp_pwWord1 = DW#16#80C4) THEN
+	        
+	        // Wiederholungsauftrag wieder zurücknehmen  
+	        #statSbWrStart := False;
+	        #stat_SbRdStart := False;
+	        #stat_SbRead := False;
+	        
+	        // Fehler ausgeben 
+	        #stat_SbError := #stat_SbRdError;
+	        
+	      ELSE
+	        // Fehlerwiederholauftrag ??                   
+	        IF #stat_SiErrorCount = #stat_SiMaxErrCount THEN
+	          
+	          // Wiederholungsauftrag wieder zurücknehmen
+	          #statSbWrStart := False;
+	          #stat_SbRdStart := False;
+	          #stat_SbRead := False;
+	          
+	          //Fehlerzähler zurücksetzen
+	          #stat_SiErrorCount := 0;
+	          
+	          
+	          // Fehler ausgeben 
+	          #stat_SbError := #stat_SbRdError;
+	          
+	          // nix tun bis Zähler überläuft
+	        ELSE
+	          #stat_SiErrorCount := #stat_SiErrorCount + 1;
+	        END_IF;
+	      END_IF;
+	      
+	      // Fehler : die Auftragsreferenz der Antwort übertimmt nicht mit der Auftragsreferenz der Anfrage überein
+	    ELSIF NOT (#stat_SiReqRef = BYTE_TO_INT(#stat_SxRespParaMulti.sxHeader.syReqRef)) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen  
+	      #statSbWrStart := False;
+	      #stat_SbRdStart := False;
+	      #stat_SbRead := False;
+	      
+	      // Fehler : falsche Auftragskennung zurück erhalten    
+	    ELSIF NOT (#stat_SxRespParaMulti.sxHeader.syReqId = B#16#81 OR #stat_SxRespParaMulti.sxHeader.syReqId = B#16#01) AND
+	      NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen  
+	      #statSbWrStart := False;
+	      #stat_SbRdStart := False;
+	      #stat_SbRead := False;
+	      
+	      // Fehler : die angeforderte Anzahl Parameter entspricht nicht der übermittelten Anzahl Parameter überein
+	    ELSIF NOT (#stat_SxRespParaMulti.sxHeader.syParaNo = B#16#01) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen  
+	      #statSbWrStart := False;
+	      #stat_SbRdStart := False;
+	      #stat_SbRead := False;
+	      
+	      // Fehler : die Achse entspricht nicht der übergebenen Achse
+	    ELSIF NOT (#stat_SyAxisNo = #stat_SxRespParaMulti.sxHeader.syAxisNo) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen  
+	      #statSbWrStart := False;
+	      #stat_SbRdStart := False;
+	      #stat_SbRead := False;
+	      
+	      // kein Fehler beim LESEN AZYKLISCH und Auftrag fertig 
+	    ELSIF NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      
+	      // die angefragten Parameter auswerten und im Puffer abspeichern
+	      
+	      // ermitteltes Format des Parameters abspeichern
+	      #stat_SyFormat := #stat_SxRespParaMulti.sxData[1];
+	      
+	      // Format = Error ? = > gesendeter Parameter fehlerhaft
+	      IF (BYTE_TO_INT(#stat_SxRespParaMulti.sxData[1]) = 68) THEN
+	        
+	        // Format = Error, zwei Bytes zu übermittelten Fehlernummer zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	        
+	        #stat_SbError := True;
+	        
+	        // ermittelte Fehlernummer im Puffer abspeichern
+	        #q_ErrorNo := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer eintragen   
+	        #stat_SwParaError := #stat_SwParaError OR W#16#01;
+	        
+	        // Format = Byte ? = > gesendeter Parameter ein Byte lang ohne Vorzeichen
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#41) OR (#stat_SxRespParaMulti.sxData[1] = B#16#05) THEN
+	        
+	        // ermittelter Parameterwert eintragen (Byte) 
+	        #q_ValueRead1 := USINT_TO_REAL(BYTE_TO_USINT(#stat_SxRespParaMulti.sxData[3]));
+	        #q_ValueRead2 := 0;
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Byte ? = > gesendeter Parameter ein Byte lang mit Vorzeichen
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#02) THEN
+	        
+	        // ermittelter Parameterwert eintragen (Byte) 
+	        #q_ValueRead1 := SINT_TO_REAL(BYTE_TO_SINT(#stat_SxRespParaMulti.sxData[3]));
+	        #q_ValueRead2 := 0;
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Word ? = > gesendeter Parameter zwei Bytes lang ohne Vorzeichen
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#42) OR (#stat_SxRespParaMulti.sxData[1] = B#16#06)
+	        OR (#stat_SxRespParaMulti.sxData[1] = B#16#0A) THEN
+	        
+	        // Format = Word, zwei Bytes zu übermitteltem Parameterwert zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	        #temp_pwWord1 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        // ermittelter Parameterwert eintragen (Word)
+	        #q_ValueRead1 := UINT_TO_REAL(WORD_TO_UINT(#temp_pwWord1));
+	        #q_ValueRead2 := 0;
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Word ? = > gesendeter Parameter zwei Bytes lang mit Vorzeichen
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#03) THEN
+	        
+	        // Format = Word, zwei Bytes zu übermitteltem Parameterwert zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	        #temp_pwWord1 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        // ermittelter Parameterwert eintragen (Word)
+	        #q_ValueRead1 := INT_TO_REAL(WORD_TO_INT(#temp_pwWord1));
+	        #q_ValueRead2 := 0;
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Double Word ? = > gesendeter Parameter vier Bytes lang ohne Vorzeichen
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#43) OR (#stat_SxRespParaMulti.sxData[1] = B#16#07) OR
+	        (#stat_SxRespParaMulti.sxData[1] = B#16#0D) THEN
+	        
+	        // Format = Double Word, vier Bytes zu übermitteltem Parameterwert zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	        #temp_pwWord1 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[5]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[6]);
+	        #temp_pwWord2 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        #temp_pdDWordHigh := SHL(IN := WORD_TO_DWORD(#temp_pwWord1), N := 16);
+	        #temp_pdDWordLow := WORD_TO_DWORD(#temp_pwWord2);
+	        
+	        // ermittelter Parameterwert eintragen (Word)
+	        #q_ValueRead1 := 0.0;
+	        #q_ValueRead2 := DWORD_TO_DINT(#temp_pdDWordHigh XOR #temp_pdDWordLow);
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Double Word ? = > gesendeter Parameter vier Bytes lang mit Vorzeichen
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#04) THEN
+	        
+	        // Format = Double Word, vier Bytes zu übermitteltem Parameterwert zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	        #temp_pwWord1 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[5]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[6]);
+	        #temp_pwWord2 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        #temp_pdDWordHigh := SHL(IN := WORD_TO_DWORD(#temp_pwWord1), N := 16);
+	        #temp_pdDWordLow := WORD_TO_DWORD(#temp_pwWord2);
+	        
+	        // ermittelter Parameterwert eintragen (Word)
+	        #q_ValueRead1 := 0.0;
+	        #q_ValueRead2 := DWORD_TO_DINT(#temp_pdDWordHigh XOR #temp_pdDWordLow);
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Double Word ? = > gesendeter Parameter vier Bytes lang (FloatingPoint)
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#08) THEN
+	        
+	        // Format = Double Word, vier Bytes zu übermitteltem Parameterwert zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	        #temp_pwWord1 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[5]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[6]);
+	        #temp_pwWord2 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        #temp_pdDWordHigh := SHL(IN := WORD_TO_DWORD(#temp_pwWord1), N := 16);
+	        #temp_pdDWordLow := WORD_TO_DWORD(#temp_pwWord2);
+	        
+	        // ermittelter Parameterwert eintragen (Word)
+	        #q_ValueRead1 := DWORD_TO_REAL(#temp_pdDWordHigh XOR #temp_pdDWordLow);
+	        #q_ValueRead2 := 0;
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Unbekanter Datentyp
+	      ELSE
+	        
+	        #stat_SiErrorId := 5;
+	        #stat_SbError := True;
+	        #stat_SbDone := False;
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer eintragen   
+	        #stat_SwParaError := #stat_SwParaError OR W#16#01;
+	        
+	      END_IF;
+	      
+	      // Fehlerkennung zurücknehmen
+	      IF (#stat_SiErrorId = 3) OR (#stat_SiErrorId = 1) THEN
+	        #stat_SiErrorId := 0;
+	        #stat_SbError := False;
+	      END_IF;
+	      
+	      #q_DiagId := W#16#00;
+	      
+	      // Auftrag : Parameter lesen ist abgeschlossen
+	      #stat_SbRdStart := False;
+	      #stat_SbRead := False;
+	    END_IF; // kein Fehler beim LESEN AZYKLISCH und Auftrag fertig 
+	  END_IF; // vom Auftrag "Parameter lesen" die Antwort abwarten und dann auswerten 
+	END_IF; // Auftrag "Parameter lesen" wurde ausgelöst
+	
+	// Auftrag "Parameter schreiben" wurde ausgelöst
+	IF #stat_SbParaNo AND NOT #stat_SbRead AND #stat_SbWrite THEN
+	  
+	  // Auftrag "Parameter schreiben" bzw. "ändern" besteht aus zwei Aufträgen
+	  // 1. Teilauftrag "Parameter lesen"
+	  // 2. Teilauftrag "Parameter schreiben bzw. ändern"
+	  
+	  // 1. Teilauftrag "Parameter lesen" vorbereiten und abschicken
+	  IF #stat_SbWrStart1 THEN
+	    
+	    // Ablöschen des Sendepuffers
+	    // Parameternummer des Parameters 
+	    #stat_SxReqParaMulti.sxParaAdress.siParaNo := 0;
+	    
+	    // Subindex des Parameters
+	    #stat_SxReqParaMulti.sxParaAdress.siIndex := 0;
+	    
+	    // Auftrags-HEADER erstellen
+	    // Auftragsreferenz
+	    #stat_SxReqParaMulti.sxHeader.syReqRef := INT_TO_BYTE(#stat_SiReqRef);
+	    
+	    // Auftragskennung 0x01=Request Parameters
+	    #stat_SxReqParaMulti.sxHeader.syReqId := B#16#01;
+	    
+	    // Achse
+	    #stat_SxReqParaMulti.sxHeader.syAxisNo := #stat_SyAxisNo;
+	    
+	    // Anzahl Parameter        
+	    #stat_SxReqParaMulti.sxHeader.syParaNo := B#16#01;
+	    
+	    // Auftrags-PARAMETERADRESSE erstellen
+	    // Parameternummer des Parameters                                
+	    #stat_SxReqParaMulti.sxParaAdress.siParaNo := #i_Parameter;
+	    
+	    // Subindex des Parameters
+	    #stat_SxReqParaMulti.sxParaAdress.siIndex := #i_Index;
+	    
+	    // SCHREIBEN AZYKLISCH
+	    #temp_piLenTele := #stat_SiLenHeader + #stat_SiLenParaMulti;
+	    #inst_WRREC_1(REQ := True,                                // Startimpuls
+	             ID := #i_HardwareId,                         // Diagnoseadresse
+	             INDEX := 47,                                  // Rahmentyp
+	             LEN := INT_TO_UINT(#temp_piLenTele),             // maximale Länge
+	             DONE => #stat_SbWrDone,                           // Schreibauftrag beendet
+	             BUSY => #stat_SbWrBusy,                           // Slave beschäftigt
+	             ERROR => #stat_SbWrError,                          // Fehler beim Schreiben
+	             STATUS => #temp_pdStatus,                           // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code
+	             RECORD := #stat_SxReqParaMulti);                    // Zeiger auf zu schreibenen Datensatz
+	    
+	    // Ausgänge setzen
+	    #stat_SbBusy := #stat_SbWrBusy;
+	    #stat_SbDone := #stat_SbWrDone;
+	    
+	    // Fehler auswerten
+	    IF #stat_SbWrError THEN
+	      
+	      // Fehlerstatus aus dem Doppelwort filtern und weitergeben                
+	      #temp_pwWord1 := DWORD_TO_WORD(SHR(IN := (#temp_pdStatus AND DW#16#FFFF00), N := 8));
+	      
+	      // Fehlerstatus setzen
+	      #stat_SiErrorId := 3;
+	      #q_DiagId := #temp_pwWord1;
+	      
+	      //Temporärer Fehler: #pdStatus = 80A7, 80B5, 80C0, 80C1, 80C2, 80C3 oder 80C4 zulassen und nocheinmal versuchen
+	      IF NOT (#temp_pwWord1 = DW#16#80A7) AND NOT (#temp_pwWord1 = DW#16#80B5) AND NOT (#temp_pwWord1 = DW#16#80C0) AND
+	        NOT (#temp_pwWord1 = DW#16#80C1) AND NOT (#temp_pwWord1 = DW#16#80C2) AND NOT (#temp_pwWord1 = DW#16#80C3) AND
+	        NOT (#temp_pwWord1 = DW#16#80C4) THEN
+	        
+	        // Wiederholungsauftrag wieder zurücknehmen
+	        #stat_SbWrStart1 := False;
+	        #stat_SbRdStart1 := False;
+	        #stat_SbWrite := False;
+	        
+	        // Fehler ausgeben 
+	        #stat_SbError := #stat_SbWrError;
+	        
+	      ELSE
+	        // Fehlerwiederholauftrag ??                   
+	        IF #stat_SiErrorCount = #stat_SiMaxErrCount THEN
+	          
+	          // Wiederholungsauftrag wieder zurücknehmen
+	          #stat_SbWrStart1 := False;
+	          #stat_SbRdStart1 := False;
+	          #stat_SbWrite := False;
+	          
+	          //Fehlerzähler zurücksetzen
+	          #stat_SiErrorCount := 0;
+	          
+	          
+	          // Fehler ausgeben 
+	          #stat_SbError := #stat_SbWrError;
+	          // nix tun bis Zähler überläuft
+	        ELSE
+	          #stat_SiErrorCount := #stat_SiErrorCount + 1;
+	        END_IF;
+	      END_IF;
+	      
+	      // kein Fehler beim SCHEIBEN AZYKLISCH und Auftrag fertig 
+	    ELSIF NOT #stat_SbWrBusy AND #stat_SbWrDone THEN
+	      
+	      // Fehlerkennung zurücknehmen
+	      IF (#stat_SiErrorId = 3) THEN
+	        #stat_SiErrorId := 0;
+	        #stat_SbError := False;
+	      END_IF;
+	      
+	      #q_DiagId := W#16#00;
+	      
+	      // Schreibauftrag fertig melden und Leseantrag anstossen
+	      #stat_SbWrStart1 := False;
+	      #stat_SbRdStart1 := True;
+	    END_IF;
+	  END_IF; // 1. Teilauftrag "Parameter lesen" vorbereiten und abschicken
+	  
+	  // vom 1. Teilauftrag "Parameter lesen" die Antwort abwarten und dann auswerten
+	  IF #stat_SbRdStart1 THEN
+	    
+	    // Ablöschen des Empfangspuffers
+	    #stat_SxRespParaMulti.sxHeader.syReqRef := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syReqId := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syAxisNo := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syParaNo := B#16#00;
+	    
+	    FOR #temp_piCount := 1 TO #stat_SiLenParaMulti DO
+	      #stat_SxRespParaMulti.sxData[#temp_piCount] := B#16#00;
+	    END_FOR;
+	    
+	    // LESEN AZYKLISCH
+	    #temp_piLenTele := #stat_SiLenHeader + #stat_SiLenParaMulti;
+	    #inst_RDREC_1(REQ := True,                                // Startimpuls
+	             ID := #i_HardwareId,                         // Diagnoseadresse        
+	             INDEX := 47,                                  // Rahmentyp           
+	             MLEN := INT_TO_UINT(#temp_piLenTele),             // maximale Länge
+	             VALID => #temp_pbValidSFB,                         // neuer Datensatz empfangen und gültig      
+	             BUSY => #stat_SbRdBusy,                           // Slave beschäftigt
+	             ERROR => #stat_SbRdError,                          // Fehler beim Schreiben
+	             STATUS => #temp_pdStatus,                           // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code 
+	             LEN => #temp_piLenSFB,                           // Länge des gelesenen Datensatzes
+	             RECORD := #stat_SxRespParaMulti);                   // Zeiger auf gelesenen Datensatz
+	    
+	    // Ausgänge setzen
+	    #stat_SbBusy := #stat_SbRdBusy;
+	    #stat_SbDone := #temp_pbValidSFB;
+	    
+	    // Fehler auswerten
+	    IF #stat_SbRdError THEN
+	      // Fehlerstatus aus dem Doppelwort filtern und weitergeben                
+	      #temp_pwWord1 := DWORD_TO_WORD(SHR(IN := (#temp_pdStatus AND DW#16#FFFF00), N := 8));
+	      
+	      // Fehlerstatus setzen
+	      #stat_SiErrorId := 3;
+	      #q_DiagId := #temp_pwWord1;
+	      
+	      //Temporärer Fehler: #pdStatus = 80A7, 80B5, 80C0, 80C1, 80C2, 80C3 oder 80C4 zulassen und nocheinmal versuchen
+	      IF NOT (#temp_pwWord1 = DW#16#80A7) AND NOT (#temp_pwWord1 = DW#16#80B5) AND NOT (#temp_pwWord1 = DW#16#80C0) AND
+	        NOT (#temp_pwWord1 = DW#16#80C1) AND NOT (#temp_pwWord1 = DW#16#80C2) AND NOT (#temp_pwWord1 = DW#16#80C3) AND
+	        NOT (#temp_pwWord1 = DW#16#80C4) THEN
+	        
+	        // Wiederholungsauftrag wieder zurücknehmen
+	        #stat_SbWrStart1 := False;
+	        #stat_SbRdStart1 := False;
+	        #stat_SbWrite := False;
+	        
+	        // Fehler ausgeben 
+	        #stat_SbError := #stat_SbRdError;
+	        
+	      ELSE
+	        // Fehlerwiederholauftrag ??                   
+	        IF #stat_SiErrorCount = #stat_SiMaxErrCount THEN
+	          
+	          // Wiederholungsauftrag wieder zurücknehmen
+	          #stat_SbWrStart1 := False;
+	          #stat_SbRdStart1 := False;
+	          #stat_SbWrite := False;
+	          
+	          //Fehlerzähler zurücksetzen
+	          #stat_SiErrorCount := 0;
+	          
+	          
+	          // Fehler ausgeben 
+	          #stat_SbError := #stat_SbRdError;
+	          
+	          // nix tun bis Zähler überläuft
+	        ELSE
+	          #stat_SiErrorCount := #stat_SiErrorCount + 1;
+	        END_IF;
+	      END_IF;
+	      
+	      // Fehler : die Auftragsreferenz der Antwort übertimmt nicht mit der Auftragsreferenz der Anfrage überein
+	    ELSIF NOT (#stat_SiReqRef = BYTE_TO_INT(#stat_SxRespParaMulti.sxHeader.syReqRef)) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart1 := False;
+	      #stat_SbRdStart1 := False;
+	      #stat_SbWrite := False;
+	      
+	      // Fehler : falsche Auftragskennung zurück erhalten    
+	    ELSIF NOT (#stat_SxRespParaMulti.sxHeader.syReqId = B#16#81 OR #stat_SxRespParaMulti.sxHeader.syReqId = B#16#01) AND
+	      NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart1 := False;
+	      #stat_SbRdStart1 := False;
+	      #stat_SbWrite := False;
+	      
+	      // Fehler : die angeforderte Anzahl Parameter entspricht nicht der übermittelten Anzahl Parameter überein
+	    ELSIF NOT (#stat_SxRespParaMulti.sxHeader.syParaNo = B#16#01) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart1 := False;
+	      #stat_SbRdStart1 := False;
+	      #stat_SbWrite := False;
+	      
+	      // Fehler : die Achse entspricht nicht der übergebenen Achse
+	    ELSIF NOT (#stat_SyAxisNo = #stat_SxRespParaMulti.sxHeader.syAxisNo) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart1 := False;
+	      #stat_SbRdStart1 := False;
+	      #stat_SbWrite := False;
+	      
+	      // kein Fehler beim LESEN AZYKLISCH und Auftrag fertig 
+	    ELSIF NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      
+	      // die angefragten Parameter auswerten und im Puffer abspeichern
+	      // ermitteltes Format des Parameters abspeichern
+	      #stat_SyFormat := #stat_SxRespParaMulti.sxData[1];
+	      
+	      // Format = Error ? = > gesendeter Parameter fehlerhaft
+	      IF (BYTE_TO_INT(#stat_SxRespParaMulti.sxData[1]) = 68) THEN
+	        
+	        // Format = Error, zwei Bytes zu übermittelten Fehlernummer zusammenfassen
+	        #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	        #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	            
+	        #stat_SbError := True;
+	            
+	        // ermittelte Fehlernummer im Puffer abspeichern
+	        #q_ErrorNo := #temp_pwWordHigh XOR #temp_pwWordLow;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer eintragen   
+	        #stat_SwParaError := #stat_SwParaError OR W#16#01;
+	        
+	        // Format = Byte ? = > gesendeter Parameter ein Byte lang
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#41) OR
+	        (#stat_SxRespParaMulti.sxData[1] = B#16#02) OR (#stat_SxRespParaMulti.sxData[1] = B#16#05) THEN
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Format = Word ? = > gesendeter Parameter zwei Bytes lang
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#42) OR (#stat_SxRespParaMulti.sxData[1] = B#16#03)
+	        OR (#stat_SxRespParaMulti.sxData[1] = B#16#06) OR (#stat_SxRespParaMulti.sxData[1] = B#16#0A) THEN
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        
+	        // Format = Double Word ? = > gesendeter Parameter vier Bytes lang
+	      ELSIF (#stat_SxRespParaMulti.sxData[1] = B#16#43) OR (#stat_SxRespParaMulti.sxData[1] = B#16#04) OR
+	        (#stat_SxRespParaMulti.sxData[1] = B#16#07) OR (#stat_SxRespParaMulti.sxData[1] = B#16#08) OR
+	        (#stat_SxRespParaMulti.sxData[1] = B#16#0D) THEN
+	        
+	        // ermittelte Fehlernummer im Puffer zurücksetzen
+	        #q_ErrorNo := W#16#00;
+	        
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	        #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	        
+	        // Unbekanter Datentyp
+	      ELSE
+	        
+	        #stat_SiErrorId := 5;
+	        #stat_SbError := True;
+	        #stat_SbDone := False;
+	        // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer eintragen   
+	        #stat_SwParaError := #stat_SwParaError OR W#16#01;
+	        
+	      END_IF;
+	      
+	      // Fehlerkennung zurücknehmen
+	      IF (#stat_SiErrorId = 3) OR (#stat_SiErrorId = 1) THEN
+	        #stat_SiErrorId := 0;
+	        #stat_SbError := False;
+	      END_IF;
+	      
+	      #q_DiagId := W#16#00;
+	      
+	      // 1. Teilauftrag "Parameter lesen" ist abgeschlossen
+	      #stat_SbRdStart1 := False;
+	      
+	      // einer der gesendeten Parameter ist fehlerhaft => Abbruch, kein "Parameter schreiben" erforderlich
+	      IF (#stat_SwParaError = W#16#00) THEN
+	        #stat_SbWrStart2 := True;
+	      ELSE
+	        #stat_SbWrStart2 := False;
+	      END_IF;
+	    END_IF; // kein Fehler beim LESEN AZYKLISCH und Auftrag fertig 
+	  END_IF; // vom 1. Teilauftrag "Parameter lesen" die Antwort abwarten und dann auswerten 
+	  
+	  // 2. Teilauftrag "Parameter schreiben bzw. ändern" vorbereiten und abschicken
+	  IF #stat_SbWrStart2 THEN
+	    
+	    // Ablöschen des Sendepuffers            
+	    FOR #temp_piCount := 1 TO #stat_SiLenChaPara DO
+	      // Parameteradresse und Parameterwert des Parameters 
+	      #stat_SxChaParaMulti.sxData[#temp_piCount] := B#16#00;
+	    END_FOR;
+	    
+	    // Auftrags-HEADER erstellen
+	    // Auftragsreferenz
+	    #stat_SxChaParaMulti.sxHeader.syReqRef := INT_TO_BYTE(#stat_SiReqRef);
+	    
+	    // Auftragskennung 0x01=Request Parameters | 0x02=Change Parameters
+	    #stat_SxChaParaMulti.sxHeader.syReqId := B#16#02;
+	    
+	    // Achse
+	    #stat_SxChaParaMulti.sxHeader.syAxisNo := #stat_SyAxisNo;
+	    
+	    // Anzahl Parameter        
+	    #stat_SxChaParaMulti.sxHeader.syParaNo := B#16#01;
+	    
+	    // Auftrags-PARAMETERADRESSE erstellen                
+	    // Attribute of parameters (0x10=Value, 0x30=Text)
+	    #stat_SxChaParaMulti.sxData[1] := B#16#10;
+	    
+	    // No. of elements (DEC: for single elements=1) 
+	    #stat_SxChaParaMulti.sxData[2] := B#16#01;
+	    
+	    // Parameternummer des Parameters                                
+	    #stat_SxChaParaMulti.sxData[4] := UINT_TO_BYTE(#i_Parameter);
+	    #stat_SxChaParaMulti.sxData[3] := WORD_TO_BYTE(SHR(IN := UINT_TO_WORD(#i_Parameter), N := 8));
+	    
+	    // Subindex des Parameters
+	    #stat_SxChaParaMulti.sxData[6] := UINT_TO_BYTE(#i_Index);
+	    #stat_SxChaParaMulti.sxData[5] := WORD_TO_BYTE(SHR(IN := UINT_TO_WORD(#i_Index), N := 8));
+	    
+	    // Auftrags-PARAMETERVALUE erstellen    
+	    // Format (BYTE, WORD, DWORD des Parameterwert übergeben
+	    #stat_SxChaParaMulti.sxData[7] := #stat_SyFormat;
+	    
+	    // Number of value
+	    #stat_SxChaParaMulti.sxData[8] := B#16#01;
+	    
+	    // Value of parameter in Bytes
+	    IF (#stat_SyFormat = B#16#41) OR
+	      (#stat_SyFormat = B#16#02) OR (#stat_SyFormat = B#16#05) THEN
+	      
+	      #stat_SxChaParaMulti.sxData[9] := WORD_TO_BYTE(DWORD_TO_WORD(DINT_TO_DWORD(REAL_TO_DINT(#i_ValueWrite1))));
+	      #stat_SxChaParaMulti.sxData[10] := 16#00;  //WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := DINT_TO_DWORD(REAL_TO_DINT(#ValueWrite1)), N := 8)));
+	      
+	      // Value of parameter in Word
+	    ELSIF (#stat_SyFormat = B#16#42) OR (#stat_SyFormat = B#16#03) OR
+	      (#stat_SyFormat = B#16#06) OR (#stat_SyFormat = B#16#0A) THEN
+	      
+	      #stat_SxChaParaMulti.sxData[10] := WORD_TO_BYTE(DWORD_TO_WORD(DINT_TO_DWORD(REAL_TO_DINT(#i_ValueWrite1))));
+	      #stat_SxChaParaMulti.sxData[9] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := DINT_TO_DWORD(REAL_TO_DINT(#i_ValueWrite1)), N := 8)));
+	      
+	      // Value of parameter in DWord    
+	    ELSIF (#stat_SyFormat = B#16#43) OR (#stat_SyFormat = B#16#04) OR
+	      (#stat_SyFormat = B#16#07) OR (#stat_SyFormat = B#16#0D) THEN
+	      
+	      #stat_SxChaParaMulti.sxData[12] := WORD_TO_BYTE(DWORD_TO_WORD(DINT_TO_DWORD(#i_ValueWrite2)));
+	      #stat_SxChaParaMulti.sxData[11] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := DINT_TO_DWORD(#i_ValueWrite2), N := 8)));
+	      #stat_SxChaParaMulti.sxData[10] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := DINT_TO_DWORD(#i_ValueWrite2), N := 16)));
+	      #stat_SxChaParaMulti.sxData[9] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := DINT_TO_DWORD(#i_ValueWrite2), N := 24)));
+	      
+	      
+	      // Value of parameter in DWord (FloatingPoint)   
+	    ELSIF (#stat_SyFormat = B#16#08) THEN
+	      
+	      #stat_SxChaParaMulti.sxData[12] := WORD_TO_BYTE(DWORD_TO_WORD(REAL_TO_DWORD(#i_ValueWrite1)));
+	      #stat_SxChaParaMulti.sxData[11] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := REAL_TO_DWORD(#i_ValueWrite1), N := 8)));
+	      #stat_SxChaParaMulti.sxData[10] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := REAL_TO_DWORD(#i_ValueWrite1), N := 16)));
+	      #stat_SxChaParaMulti.sxData[9] := WORD_TO_BYTE(DWORD_TO_WORD(SHR(IN := REAL_TO_DWORD(#i_ValueWrite1), N := 24)));
+	      
+	    END_IF;
+	    
+	    // SCHREIBEN AZYKLISCH
+	    #temp_piLenTele := #stat_SiLenHeader + #stat_SiLenChaPara;
+	    #inst_WRREC_1(REQ := True,                                // Startimpuls
+	             ID := #i_HardwareId,                         // Diagnoseadresse
+	             INDEX := 47,                                  // Rahmentyp
+	             LEN := INT_TO_UINT(#temp_piLenTele),             // maximale Länge
+	             DONE => #stat_SbWrDone,                           // Schreibauftrag beendet
+	             BUSY => #stat_SbWrBusy,                           // Slave beschäftigt
+	             ERROR => #stat_SbWrError,                          // Fehler beim Schreiben
+	             STATUS => #temp_pdStatus,                           // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code
+	             RECORD := #stat_SxChaParaMulti);                    // Zeiger auf zu schreibenen Datensatzes
+	    
+	    // Ausgänge setzen
+	    #stat_SbBusy := #stat_SbWrBusy;
+	    #stat_SbDone := #stat_SbWrDone;
+	    
+	    // Fehler auswerten
+	    IF #stat_SbWrError THEN
+	      // Fehlerstatus aus dem Doppelwort filtern und weitergeben                
+	      #temp_pwWord1 := DWORD_TO_WORD(SHR(IN := (#temp_pdStatus AND DW#16#FFFF00), N := 8));
+	      
+	      // Fehlerstatus setzen
+	      #stat_SiErrorId := 3;
+	      #stat_SbError := False;
+	      #q_DiagId := #temp_pwWord1;
+	      
+	      //Temporärer Fehler: #pdStatus = 80A7, 80B5, 80C0, 80C1, 80C2, 80C3 oder 80C4 zulassen und nocheinmal versuchen
+	      IF NOT (#temp_pwWord1 = DW#16#80A7) AND NOT (#temp_pwWord1 = DW#16#80B5) AND NOT (#temp_pwWord1 = DW#16#80C0) AND
+	        NOT (#temp_pwWord1 = DW#16#80C1) AND NOT (#temp_pwWord1 = DW#16#80C2) AND NOT (#temp_pwWord1 = DW#16#80C3) AND
+	        NOT (#temp_pwWord1 = DW#16#80C4) THEN
+	        
+	        // Wiederholungsauftrag wieder zurücknehmen
+	        #stat_SbWrStart2 := False;
+	        #stat_SbRdStart2 := False;
+	        #stat_SbWrite := False;
+	        
+	        // Fehler ausgeben 
+	        #stat_SbError := #stat_SbWrError;
+	        
+	      ELSE
+	        // Fehlerwiederholauftrag ??                   
+	        IF #stat_SiErrorCount = #stat_SiMaxErrCount THEN
+	          
+	          // Wiederholungsauftrag wieder zurücknehmen
+	          #stat_SbWrStart2 := False;
+	          #stat_SbRdStart2 := False;
+	          #stat_SbWrite := False;
+	          
+	          //Fehlerzähler zurücksetzen
+	          #stat_SiErrorCount := 0;
+	          
+	          
+	          // Fehler ausgeben 
+	          #stat_SbError := #stat_SbWrError;
+	          
+	          // nix tun bis Zähler überläuft
+	        ELSE
+	          #stat_SiErrorCount := #stat_SiErrorCount + 1;
+	        END_IF;
+	      END_IF;
+	      
+	      // kein Fehler beim SCHEIBEN AZYKLISCH und Auftrag fertig 
+	    ELSIF NOT #stat_SbWrBusy AND #stat_SbWrDone THEN
+	      // Fehlerkennung zurücknehmen
+	      #q_DiagId := W#16#00;
+	      
+	      // Schreibauftrag fertig melden und Leseantrag anstossen
+	      #stat_SbWrStart2 := False;
+	      #stat_SbRdStart2 := True;
+	    END_IF;
+	  END_IF; // 2. Teilauftrag "Parameter schreiben bzw. ändern" vorbereiten und abschicken
+	  
+	  // vom 2. Teilauftrag "Parameter schreiben bzw. ändern" die Antwort abwarten und dann auswerten
+	  IF #stat_SbRdStart2 THEN
+	    
+	    // Ablöschen des Empfangspuffers
+	    #stat_SxRespParaMulti.sxHeader.syReqRef := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syReqId := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syAxisNo := B#16#00;
+	    #stat_SxRespParaMulti.sxHeader.syParaNo := B#16#00;
+	    
+	    FOR #temp_piCount := 1 TO #stat_SiLenParaMulti DO
+	      #stat_SxRespParaMulti.sxData[#temp_piCount] := B#16#00;
+	    END_FOR;
+	    
+	    // LESEN AZYKLISCH
+	    #temp_piLenTele := #stat_SiLenHeader + #stat_SiLenParaMulti;
+	    #inst_RDREC_1(REQ := True,                                // Startimpuls
+	             ID := #i_HardwareId,                         // Diagnoseadresse        
+	             INDEX := 47,                                  // Rahmentyp           
+	             MLEN := INT_TO_UINT(#temp_piLenTele),             // maximale Länge
+	             VALID => #temp_pbValidSFB,                         // neuer Datensatz empfangen und gültig   
+	             BUSY => #stat_SbRdBusy,                           // Slave beschäftigt
+	             ERROR => #stat_SbRdError,                          // Fehler beim Schreiben
+	             STATUS => #temp_pdStatus,                           // Status[1] = Error => Status[2] Error Decode + Status[3] Error Code 
+	             LEN => #temp_piLenSFB,                           // Länge des gelesenen Datensatzes
+	             RECORD := #stat_SxRespParaMulti);                   // Zeiger auf gelesenen Datensatz
+	    
+	    // Ausgänge setzen
+	    #stat_SbBusy := #stat_SbRdBusy;
+	    #stat_SbDone := #temp_pbValidSFB;
+	    
+	    // Fehler auswerten
+	    IF #stat_SbRdError THEN
+	      // Fehlerstatus aus dem Doppelwort filtern und weitergeben                
+	      #temp_pwWord1 := DWORD_TO_WORD(SHR(IN := (#temp_pdStatus AND DW#16#FFFF00), N := 8));
+	      
+	      // Fehlerstatus setzen
+	      #stat_SiErrorId := 3;
+	      #q_DiagId := #temp_pwWord1;
+	      
+	      //Temporärer Fehler: #pdStatus = 80A7, 80B5, 80C0, 80C1, 80C2, 80C3 oder 80C4 zulassen und nocheinmal versuchen
+	      IF NOT (#temp_pwWord1 = DW#16#80A7) AND NOT (#temp_pwWord1 = DW#16#80B5) AND NOT (#temp_pwWord1 = DW#16#80C0) AND
+	        NOT (#temp_pwWord1 = DW#16#80C1) AND NOT (#temp_pwWord1 = DW#16#80C2) AND NOT (#temp_pwWord1 = DW#16#80C3) AND
+	        NOT (#temp_pwWord1 = DW#16#80C4) THEN
+	        
+	        // Wiederholungsauftrag wieder zurücknehmen
+	        #stat_SbWrStart2 := False;
+	        #stat_SbRdStart2 := False;
+	        #stat_SbWrite := False;
+	        
+	        // Fehler ausgeben 
+	        #stat_SbError := #stat_SbRdError;
+	        
+	      ELSE
+	        // Fehlerwiederholauftrag ??                   
+	        IF #stat_SiErrorCount = #stat_SiMaxErrCount THEN
+	          
+	          // Wiederholungsauftrag wieder zurücknehmen
+	          #stat_SbWrStart2 := False;
+	          #stat_SbRdStart2 := False;
+	          #stat_SbWrite := False;
+	          
+	          //Fehlerzähler zurücksetzen
+	          #stat_SiErrorCount := 0;
+	          
+	          
+	          // Fehler ausgeben 
+	          #stat_SbError := #stat_SbRdError;
+	          
+	          // nix tun bis Zähler überläuft
+	        ELSE
+	          #stat_SiErrorCount := #stat_SiErrorCount + 1;
+	        END_IF;
+	      END_IF;
+	      
+	      // Fehler : die Auftragsreferenz der Antwort übertimmt nicht mit der Auftragsreferenz der Anfrage überein
+	    ELSIF NOT (#stat_SiReqRef = BYTE_TO_INT(#stat_SxRespParaMulti.sxHeader.syReqRef)) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart2 := False;
+	      #stat_SbRdStart2 := False;
+	      #stat_SbWrite := False;
+	      
+	      // Fehler : falsche Auftragskennung zurück erhalten    
+	    ELSIF NOT (#stat_SxRespParaMulti.sxHeader.syReqId = B#16#82 OR #stat_SxRespParaMulti.sxHeader.syReqId = B#16#02) AND
+	      NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart2 := False;
+	      #stat_SbRdStart2 := False;
+	      #stat_SbWrite := False;
+	      
+	      // Fehler : die angeforderte Anzahl Parameter entspricht nicht der übermittelten Anzahl Parameter überein
+	    ELSIF NOT (#stat_SxRespParaMulti.sxHeader.syParaNo = B#16#01) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart2 := False;
+	      #stat_SbRdStart2 := False;
+	      #stat_SbWrite := False;
+	      
+	      // Fehler : die Achse entspricht nicht der übergebenen Achse
+	    ELSIF NOT (#stat_SyAxisNo = #stat_SxRespParaMulti.sxHeader.syAxisNo) AND NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      #stat_SiErrorId := 1;
+	      #stat_SbError := True;
+	      #stat_SbDone := False;
+	      
+	      // Wiederholungsauftrag wieder zurücknehmen
+	      #stat_SbWrStart2 := False;
+	      #stat_SbRdStart2 := False;
+	      #stat_SbWrite := False;
+	      
+	      // kein Fehler beim LESEN AZYKLISCH und Auftrag fertig 
+	    ELSIF NOT #stat_SbRdBusy AND #temp_pbValidSFB THEN
+	      
+	      // 2. Teilauftrag "Parameter schreiben bzw. ändern" negative Rückmeldung erhalten 
+	      IF #stat_SxRespParaMulti.sxHeader.syReqId = B#16#82 THEN
+	        
+	        // die angefragten Parameter auswerten und im Puffer abspeichern
+	        // Format des Parameters auswerten, bei Format = Error Fehler auswerten 
+	        IF (BYTE_TO_INT(#stat_SxRespParaMulti.sxData[1]) = 68) THEN
+	          
+	          // Fehlerwert ermitteln und abspeichern 
+	          // Format = Word, zwei Bytes zu übermitteltem Parameterwert zusammenfassen
+	          #temp_pwWordHigh := SHL(IN := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[3]), N := 8);
+	          #temp_pwWordLow := BYTE_TO_WORD(#stat_SxRespParaMulti.sxData[4]);
+	          #temp_pwWord1 := #temp_pwWordHigh XOR #temp_pwWordLow;
+	            
+	          #stat_SbError := True;
+	            
+	          // ermittelte Fehlernummer im Puffer zurücksetzen
+	          #q_ErrorNo := W#16#00;
+	          
+	          #q_ErrorNo := #temp_pwWord1;
+	          
+	          // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer eintragen   
+	          #stat_SwParaError := #stat_SwParaError OR W#16#01;
+	          
+	        ELSE
+	          
+	          // Die Fehlerhaftigkeit des erkannten Parameter in der Fehlernummer löschen   
+	          #stat_SwParaError := #stat_SwParaError AND W#16#FFFE;
+	          
+	          // ermittelte Fehlernummer im Puffer zurücksetzen
+	          #q_ErrorNo := W#16#00;
+	        END_IF;
+	      END_IF; // 2. Teilauftrag "Parameter schreiben bzw. ändern" negative Rückmeldung erhalten
+	      
+	      // Fehlerkennung zurücknehmen
+	      IF (#stat_SiErrorId = 3) OR (#stat_SiErrorId = 1) THEN
+	        #stat_SiErrorId := 0;
+	        #stat_SbError := False;
+	      END_IF;
+	      
+	      #q_DiagId := W#16#00;
+	      
+	      // 2. Teilauftrag "Parameter schreiben bzw. ändern" ist abgeschlossen
+	      #stat_SbRdStart2 := False;
+	      #stat_SbWrite := False;
+	      
+	    END_IF; // kein Fehler beim LESEN AZYKLISCH und Auftrag fertig 
+	  END_IF; // vom 2. Teilauftrag "Parameter schreiben bzw. ändern" die Antwort abwarten und dann auswerten 
+	END_IF; // Auftrag "Parameter schreiben" wurde ausgelöst
+	
+	#temp_pdDWordHigh := SHL(IN := INT_TO_DWORD(#stat_SiErrorId), N := 16);
+	#temp_pdDWordLow := WORD_TO_DWORD(#stat_SwParaError);
+	
+	// ermittelter Parameterwert eintragen (Word)
+	#q_ErrorId := #temp_pdDWordHigh XOR #temp_pdDWordLow;
+	
+	// Initialisierung von Ausgängen
+	#q_Busy := #stat_SbBusy;
+	#q_Error := #stat_SbError;
+	#q_Format := #stat_SyFormat;
+	// Änderung wegen verhalten von Ready  
+	#q_Done := #stat_SbDone;
+	// Prüfen, ob Auftrag abgeschlossen ist
+	IF ((#q_Error OR #q_Done) AND NOT #stat_SbReady) THEN
+	  #q_Ready := True;
+	  #stat_SbReady := True;
+	ELSE
+	  #q_Ready := False;
+	END_IF;
+	
+	
+END_FUNCTION_BLOCK
+

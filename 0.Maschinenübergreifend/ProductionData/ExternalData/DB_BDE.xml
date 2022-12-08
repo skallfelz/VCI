@@ -1,0 +1,1301 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T07:31:26.2167371Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.InstanceDB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <DBAccessibleFromWebserver>true</DBAccessibleFromWebserver>
+      <HeaderAuthor>EconoPak GmbH</HeaderAuthor>
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <InstanceOfName>FB_BDE</InstanceOfName>
+      <InstanceOfType>FB</InstanceOfType>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Input">
+    <Member Name="i_CountTotal_OK" Datatype="DInt" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_CountTotal_NOK" Datatype="DInt" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_CountTotal_In" Datatype="DInt" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="Output">
+    <Member Name="q_ProductionData" Datatype="&quot;UDT_BDE&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="FaultCodeInformationMessages" Datatype="Int" /><Member Name="FaultCodeOperateMessages" Datatype="Int" /><Member Name="FaultCodeFaultMessagesAbsolut" Datatype="Int" /><Member Name="FaultCodeFaultMessagesCycleEnd" Datatype="Int" /><Member Name="ActualOMACMode" Datatype="DInt" /><Member Name="ActualOMACStatus" Datatype="DInt" /><Member Name="ProductCountOK" Datatype="DInt" /><Member Name="ProductCountNOK" Datatype="DInt" /><Member Name="ProductCountGesamt" Datatype="DInt" /></Section></Sections></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="iq_InformationMessages" Datatype="&quot;UDT_Messages&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="E-StopRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" />
+          <Member Name="FaultCommunication" Datatype="Bool" />
+          <Member Name="PressureAirMonitor" Datatype="Bool" />
+          <Member Name="24VFuseTripped" Datatype="Bool" />
+          <Member Name="SmartlineModulFault" Datatype="Bool" />
+          <Member Name="SmartlineModulWarning" Datatype="Bool" />
+          <Member Name="GlueingNotReady" Datatype="Bool" />
+          <Member Name="GlueingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CodingNotReady" Datatype="Bool" />
+          <Member Name="CodingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CheckweigherNotReady" Datatype="Bool" />
+          <Member Name="MetalDetectorNotReady" Datatype="Bool" />
+          <Member Name="FollowingMachineNotReady" Datatype="Bool" />
+          <Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" />
+          <Member Name="MaindriveBlocked" Datatype="Bool" />
+          <Member Name="VirtualMaster" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" />
+          <Member Name="FaultMotor30M1" Datatype="Bool" />
+          <Member Name="FaultMotor31M1" Datatype="Bool" />
+          <Member Name="FaultMotor32M1" Datatype="Bool" />
+          <Member Name="FaultMotor33M1" Datatype="Bool" />
+          <Member Name="FaultMotor34M1" Datatype="Bool" />
+          <Member Name="FaultMotor35M1" Datatype="Bool" />
+          <Member Name="FaultMotor36M1" Datatype="Bool" />
+          <Member Name="FaultMotor37M1" Datatype="Bool" />
+          <Member Name="FaultMotor38M1" Datatype="Bool" />
+          <Member Name="FaultMotor39M1" Datatype="Bool" />
+          <Member Name="FaultMotor40M1" Datatype="Bool" />
+          <Member Name="FaultMotor41M1" Datatype="Bool" />
+          <Member Name="FaultMotor42M1" Datatype="Bool" />
+          <Member Name="FaultMotor43M1" Datatype="Bool" />
+          <Member Name="FaultMotor44M1" Datatype="Bool" />
+          <Member Name="FaultMotor45M1" Datatype="Bool" />
+          <Member Name="FaultMotor46M1" Datatype="Bool" />
+          <Member Name="FaultMotor47M1" Datatype="Bool" />
+          <Member Name="FaultMotor48M1" Datatype="Bool" />
+          <Member Name="FaultMotor49M1" Datatype="Bool" />
+          <Member Name="FaultMotor50M1" Datatype="Bool" />
+          <Member Name="FaultMotor51M1" Datatype="Bool" />
+          <Member Name="FaultMotor52M1" Datatype="Bool" />
+          <Member Name="FaultMotor53M1" Datatype="Bool" />
+          <Member Name="FaultMotor54M1" Datatype="Bool" />
+          <Member Name="FaultMotor55M1" Datatype="Bool" />
+          <Member Name="FaultMotor56M1" Datatype="Bool" />
+          <Member Name="FaultMotor57M1" Datatype="Bool" />
+          <Member Name="FaultMotor58M1" Datatype="Bool" />
+          <Member Name="FaultMotor59M1" Datatype="Bool" />
+          <Member Name="FaultMotor60M1" Datatype="Bool" />
+          <Member Name="FaultMotor61M1" Datatype="Bool" />
+          <Member Name="FaultMotor62M1" Datatype="Bool" />
+          <Member Name="FaultMotor63M1" Datatype="Bool" />
+          <Member Name="FaultMotor64M1" Datatype="Bool" />
+          <Member Name="FaultMotor65M1" Datatype="Bool" />
+          <Member Name="FaultMotor66M1" Datatype="Bool" />
+          <Member Name="FaultMotor67M1" Datatype="Bool" />
+          <Member Name="FaultMotor68M1" Datatype="Bool" />
+          <Member Name="FaultMotor69M1" Datatype="Bool" />
+          <Member Name="FaultMotor70M1" Datatype="Bool" />
+          <Member Name="FaultMotor71M1" Datatype="Bool" />
+          <Member Name="FaultMotor72M1" Datatype="Bool" />
+          <Member Name="FaultMotor73M1" Datatype="Bool" />
+          <Member Name="FaultMotor74M1" Datatype="Bool" />
+          <Member Name="FaultMotor75M1" Datatype="Bool" />
+          <Member Name="FaultMotor76M1" Datatype="Bool" />
+          <Member Name="FaultMotor77M1" Datatype="Bool" />
+          <Member Name="FaultMotor78M1" Datatype="Bool" />
+          <Member Name="FaultMotor79M1" Datatype="Bool" />
+          <Member Name="FaultMotor80M1" Datatype="Bool" />
+          <Member Name="FaultMotor81M1" Datatype="Bool" />
+          <Member Name="FaultMotor82M1" Datatype="Bool" />
+          <Member Name="FaultMotor83M1" Datatype="Bool" />
+          <Member Name="FaultMotor84M1" Datatype="Bool" />
+          <Member Name="FaultMotor85M1" Datatype="Bool" />
+          <Member Name="FaultMotor86M1" Datatype="Bool" />
+          <Member Name="FaultMotor87M1" Datatype="Bool" />
+          <Member Name="FaultMotor88M1" Datatype="Bool" />
+          <Member Name="FaultMotor89M1" Datatype="Bool" />
+          <Member Name="FaultMotor90M1" Datatype="Bool" />
+          <Member Name="FaultMotor91M1" Datatype="Bool" />
+          <Member Name="FaultMotor92M1" Datatype="Bool" />
+          <Member Name="FaultMotor93M1" Datatype="Bool" />
+          <Member Name="FaultMotor94M1" Datatype="Bool" />
+          <Member Name="FaultMotor95M1" Datatype="Bool" />
+          <Member Name="FaultMotor96M1" Datatype="Bool" />
+          <Member Name="FaultMotor97M1" Datatype="Bool" />
+          <Member Name="FaultMotor98M1" Datatype="Bool" />
+          <Member Name="FaultMotor99M1" Datatype="Bool" />
+          <Member Name="E-StopOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopExternalOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopLeft" Datatype="Bool" />
+          <Member Name="E-StopRight" Datatype="Bool" />
+          <Member Name="E-StopProductionLine" Datatype="Bool" />
+          <Member Name="E-StopOutfeed" Datatype="Bool" />
+          <Member Name="E-StopReserve_105" Datatype="Bool" />
+          <Member Name="E-StopReserve_106" Datatype="Bool" />
+          <Member Name="E-StopReserve_107" Datatype="Bool" />
+          <Member Name="E-StopReserve_108" Datatype="Bool" />
+          <Member Name="E-StopReserve_109" Datatype="Bool" />
+          <Member Name="E-StopReserve_110" Datatype="Bool" />
+          <Member Name="E-StopReserve_111" Datatype="Bool" />
+          <Member Name="E-StopReserve_112" Datatype="Bool" />
+          <Member Name="E-StopReserve_113" Datatype="Bool" />
+          <Member Name="E-StopReserve_114" Datatype="Bool" />
+          <Member Name="E-StopReserve_115" Datatype="Bool" />
+          <Member Name="E-StopReserve_116" Datatype="Bool" />
+          <Member Name="E-StopReserve_117" Datatype="Bool" />
+          <Member Name="E-StopReserve_118" Datatype="Bool" />
+          <Member Name="E-StopReserve_119" Datatype="Bool" />
+          <Member Name="GuardDoor1" Datatype="Bool" />
+          <Member Name="GuardDoor2" Datatype="Bool" />
+          <Member Name="GuardDoor3" Datatype="Bool" />
+          <Member Name="GuardDoor4" Datatype="Bool" />
+          <Member Name="GuardDoor5" Datatype="Bool" />
+          <Member Name="GuardDoor6" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_126" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_127" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_128" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" />
+          <Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" />
+          <Member Name="TemperatureLoweringActive" Datatype="Bool" />
+          <Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" />
+          <Member Name="MonitoringWatercooling" Datatype="Bool" />
+          <Member Name="RecoolingFaulted" Datatype="Bool" />
+          <Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" />
+          <Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" />
+          <Member Name="AutomaticStartUp" Datatype="Bool" />
+          <Member Name="FollowingmachineIsForced" Datatype="Bool" />
+          <Member Name="FormatSelectionLocked" Datatype="Bool" />
+          <Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" />
+          <Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" />
+          <Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" />
+          <Member Name="StopTheMachineAccumulation" Datatype="Bool" />
+          <Member Name="RunTheMachineEmpty" Datatype="Bool" />
+          <Member Name="CodingIsForced" Datatype="Bool" />
+          <Member Name="CheckweigherIsForced" Datatype="Bool" />
+          <Member Name="MetadetectorIsForced" Datatype="Bool" />
+          <Member Name="SikoMonitoringForced" Datatype="Bool" />
+          <Member Name="FaultedHotAirBlower" Datatype="Bool" />
+          <Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleFuseTripped" Datatype="Bool" />
+          <Member Name="MonitoringAngleTransfer" Datatype="Bool" />
+          <Member Name="MonitoringRotationStation" Datatype="Bool" />
+          <Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" />
+          <Member Name="MonitoringSikoDisplays" Datatype="Bool" />
+          <Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" />
+          <Member Name="AccumulationHotAirFronflap" Datatype="Bool" />
+          <Member Name="AccumulationHotAirSideflap" Datatype="Bool" />
+          <Member Name="FaultTechnologyObject" Datatype="Bool" />
+          <Member Name="FaultEncoder" Datatype="Bool" />
+          <Member Name="ToManyNoksInARow" Datatype="Bool" />
+          <Member Name="InfeedMachineNotReady" Datatype="Bool" />
+          <Member Name="Reserve_172" Datatype="Bool" />
+          <Member Name="Reserve_173" Datatype="Bool" />
+          <Member Name="Reserve_174" Datatype="Bool" />
+          <Member Name="Reserve_175" Datatype="Bool" />
+          <Member Name="Reserve_176" Datatype="Bool" />
+          <Member Name="Reserve_177" Datatype="Bool" />
+          <Member Name="Reserve_178" Datatype="Bool" />
+          <Member Name="Reserve_179" Datatype="Bool" />
+          <Member Name="Reserve_180" Datatype="Bool" />
+          <Member Name="Reserve_181" Datatype="Bool" />
+          <Member Name="Reserve_182" Datatype="Bool" />
+          <Member Name="Reserve_183" Datatype="Bool" />
+          <Member Name="Reserve_184" Datatype="Bool" />
+          <Member Name="Reserve_185" Datatype="Bool" />
+          <Member Name="Reserve_186" Datatype="Bool" />
+          <Member Name="Reserve_187" Datatype="Bool" />
+          <Member Name="Reserve_188" Datatype="Bool" />
+          <Member Name="Reserve_189" Datatype="Bool" />
+          <Member Name="Reserve_190" Datatype="Bool" />
+          <Member Name="Reserve_191" Datatype="Bool" />
+          <Member Name="Reserve_192" Datatype="Bool" />
+          <Member Name="Reserve_193" Datatype="Bool" />
+          <Member Name="Reserve_194" Datatype="Bool" />
+          <Member Name="Reserve_195" Datatype="Bool" />
+          <Member Name="Reserve_196" Datatype="Bool" />
+          <Member Name="Reserve_197" Datatype="Bool" />
+          <Member Name="Reserve_198" Datatype="Bool" />
+          <Member Name="Reserve_199" Datatype="Bool" />
+          <Member Name="Reserve_200" Datatype="Bool" />
+          <Member Name="Reserve_201" Datatype="Bool" />
+          <Member Name="Reserve_202" Datatype="Bool" />
+          <Member Name="Reserve_203" Datatype="Bool" />
+          <Member Name="Reserve_204" Datatype="Bool" />
+          <Member Name="Reserve_205" Datatype="Bool" />
+          <Member Name="Reserve_206" Datatype="Bool" />
+          <Member Name="Reserve_207" Datatype="Bool" />
+          <Member Name="Reserve_208" Datatype="Bool" />
+          <Member Name="Reserve_209" Datatype="Bool" />
+          <Member Name="Reserve_210" Datatype="Bool" />
+          <Member Name="Reserve_211" Datatype="Bool" />
+          <Member Name="Reserve_212" Datatype="Bool" />
+          <Member Name="Reserve_213" Datatype="Bool" />
+          <Member Name="Reserve_214" Datatype="Bool" />
+          <Member Name="Reserve_215" Datatype="Bool" />
+          <Member Name="Reserve_216" Datatype="Bool" />
+          <Member Name="Reserve_217" Datatype="Bool" />
+          <Member Name="Reserve_218" Datatype="Bool" />
+          <Member Name="Reserve_219" Datatype="Bool" />
+          <Member Name="Reserve_220" Datatype="Bool" />
+          <Member Name="Reserve_221" Datatype="Bool" />
+          <Member Name="Reserve_222" Datatype="Bool" />
+          <Member Name="Reserve_223" Datatype="Bool" />
+          <Member Name="Reserve_224" Datatype="Bool" />
+          <Member Name="Reserve_225" Datatype="Bool" />
+          <Member Name="Reserve_226" Datatype="Bool" />
+          <Member Name="Reserve_227" Datatype="Bool" />
+          <Member Name="Reserve_228" Datatype="Bool" />
+          <Member Name="Reserve_229" Datatype="Bool" />
+          <Member Name="Reserve_230" Datatype="Bool" />
+          <Member Name="Reserve_231" Datatype="Bool" />
+          <Member Name="Reserve_232" Datatype="Bool" />
+          <Member Name="Reserve_233" Datatype="Bool" />
+          <Member Name="Reserve_234" Datatype="Bool" />
+          <Member Name="Reserve_235" Datatype="Bool" />
+          <Member Name="Reserve_236" Datatype="Bool" />
+          <Member Name="Reserve_237" Datatype="Bool" />
+          <Member Name="Reserve_238" Datatype="Bool" />
+          <Member Name="Reserve_239" Datatype="Bool" />
+          <Member Name="Reserve_240" Datatype="Bool" />
+          <Member Name="Reserve_241" Datatype="Bool" />
+          <Member Name="Reserve_242" Datatype="Bool" />
+          <Member Name="Reserve_243" Datatype="Bool" />
+          <Member Name="Reserve_244" Datatype="Bool" />
+          <Member Name="Reserve_245" Datatype="Bool" />
+          <Member Name="Reserve_246" Datatype="Bool" />
+          <Member Name="Reserve_247" Datatype="Bool" />
+          <Member Name="Reserve_248" Datatype="Bool" />
+          <Member Name="Reserve_249" Datatype="Bool" />
+          <Member Name="Reserve_250" Datatype="Bool" />
+          <Member Name="Reserve_251" Datatype="Bool" />
+          <Member Name="Reserve_252" Datatype="Bool" />
+          <Member Name="Reserve_253" Datatype="Bool" />
+          <Member Name="Reserve_254" Datatype="Bool" />
+          <Member Name="Reserve_255" Datatype="Bool" />
+          <Member Name="Reserve_256" Datatype="Bool" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_OperateMessages" Datatype="&quot;UDT_Messages&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="E-StopRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" />
+          <Member Name="FaultCommunication" Datatype="Bool" />
+          <Member Name="PressureAirMonitor" Datatype="Bool" />
+          <Member Name="24VFuseTripped" Datatype="Bool" />
+          <Member Name="SmartlineModulFault" Datatype="Bool" />
+          <Member Name="SmartlineModulWarning" Datatype="Bool" />
+          <Member Name="GlueingNotReady" Datatype="Bool" />
+          <Member Name="GlueingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CodingNotReady" Datatype="Bool" />
+          <Member Name="CodingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CheckweigherNotReady" Datatype="Bool" />
+          <Member Name="MetalDetectorNotReady" Datatype="Bool" />
+          <Member Name="FollowingMachineNotReady" Datatype="Bool" />
+          <Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" />
+          <Member Name="MaindriveBlocked" Datatype="Bool" />
+          <Member Name="VirtualMaster" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" />
+          <Member Name="FaultMotor30M1" Datatype="Bool" />
+          <Member Name="FaultMotor31M1" Datatype="Bool" />
+          <Member Name="FaultMotor32M1" Datatype="Bool" />
+          <Member Name="FaultMotor33M1" Datatype="Bool" />
+          <Member Name="FaultMotor34M1" Datatype="Bool" />
+          <Member Name="FaultMotor35M1" Datatype="Bool" />
+          <Member Name="FaultMotor36M1" Datatype="Bool" />
+          <Member Name="FaultMotor37M1" Datatype="Bool" />
+          <Member Name="FaultMotor38M1" Datatype="Bool" />
+          <Member Name="FaultMotor39M1" Datatype="Bool" />
+          <Member Name="FaultMotor40M1" Datatype="Bool" />
+          <Member Name="FaultMotor41M1" Datatype="Bool" />
+          <Member Name="FaultMotor42M1" Datatype="Bool" />
+          <Member Name="FaultMotor43M1" Datatype="Bool" />
+          <Member Name="FaultMotor44M1" Datatype="Bool" />
+          <Member Name="FaultMotor45M1" Datatype="Bool" />
+          <Member Name="FaultMotor46M1" Datatype="Bool" />
+          <Member Name="FaultMotor47M1" Datatype="Bool" />
+          <Member Name="FaultMotor48M1" Datatype="Bool" />
+          <Member Name="FaultMotor49M1" Datatype="Bool" />
+          <Member Name="FaultMotor50M1" Datatype="Bool" />
+          <Member Name="FaultMotor51M1" Datatype="Bool" />
+          <Member Name="FaultMotor52M1" Datatype="Bool" />
+          <Member Name="FaultMotor53M1" Datatype="Bool" />
+          <Member Name="FaultMotor54M1" Datatype="Bool" />
+          <Member Name="FaultMotor55M1" Datatype="Bool" />
+          <Member Name="FaultMotor56M1" Datatype="Bool" />
+          <Member Name="FaultMotor57M1" Datatype="Bool" />
+          <Member Name="FaultMotor58M1" Datatype="Bool" />
+          <Member Name="FaultMotor59M1" Datatype="Bool" />
+          <Member Name="FaultMotor60M1" Datatype="Bool" />
+          <Member Name="FaultMotor61M1" Datatype="Bool" />
+          <Member Name="FaultMotor62M1" Datatype="Bool" />
+          <Member Name="FaultMotor63M1" Datatype="Bool" />
+          <Member Name="FaultMotor64M1" Datatype="Bool" />
+          <Member Name="FaultMotor65M1" Datatype="Bool" />
+          <Member Name="FaultMotor66M1" Datatype="Bool" />
+          <Member Name="FaultMotor67M1" Datatype="Bool" />
+          <Member Name="FaultMotor68M1" Datatype="Bool" />
+          <Member Name="FaultMotor69M1" Datatype="Bool" />
+          <Member Name="FaultMotor70M1" Datatype="Bool" />
+          <Member Name="FaultMotor71M1" Datatype="Bool" />
+          <Member Name="FaultMotor72M1" Datatype="Bool" />
+          <Member Name="FaultMotor73M1" Datatype="Bool" />
+          <Member Name="FaultMotor74M1" Datatype="Bool" />
+          <Member Name="FaultMotor75M1" Datatype="Bool" />
+          <Member Name="FaultMotor76M1" Datatype="Bool" />
+          <Member Name="FaultMotor77M1" Datatype="Bool" />
+          <Member Name="FaultMotor78M1" Datatype="Bool" />
+          <Member Name="FaultMotor79M1" Datatype="Bool" />
+          <Member Name="FaultMotor80M1" Datatype="Bool" />
+          <Member Name="FaultMotor81M1" Datatype="Bool" />
+          <Member Name="FaultMotor82M1" Datatype="Bool" />
+          <Member Name="FaultMotor83M1" Datatype="Bool" />
+          <Member Name="FaultMotor84M1" Datatype="Bool" />
+          <Member Name="FaultMotor85M1" Datatype="Bool" />
+          <Member Name="FaultMotor86M1" Datatype="Bool" />
+          <Member Name="FaultMotor87M1" Datatype="Bool" />
+          <Member Name="FaultMotor88M1" Datatype="Bool" />
+          <Member Name="FaultMotor89M1" Datatype="Bool" />
+          <Member Name="FaultMotor90M1" Datatype="Bool" />
+          <Member Name="FaultMotor91M1" Datatype="Bool" />
+          <Member Name="FaultMotor92M1" Datatype="Bool" />
+          <Member Name="FaultMotor93M1" Datatype="Bool" />
+          <Member Name="FaultMotor94M1" Datatype="Bool" />
+          <Member Name="FaultMotor95M1" Datatype="Bool" />
+          <Member Name="FaultMotor96M1" Datatype="Bool" />
+          <Member Name="FaultMotor97M1" Datatype="Bool" />
+          <Member Name="FaultMotor98M1" Datatype="Bool" />
+          <Member Name="FaultMotor99M1" Datatype="Bool" />
+          <Member Name="E-StopOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopExternalOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopLeft" Datatype="Bool" />
+          <Member Name="E-StopRight" Datatype="Bool" />
+          <Member Name="E-StopProductionLine" Datatype="Bool" />
+          <Member Name="E-StopOutfeed" Datatype="Bool" />
+          <Member Name="E-StopReserve_105" Datatype="Bool" />
+          <Member Name="E-StopReserve_106" Datatype="Bool" />
+          <Member Name="E-StopReserve_107" Datatype="Bool" />
+          <Member Name="E-StopReserve_108" Datatype="Bool" />
+          <Member Name="E-StopReserve_109" Datatype="Bool" />
+          <Member Name="E-StopReserve_110" Datatype="Bool" />
+          <Member Name="E-StopReserve_111" Datatype="Bool" />
+          <Member Name="E-StopReserve_112" Datatype="Bool" />
+          <Member Name="E-StopReserve_113" Datatype="Bool" />
+          <Member Name="E-StopReserve_114" Datatype="Bool" />
+          <Member Name="E-StopReserve_115" Datatype="Bool" />
+          <Member Name="E-StopReserve_116" Datatype="Bool" />
+          <Member Name="E-StopReserve_117" Datatype="Bool" />
+          <Member Name="E-StopReserve_118" Datatype="Bool" />
+          <Member Name="E-StopReserve_119" Datatype="Bool" />
+          <Member Name="GuardDoor1" Datatype="Bool" />
+          <Member Name="GuardDoor2" Datatype="Bool" />
+          <Member Name="GuardDoor3" Datatype="Bool" />
+          <Member Name="GuardDoor4" Datatype="Bool" />
+          <Member Name="GuardDoor5" Datatype="Bool" />
+          <Member Name="GuardDoor6" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_126" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_127" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_128" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" />
+          <Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" />
+          <Member Name="TemperatureLoweringActive" Datatype="Bool" />
+          <Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" />
+          <Member Name="MonitoringWatercooling" Datatype="Bool" />
+          <Member Name="RecoolingFaulted" Datatype="Bool" />
+          <Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" />
+          <Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" />
+          <Member Name="AutomaticStartUp" Datatype="Bool" />
+          <Member Name="FollowingmachineIsForced" Datatype="Bool" />
+          <Member Name="FormatSelectionLocked" Datatype="Bool" />
+          <Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" />
+          <Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" />
+          <Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" />
+          <Member Name="StopTheMachineAccumulation" Datatype="Bool" />
+          <Member Name="RunTheMachineEmpty" Datatype="Bool" />
+          <Member Name="CodingIsForced" Datatype="Bool" />
+          <Member Name="CheckweigherIsForced" Datatype="Bool" />
+          <Member Name="MetadetectorIsForced" Datatype="Bool" />
+          <Member Name="SikoMonitoringForced" Datatype="Bool" />
+          <Member Name="FaultedHotAirBlower" Datatype="Bool" />
+          <Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleFuseTripped" Datatype="Bool" />
+          <Member Name="MonitoringAngleTransfer" Datatype="Bool" />
+          <Member Name="MonitoringRotationStation" Datatype="Bool" />
+          <Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" />
+          <Member Name="MonitoringSikoDisplays" Datatype="Bool" />
+          <Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" />
+          <Member Name="AccumulationHotAirFronflap" Datatype="Bool" />
+          <Member Name="AccumulationHotAirSideflap" Datatype="Bool" />
+          <Member Name="FaultTechnologyObject" Datatype="Bool" />
+          <Member Name="FaultEncoder" Datatype="Bool" />
+          <Member Name="ToManyNoksInARow" Datatype="Bool" />
+          <Member Name="InfeedMachineNotReady" Datatype="Bool" />
+          <Member Name="Reserve_172" Datatype="Bool" />
+          <Member Name="Reserve_173" Datatype="Bool" />
+          <Member Name="Reserve_174" Datatype="Bool" />
+          <Member Name="Reserve_175" Datatype="Bool" />
+          <Member Name="Reserve_176" Datatype="Bool" />
+          <Member Name="Reserve_177" Datatype="Bool" />
+          <Member Name="Reserve_178" Datatype="Bool" />
+          <Member Name="Reserve_179" Datatype="Bool" />
+          <Member Name="Reserve_180" Datatype="Bool" />
+          <Member Name="Reserve_181" Datatype="Bool" />
+          <Member Name="Reserve_182" Datatype="Bool" />
+          <Member Name="Reserve_183" Datatype="Bool" />
+          <Member Name="Reserve_184" Datatype="Bool" />
+          <Member Name="Reserve_185" Datatype="Bool" />
+          <Member Name="Reserve_186" Datatype="Bool" />
+          <Member Name="Reserve_187" Datatype="Bool" />
+          <Member Name="Reserve_188" Datatype="Bool" />
+          <Member Name="Reserve_189" Datatype="Bool" />
+          <Member Name="Reserve_190" Datatype="Bool" />
+          <Member Name="Reserve_191" Datatype="Bool" />
+          <Member Name="Reserve_192" Datatype="Bool" />
+          <Member Name="Reserve_193" Datatype="Bool" />
+          <Member Name="Reserve_194" Datatype="Bool" />
+          <Member Name="Reserve_195" Datatype="Bool" />
+          <Member Name="Reserve_196" Datatype="Bool" />
+          <Member Name="Reserve_197" Datatype="Bool" />
+          <Member Name="Reserve_198" Datatype="Bool" />
+          <Member Name="Reserve_199" Datatype="Bool" />
+          <Member Name="Reserve_200" Datatype="Bool" />
+          <Member Name="Reserve_201" Datatype="Bool" />
+          <Member Name="Reserve_202" Datatype="Bool" />
+          <Member Name="Reserve_203" Datatype="Bool" />
+          <Member Name="Reserve_204" Datatype="Bool" />
+          <Member Name="Reserve_205" Datatype="Bool" />
+          <Member Name="Reserve_206" Datatype="Bool" />
+          <Member Name="Reserve_207" Datatype="Bool" />
+          <Member Name="Reserve_208" Datatype="Bool" />
+          <Member Name="Reserve_209" Datatype="Bool" />
+          <Member Name="Reserve_210" Datatype="Bool" />
+          <Member Name="Reserve_211" Datatype="Bool" />
+          <Member Name="Reserve_212" Datatype="Bool" />
+          <Member Name="Reserve_213" Datatype="Bool" />
+          <Member Name="Reserve_214" Datatype="Bool" />
+          <Member Name="Reserve_215" Datatype="Bool" />
+          <Member Name="Reserve_216" Datatype="Bool" />
+          <Member Name="Reserve_217" Datatype="Bool" />
+          <Member Name="Reserve_218" Datatype="Bool" />
+          <Member Name="Reserve_219" Datatype="Bool" />
+          <Member Name="Reserve_220" Datatype="Bool" />
+          <Member Name="Reserve_221" Datatype="Bool" />
+          <Member Name="Reserve_222" Datatype="Bool" />
+          <Member Name="Reserve_223" Datatype="Bool" />
+          <Member Name="Reserve_224" Datatype="Bool" />
+          <Member Name="Reserve_225" Datatype="Bool" />
+          <Member Name="Reserve_226" Datatype="Bool" />
+          <Member Name="Reserve_227" Datatype="Bool" />
+          <Member Name="Reserve_228" Datatype="Bool" />
+          <Member Name="Reserve_229" Datatype="Bool" />
+          <Member Name="Reserve_230" Datatype="Bool" />
+          <Member Name="Reserve_231" Datatype="Bool" />
+          <Member Name="Reserve_232" Datatype="Bool" />
+          <Member Name="Reserve_233" Datatype="Bool" />
+          <Member Name="Reserve_234" Datatype="Bool" />
+          <Member Name="Reserve_235" Datatype="Bool" />
+          <Member Name="Reserve_236" Datatype="Bool" />
+          <Member Name="Reserve_237" Datatype="Bool" />
+          <Member Name="Reserve_238" Datatype="Bool" />
+          <Member Name="Reserve_239" Datatype="Bool" />
+          <Member Name="Reserve_240" Datatype="Bool" />
+          <Member Name="Reserve_241" Datatype="Bool" />
+          <Member Name="Reserve_242" Datatype="Bool" />
+          <Member Name="Reserve_243" Datatype="Bool" />
+          <Member Name="Reserve_244" Datatype="Bool" />
+          <Member Name="Reserve_245" Datatype="Bool" />
+          <Member Name="Reserve_246" Datatype="Bool" />
+          <Member Name="Reserve_247" Datatype="Bool" />
+          <Member Name="Reserve_248" Datatype="Bool" />
+          <Member Name="Reserve_249" Datatype="Bool" />
+          <Member Name="Reserve_250" Datatype="Bool" />
+          <Member Name="Reserve_251" Datatype="Bool" />
+          <Member Name="Reserve_252" Datatype="Bool" />
+          <Member Name="Reserve_253" Datatype="Bool" />
+          <Member Name="Reserve_254" Datatype="Bool" />
+          <Member Name="Reserve_255" Datatype="Bool" />
+          <Member Name="Reserve_256" Datatype="Bool" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_FaultMessagesAbsolut" Datatype="&quot;UDT_Messages&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="E-StopRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" />
+          <Member Name="FaultCommunication" Datatype="Bool" />
+          <Member Name="PressureAirMonitor" Datatype="Bool" />
+          <Member Name="24VFuseTripped" Datatype="Bool" />
+          <Member Name="SmartlineModulFault" Datatype="Bool" />
+          <Member Name="SmartlineModulWarning" Datatype="Bool" />
+          <Member Name="GlueingNotReady" Datatype="Bool" />
+          <Member Name="GlueingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CodingNotReady" Datatype="Bool" />
+          <Member Name="CodingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CheckweigherNotReady" Datatype="Bool" />
+          <Member Name="MetalDetectorNotReady" Datatype="Bool" />
+          <Member Name="FollowingMachineNotReady" Datatype="Bool" />
+          <Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" />
+          <Member Name="MaindriveBlocked" Datatype="Bool" />
+          <Member Name="VirtualMaster" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" />
+          <Member Name="FaultMotor30M1" Datatype="Bool" />
+          <Member Name="FaultMotor31M1" Datatype="Bool" />
+          <Member Name="FaultMotor32M1" Datatype="Bool" />
+          <Member Name="FaultMotor33M1" Datatype="Bool" />
+          <Member Name="FaultMotor34M1" Datatype="Bool" />
+          <Member Name="FaultMotor35M1" Datatype="Bool" />
+          <Member Name="FaultMotor36M1" Datatype="Bool" />
+          <Member Name="FaultMotor37M1" Datatype="Bool" />
+          <Member Name="FaultMotor38M1" Datatype="Bool" />
+          <Member Name="FaultMotor39M1" Datatype="Bool" />
+          <Member Name="FaultMotor40M1" Datatype="Bool" />
+          <Member Name="FaultMotor41M1" Datatype="Bool" />
+          <Member Name="FaultMotor42M1" Datatype="Bool" />
+          <Member Name="FaultMotor43M1" Datatype="Bool" />
+          <Member Name="FaultMotor44M1" Datatype="Bool" />
+          <Member Name="FaultMotor45M1" Datatype="Bool" />
+          <Member Name="FaultMotor46M1" Datatype="Bool" />
+          <Member Name="FaultMotor47M1" Datatype="Bool" />
+          <Member Name="FaultMotor48M1" Datatype="Bool" />
+          <Member Name="FaultMotor49M1" Datatype="Bool" />
+          <Member Name="FaultMotor50M1" Datatype="Bool" />
+          <Member Name="FaultMotor51M1" Datatype="Bool" />
+          <Member Name="FaultMotor52M1" Datatype="Bool" />
+          <Member Name="FaultMotor53M1" Datatype="Bool" />
+          <Member Name="FaultMotor54M1" Datatype="Bool" />
+          <Member Name="FaultMotor55M1" Datatype="Bool" />
+          <Member Name="FaultMotor56M1" Datatype="Bool" />
+          <Member Name="FaultMotor57M1" Datatype="Bool" />
+          <Member Name="FaultMotor58M1" Datatype="Bool" />
+          <Member Name="FaultMotor59M1" Datatype="Bool" />
+          <Member Name="FaultMotor60M1" Datatype="Bool" />
+          <Member Name="FaultMotor61M1" Datatype="Bool" />
+          <Member Name="FaultMotor62M1" Datatype="Bool" />
+          <Member Name="FaultMotor63M1" Datatype="Bool" />
+          <Member Name="FaultMotor64M1" Datatype="Bool" />
+          <Member Name="FaultMotor65M1" Datatype="Bool" />
+          <Member Name="FaultMotor66M1" Datatype="Bool" />
+          <Member Name="FaultMotor67M1" Datatype="Bool" />
+          <Member Name="FaultMotor68M1" Datatype="Bool" />
+          <Member Name="FaultMotor69M1" Datatype="Bool" />
+          <Member Name="FaultMotor70M1" Datatype="Bool" />
+          <Member Name="FaultMotor71M1" Datatype="Bool" />
+          <Member Name="FaultMotor72M1" Datatype="Bool" />
+          <Member Name="FaultMotor73M1" Datatype="Bool" />
+          <Member Name="FaultMotor74M1" Datatype="Bool" />
+          <Member Name="FaultMotor75M1" Datatype="Bool" />
+          <Member Name="FaultMotor76M1" Datatype="Bool" />
+          <Member Name="FaultMotor77M1" Datatype="Bool" />
+          <Member Name="FaultMotor78M1" Datatype="Bool" />
+          <Member Name="FaultMotor79M1" Datatype="Bool" />
+          <Member Name="FaultMotor80M1" Datatype="Bool" />
+          <Member Name="FaultMotor81M1" Datatype="Bool" />
+          <Member Name="FaultMotor82M1" Datatype="Bool" />
+          <Member Name="FaultMotor83M1" Datatype="Bool" />
+          <Member Name="FaultMotor84M1" Datatype="Bool" />
+          <Member Name="FaultMotor85M1" Datatype="Bool" />
+          <Member Name="FaultMotor86M1" Datatype="Bool" />
+          <Member Name="FaultMotor87M1" Datatype="Bool" />
+          <Member Name="FaultMotor88M1" Datatype="Bool" />
+          <Member Name="FaultMotor89M1" Datatype="Bool" />
+          <Member Name="FaultMotor90M1" Datatype="Bool" />
+          <Member Name="FaultMotor91M1" Datatype="Bool" />
+          <Member Name="FaultMotor92M1" Datatype="Bool" />
+          <Member Name="FaultMotor93M1" Datatype="Bool" />
+          <Member Name="FaultMotor94M1" Datatype="Bool" />
+          <Member Name="FaultMotor95M1" Datatype="Bool" />
+          <Member Name="FaultMotor96M1" Datatype="Bool" />
+          <Member Name="FaultMotor97M1" Datatype="Bool" />
+          <Member Name="FaultMotor98M1" Datatype="Bool" />
+          <Member Name="FaultMotor99M1" Datatype="Bool" />
+          <Member Name="E-StopOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopExternalOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopLeft" Datatype="Bool" />
+          <Member Name="E-StopRight" Datatype="Bool" />
+          <Member Name="E-StopProductionLine" Datatype="Bool" />
+          <Member Name="E-StopOutfeed" Datatype="Bool" />
+          <Member Name="E-StopReserve_105" Datatype="Bool" />
+          <Member Name="E-StopReserve_106" Datatype="Bool" />
+          <Member Name="E-StopReserve_107" Datatype="Bool" />
+          <Member Name="E-StopReserve_108" Datatype="Bool" />
+          <Member Name="E-StopReserve_109" Datatype="Bool" />
+          <Member Name="E-StopReserve_110" Datatype="Bool" />
+          <Member Name="E-StopReserve_111" Datatype="Bool" />
+          <Member Name="E-StopReserve_112" Datatype="Bool" />
+          <Member Name="E-StopReserve_113" Datatype="Bool" />
+          <Member Name="E-StopReserve_114" Datatype="Bool" />
+          <Member Name="E-StopReserve_115" Datatype="Bool" />
+          <Member Name="E-StopReserve_116" Datatype="Bool" />
+          <Member Name="E-StopReserve_117" Datatype="Bool" />
+          <Member Name="E-StopReserve_118" Datatype="Bool" />
+          <Member Name="E-StopReserve_119" Datatype="Bool" />
+          <Member Name="GuardDoor1" Datatype="Bool" />
+          <Member Name="GuardDoor2" Datatype="Bool" />
+          <Member Name="GuardDoor3" Datatype="Bool" />
+          <Member Name="GuardDoor4" Datatype="Bool" />
+          <Member Name="GuardDoor5" Datatype="Bool" />
+          <Member Name="GuardDoor6" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_126" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_127" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_128" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" />
+          <Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" />
+          <Member Name="TemperatureLoweringActive" Datatype="Bool" />
+          <Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" />
+          <Member Name="MonitoringWatercooling" Datatype="Bool" />
+          <Member Name="RecoolingFaulted" Datatype="Bool" />
+          <Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" />
+          <Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" />
+          <Member Name="AutomaticStartUp" Datatype="Bool" />
+          <Member Name="FollowingmachineIsForced" Datatype="Bool" />
+          <Member Name="FormatSelectionLocked" Datatype="Bool" />
+          <Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" />
+          <Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" />
+          <Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" />
+          <Member Name="StopTheMachineAccumulation" Datatype="Bool" />
+          <Member Name="RunTheMachineEmpty" Datatype="Bool" />
+          <Member Name="CodingIsForced" Datatype="Bool" />
+          <Member Name="CheckweigherIsForced" Datatype="Bool" />
+          <Member Name="MetadetectorIsForced" Datatype="Bool" />
+          <Member Name="SikoMonitoringForced" Datatype="Bool" />
+          <Member Name="FaultedHotAirBlower" Datatype="Bool" />
+          <Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleFuseTripped" Datatype="Bool" />
+          <Member Name="MonitoringAngleTransfer" Datatype="Bool" />
+          <Member Name="MonitoringRotationStation" Datatype="Bool" />
+          <Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" />
+          <Member Name="MonitoringSikoDisplays" Datatype="Bool" />
+          <Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" />
+          <Member Name="AccumulationHotAirFronflap" Datatype="Bool" />
+          <Member Name="AccumulationHotAirSideflap" Datatype="Bool" />
+          <Member Name="FaultTechnologyObject" Datatype="Bool" />
+          <Member Name="FaultEncoder" Datatype="Bool" />
+          <Member Name="ToManyNoksInARow" Datatype="Bool" />
+          <Member Name="InfeedMachineNotReady" Datatype="Bool" />
+          <Member Name="Reserve_172" Datatype="Bool" />
+          <Member Name="Reserve_173" Datatype="Bool" />
+          <Member Name="Reserve_174" Datatype="Bool" />
+          <Member Name="Reserve_175" Datatype="Bool" />
+          <Member Name="Reserve_176" Datatype="Bool" />
+          <Member Name="Reserve_177" Datatype="Bool" />
+          <Member Name="Reserve_178" Datatype="Bool" />
+          <Member Name="Reserve_179" Datatype="Bool" />
+          <Member Name="Reserve_180" Datatype="Bool" />
+          <Member Name="Reserve_181" Datatype="Bool" />
+          <Member Name="Reserve_182" Datatype="Bool" />
+          <Member Name="Reserve_183" Datatype="Bool" />
+          <Member Name="Reserve_184" Datatype="Bool" />
+          <Member Name="Reserve_185" Datatype="Bool" />
+          <Member Name="Reserve_186" Datatype="Bool" />
+          <Member Name="Reserve_187" Datatype="Bool" />
+          <Member Name="Reserve_188" Datatype="Bool" />
+          <Member Name="Reserve_189" Datatype="Bool" />
+          <Member Name="Reserve_190" Datatype="Bool" />
+          <Member Name="Reserve_191" Datatype="Bool" />
+          <Member Name="Reserve_192" Datatype="Bool" />
+          <Member Name="Reserve_193" Datatype="Bool" />
+          <Member Name="Reserve_194" Datatype="Bool" />
+          <Member Name="Reserve_195" Datatype="Bool" />
+          <Member Name="Reserve_196" Datatype="Bool" />
+          <Member Name="Reserve_197" Datatype="Bool" />
+          <Member Name="Reserve_198" Datatype="Bool" />
+          <Member Name="Reserve_199" Datatype="Bool" />
+          <Member Name="Reserve_200" Datatype="Bool" />
+          <Member Name="Reserve_201" Datatype="Bool" />
+          <Member Name="Reserve_202" Datatype="Bool" />
+          <Member Name="Reserve_203" Datatype="Bool" />
+          <Member Name="Reserve_204" Datatype="Bool" />
+          <Member Name="Reserve_205" Datatype="Bool" />
+          <Member Name="Reserve_206" Datatype="Bool" />
+          <Member Name="Reserve_207" Datatype="Bool" />
+          <Member Name="Reserve_208" Datatype="Bool" />
+          <Member Name="Reserve_209" Datatype="Bool" />
+          <Member Name="Reserve_210" Datatype="Bool" />
+          <Member Name="Reserve_211" Datatype="Bool" />
+          <Member Name="Reserve_212" Datatype="Bool" />
+          <Member Name="Reserve_213" Datatype="Bool" />
+          <Member Name="Reserve_214" Datatype="Bool" />
+          <Member Name="Reserve_215" Datatype="Bool" />
+          <Member Name="Reserve_216" Datatype="Bool" />
+          <Member Name="Reserve_217" Datatype="Bool" />
+          <Member Name="Reserve_218" Datatype="Bool" />
+          <Member Name="Reserve_219" Datatype="Bool" />
+          <Member Name="Reserve_220" Datatype="Bool" />
+          <Member Name="Reserve_221" Datatype="Bool" />
+          <Member Name="Reserve_222" Datatype="Bool" />
+          <Member Name="Reserve_223" Datatype="Bool" />
+          <Member Name="Reserve_224" Datatype="Bool" />
+          <Member Name="Reserve_225" Datatype="Bool" />
+          <Member Name="Reserve_226" Datatype="Bool" />
+          <Member Name="Reserve_227" Datatype="Bool" />
+          <Member Name="Reserve_228" Datatype="Bool" />
+          <Member Name="Reserve_229" Datatype="Bool" />
+          <Member Name="Reserve_230" Datatype="Bool" />
+          <Member Name="Reserve_231" Datatype="Bool" />
+          <Member Name="Reserve_232" Datatype="Bool" />
+          <Member Name="Reserve_233" Datatype="Bool" />
+          <Member Name="Reserve_234" Datatype="Bool" />
+          <Member Name="Reserve_235" Datatype="Bool" />
+          <Member Name="Reserve_236" Datatype="Bool" />
+          <Member Name="Reserve_237" Datatype="Bool" />
+          <Member Name="Reserve_238" Datatype="Bool" />
+          <Member Name="Reserve_239" Datatype="Bool" />
+          <Member Name="Reserve_240" Datatype="Bool" />
+          <Member Name="Reserve_241" Datatype="Bool" />
+          <Member Name="Reserve_242" Datatype="Bool" />
+          <Member Name="Reserve_243" Datatype="Bool" />
+          <Member Name="Reserve_244" Datatype="Bool" />
+          <Member Name="Reserve_245" Datatype="Bool" />
+          <Member Name="Reserve_246" Datatype="Bool" />
+          <Member Name="Reserve_247" Datatype="Bool" />
+          <Member Name="Reserve_248" Datatype="Bool" />
+          <Member Name="Reserve_249" Datatype="Bool" />
+          <Member Name="Reserve_250" Datatype="Bool" />
+          <Member Name="Reserve_251" Datatype="Bool" />
+          <Member Name="Reserve_252" Datatype="Bool" />
+          <Member Name="Reserve_253" Datatype="Bool" />
+          <Member Name="Reserve_254" Datatype="Bool" />
+          <Member Name="Reserve_255" Datatype="Bool" />
+          <Member Name="Reserve_256" Datatype="Bool" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_FaultMessagesCycleEnd" Datatype="&quot;UDT_Messages&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="E-StopRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggered" Datatype="Bool" />
+          <Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" />
+          <Member Name="FaultCommunication" Datatype="Bool" />
+          <Member Name="PressureAirMonitor" Datatype="Bool" />
+          <Member Name="24VFuseTripped" Datatype="Bool" />
+          <Member Name="SmartlineModulFault" Datatype="Bool" />
+          <Member Name="SmartlineModulWarning" Datatype="Bool" />
+          <Member Name="GlueingNotReady" Datatype="Bool" />
+          <Member Name="GlueingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CodingNotReady" Datatype="Bool" />
+          <Member Name="CodingMinimumFillLevel" Datatype="Bool" />
+          <Member Name="CheckweigherNotReady" Datatype="Bool" />
+          <Member Name="MetalDetectorNotReady" Datatype="Bool" />
+          <Member Name="FollowingMachineNotReady" Datatype="Bool" />
+          <Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" />
+          <Member Name="MaindriveBlocked" Datatype="Bool" />
+          <Member Name="VirtualMaster" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" />
+          <Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" />
+          <Member Name="FaultMotor30M1" Datatype="Bool" />
+          <Member Name="FaultMotor31M1" Datatype="Bool" />
+          <Member Name="FaultMotor32M1" Datatype="Bool" />
+          <Member Name="FaultMotor33M1" Datatype="Bool" />
+          <Member Name="FaultMotor34M1" Datatype="Bool" />
+          <Member Name="FaultMotor35M1" Datatype="Bool" />
+          <Member Name="FaultMotor36M1" Datatype="Bool" />
+          <Member Name="FaultMotor37M1" Datatype="Bool" />
+          <Member Name="FaultMotor38M1" Datatype="Bool" />
+          <Member Name="FaultMotor39M1" Datatype="Bool" />
+          <Member Name="FaultMotor40M1" Datatype="Bool" />
+          <Member Name="FaultMotor41M1" Datatype="Bool" />
+          <Member Name="FaultMotor42M1" Datatype="Bool" />
+          <Member Name="FaultMotor43M1" Datatype="Bool" />
+          <Member Name="FaultMotor44M1" Datatype="Bool" />
+          <Member Name="FaultMotor45M1" Datatype="Bool" />
+          <Member Name="FaultMotor46M1" Datatype="Bool" />
+          <Member Name="FaultMotor47M1" Datatype="Bool" />
+          <Member Name="FaultMotor48M1" Datatype="Bool" />
+          <Member Name="FaultMotor49M1" Datatype="Bool" />
+          <Member Name="FaultMotor50M1" Datatype="Bool" />
+          <Member Name="FaultMotor51M1" Datatype="Bool" />
+          <Member Name="FaultMotor52M1" Datatype="Bool" />
+          <Member Name="FaultMotor53M1" Datatype="Bool" />
+          <Member Name="FaultMotor54M1" Datatype="Bool" />
+          <Member Name="FaultMotor55M1" Datatype="Bool" />
+          <Member Name="FaultMotor56M1" Datatype="Bool" />
+          <Member Name="FaultMotor57M1" Datatype="Bool" />
+          <Member Name="FaultMotor58M1" Datatype="Bool" />
+          <Member Name="FaultMotor59M1" Datatype="Bool" />
+          <Member Name="FaultMotor60M1" Datatype="Bool" />
+          <Member Name="FaultMotor61M1" Datatype="Bool" />
+          <Member Name="FaultMotor62M1" Datatype="Bool" />
+          <Member Name="FaultMotor63M1" Datatype="Bool" />
+          <Member Name="FaultMotor64M1" Datatype="Bool" />
+          <Member Name="FaultMotor65M1" Datatype="Bool" />
+          <Member Name="FaultMotor66M1" Datatype="Bool" />
+          <Member Name="FaultMotor67M1" Datatype="Bool" />
+          <Member Name="FaultMotor68M1" Datatype="Bool" />
+          <Member Name="FaultMotor69M1" Datatype="Bool" />
+          <Member Name="FaultMotor70M1" Datatype="Bool" />
+          <Member Name="FaultMotor71M1" Datatype="Bool" />
+          <Member Name="FaultMotor72M1" Datatype="Bool" />
+          <Member Name="FaultMotor73M1" Datatype="Bool" />
+          <Member Name="FaultMotor74M1" Datatype="Bool" />
+          <Member Name="FaultMotor75M1" Datatype="Bool" />
+          <Member Name="FaultMotor76M1" Datatype="Bool" />
+          <Member Name="FaultMotor77M1" Datatype="Bool" />
+          <Member Name="FaultMotor78M1" Datatype="Bool" />
+          <Member Name="FaultMotor79M1" Datatype="Bool" />
+          <Member Name="FaultMotor80M1" Datatype="Bool" />
+          <Member Name="FaultMotor81M1" Datatype="Bool" />
+          <Member Name="FaultMotor82M1" Datatype="Bool" />
+          <Member Name="FaultMotor83M1" Datatype="Bool" />
+          <Member Name="FaultMotor84M1" Datatype="Bool" />
+          <Member Name="FaultMotor85M1" Datatype="Bool" />
+          <Member Name="FaultMotor86M1" Datatype="Bool" />
+          <Member Name="FaultMotor87M1" Datatype="Bool" />
+          <Member Name="FaultMotor88M1" Datatype="Bool" />
+          <Member Name="FaultMotor89M1" Datatype="Bool" />
+          <Member Name="FaultMotor90M1" Datatype="Bool" />
+          <Member Name="FaultMotor91M1" Datatype="Bool" />
+          <Member Name="FaultMotor92M1" Datatype="Bool" />
+          <Member Name="FaultMotor93M1" Datatype="Bool" />
+          <Member Name="FaultMotor94M1" Datatype="Bool" />
+          <Member Name="FaultMotor95M1" Datatype="Bool" />
+          <Member Name="FaultMotor96M1" Datatype="Bool" />
+          <Member Name="FaultMotor97M1" Datatype="Bool" />
+          <Member Name="FaultMotor98M1" Datatype="Bool" />
+          <Member Name="FaultMotor99M1" Datatype="Bool" />
+          <Member Name="E-StopOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopExternalOperatorPanel" Datatype="Bool" />
+          <Member Name="E-StopLeft" Datatype="Bool" />
+          <Member Name="E-StopRight" Datatype="Bool" />
+          <Member Name="E-StopProductionLine" Datatype="Bool" />
+          <Member Name="E-StopOutfeed" Datatype="Bool" />
+          <Member Name="E-StopReserve_105" Datatype="Bool" />
+          <Member Name="E-StopReserve_106" Datatype="Bool" />
+          <Member Name="E-StopReserve_107" Datatype="Bool" />
+          <Member Name="E-StopReserve_108" Datatype="Bool" />
+          <Member Name="E-StopReserve_109" Datatype="Bool" />
+          <Member Name="E-StopReserve_110" Datatype="Bool" />
+          <Member Name="E-StopReserve_111" Datatype="Bool" />
+          <Member Name="E-StopReserve_112" Datatype="Bool" />
+          <Member Name="E-StopReserve_113" Datatype="Bool" />
+          <Member Name="E-StopReserve_114" Datatype="Bool" />
+          <Member Name="E-StopReserve_115" Datatype="Bool" />
+          <Member Name="E-StopReserve_116" Datatype="Bool" />
+          <Member Name="E-StopReserve_117" Datatype="Bool" />
+          <Member Name="E-StopReserve_118" Datatype="Bool" />
+          <Member Name="E-StopReserve_119" Datatype="Bool" />
+          <Member Name="GuardDoor1" Datatype="Bool" />
+          <Member Name="GuardDoor2" Datatype="Bool" />
+          <Member Name="GuardDoor3" Datatype="Bool" />
+          <Member Name="GuardDoor4" Datatype="Bool" />
+          <Member Name="GuardDoor5" Datatype="Bool" />
+          <Member Name="GuardDoor6" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_126" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_127" Datatype="Bool" />
+          <Member Name="GuardDoorReserve_128" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" />
+          <Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" />
+          <Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" />
+          <Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" />
+          <Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" />
+          <Member Name="TemperatureLoweringActive" Datatype="Bool" />
+          <Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" />
+          <Member Name="MonitoringWatercooling" Datatype="Bool" />
+          <Member Name="RecoolingFaulted" Datatype="Bool" />
+          <Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" />
+          <Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" />
+          <Member Name="AutomaticStartUp" Datatype="Bool" />
+          <Member Name="FollowingmachineIsForced" Datatype="Bool" />
+          <Member Name="FormatSelectionLocked" Datatype="Bool" />
+          <Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" />
+          <Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" />
+          <Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" />
+          <Member Name="StopTheMachineAccumulation" Datatype="Bool" />
+          <Member Name="RunTheMachineEmpty" Datatype="Bool" />
+          <Member Name="CodingIsForced" Datatype="Bool" />
+          <Member Name="CheckweigherIsForced" Datatype="Bool" />
+          <Member Name="MetadetectorIsForced" Datatype="Bool" />
+          <Member Name="SikoMonitoringForced" Datatype="Bool" />
+          <Member Name="FaultedHotAirBlower" Datatype="Bool" />
+          <Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" />
+          <Member Name="HeatingNozzleFuseTripped" Datatype="Bool" />
+          <Member Name="MonitoringAngleTransfer" Datatype="Bool" />
+          <Member Name="MonitoringRotationStation" Datatype="Bool" />
+          <Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" />
+          <Member Name="MonitoringSikoDisplays" Datatype="Bool" />
+          <Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" />
+          <Member Name="AccumulationHotAirFronflap" Datatype="Bool" />
+          <Member Name="AccumulationHotAirSideflap" Datatype="Bool" />
+          <Member Name="FaultTechnologyObject" Datatype="Bool" />
+          <Member Name="FaultEncoder" Datatype="Bool" />
+          <Member Name="ToManyNoksInARow" Datatype="Bool" />
+          <Member Name="InfeedMachineNotReady" Datatype="Bool" />
+          <Member Name="Reserve_172" Datatype="Bool" />
+          <Member Name="Reserve_173" Datatype="Bool" />
+          <Member Name="Reserve_174" Datatype="Bool" />
+          <Member Name="Reserve_175" Datatype="Bool" />
+          <Member Name="Reserve_176" Datatype="Bool" />
+          <Member Name="Reserve_177" Datatype="Bool" />
+          <Member Name="Reserve_178" Datatype="Bool" />
+          <Member Name="Reserve_179" Datatype="Bool" />
+          <Member Name="Reserve_180" Datatype="Bool" />
+          <Member Name="Reserve_181" Datatype="Bool" />
+          <Member Name="Reserve_182" Datatype="Bool" />
+          <Member Name="Reserve_183" Datatype="Bool" />
+          <Member Name="Reserve_184" Datatype="Bool" />
+          <Member Name="Reserve_185" Datatype="Bool" />
+          <Member Name="Reserve_186" Datatype="Bool" />
+          <Member Name="Reserve_187" Datatype="Bool" />
+          <Member Name="Reserve_188" Datatype="Bool" />
+          <Member Name="Reserve_189" Datatype="Bool" />
+          <Member Name="Reserve_190" Datatype="Bool" />
+          <Member Name="Reserve_191" Datatype="Bool" />
+          <Member Name="Reserve_192" Datatype="Bool" />
+          <Member Name="Reserve_193" Datatype="Bool" />
+          <Member Name="Reserve_194" Datatype="Bool" />
+          <Member Name="Reserve_195" Datatype="Bool" />
+          <Member Name="Reserve_196" Datatype="Bool" />
+          <Member Name="Reserve_197" Datatype="Bool" />
+          <Member Name="Reserve_198" Datatype="Bool" />
+          <Member Name="Reserve_199" Datatype="Bool" />
+          <Member Name="Reserve_200" Datatype="Bool" />
+          <Member Name="Reserve_201" Datatype="Bool" />
+          <Member Name="Reserve_202" Datatype="Bool" />
+          <Member Name="Reserve_203" Datatype="Bool" />
+          <Member Name="Reserve_204" Datatype="Bool" />
+          <Member Name="Reserve_205" Datatype="Bool" />
+          <Member Name="Reserve_206" Datatype="Bool" />
+          <Member Name="Reserve_207" Datatype="Bool" />
+          <Member Name="Reserve_208" Datatype="Bool" />
+          <Member Name="Reserve_209" Datatype="Bool" />
+          <Member Name="Reserve_210" Datatype="Bool" />
+          <Member Name="Reserve_211" Datatype="Bool" />
+          <Member Name="Reserve_212" Datatype="Bool" />
+          <Member Name="Reserve_213" Datatype="Bool" />
+          <Member Name="Reserve_214" Datatype="Bool" />
+          <Member Name="Reserve_215" Datatype="Bool" />
+          <Member Name="Reserve_216" Datatype="Bool" />
+          <Member Name="Reserve_217" Datatype="Bool" />
+          <Member Name="Reserve_218" Datatype="Bool" />
+          <Member Name="Reserve_219" Datatype="Bool" />
+          <Member Name="Reserve_220" Datatype="Bool" />
+          <Member Name="Reserve_221" Datatype="Bool" />
+          <Member Name="Reserve_222" Datatype="Bool" />
+          <Member Name="Reserve_223" Datatype="Bool" />
+          <Member Name="Reserve_224" Datatype="Bool" />
+          <Member Name="Reserve_225" Datatype="Bool" />
+          <Member Name="Reserve_226" Datatype="Bool" />
+          <Member Name="Reserve_227" Datatype="Bool" />
+          <Member Name="Reserve_228" Datatype="Bool" />
+          <Member Name="Reserve_229" Datatype="Bool" />
+          <Member Name="Reserve_230" Datatype="Bool" />
+          <Member Name="Reserve_231" Datatype="Bool" />
+          <Member Name="Reserve_232" Datatype="Bool" />
+          <Member Name="Reserve_233" Datatype="Bool" />
+          <Member Name="Reserve_234" Datatype="Bool" />
+          <Member Name="Reserve_235" Datatype="Bool" />
+          <Member Name="Reserve_236" Datatype="Bool" />
+          <Member Name="Reserve_237" Datatype="Bool" />
+          <Member Name="Reserve_238" Datatype="Bool" />
+          <Member Name="Reserve_239" Datatype="Bool" />
+          <Member Name="Reserve_240" Datatype="Bool" />
+          <Member Name="Reserve_241" Datatype="Bool" />
+          <Member Name="Reserve_242" Datatype="Bool" />
+          <Member Name="Reserve_243" Datatype="Bool" />
+          <Member Name="Reserve_244" Datatype="Bool" />
+          <Member Name="Reserve_245" Datatype="Bool" />
+          <Member Name="Reserve_246" Datatype="Bool" />
+          <Member Name="Reserve_247" Datatype="Bool" />
+          <Member Name="Reserve_248" Datatype="Bool" />
+          <Member Name="Reserve_249" Datatype="Bool" />
+          <Member Name="Reserve_250" Datatype="Bool" />
+          <Member Name="Reserve_251" Datatype="Bool" />
+          <Member Name="Reserve_252" Datatype="Bool" />
+          <Member Name="Reserve_253" Datatype="Bool" />
+          <Member Name="Reserve_254" Datatype="Bool" />
+          <Member Name="Reserve_255" Datatype="Bool" />
+          <Member Name="Reserve_256" Datatype="Bool" />
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_OMACGlobalData" Datatype="&quot;UDT_OMAC_GlobalData&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="FirstCycle" Datatype="Bool" />
+          <Member Name="UnitMode" Datatype="DInt" />
+          <Member Name="UnitModeChangeRequest" Datatype="Bool" />
+          <Member Name="CntrlCmd" Datatype="DInt" />
+          <Member Name="CmdChangeRequest" Datatype="Bool" />
+          <Member Name="EnableBooleanInterface" Datatype="Bool" />
+          <Member Name="ProductionModeRequest" Datatype="Bool" />
+          <Member Name="MaintenanceModeRequest" Datatype="Bool" />
+          <Member Name="ManualModeRequest" Datatype="Bool" />
+          <Member Name="ChangeOverModeRequest" Datatype="Bool" />
+          <Member Name="CleanModeRequest" Datatype="Bool" />
+          <Member Name="SetUpModeRequest" Datatype="Bool" />
+          <Member Name="EmptyOutModeRequest" Datatype="Bool" />
+          <Member Name="OEMSpecificModeRequest" Datatype="Bool" />
+          <Member Name="UserMode01Request" Datatype="Bool" />
+          <Member Name="UserMode02Request" Datatype="Bool" />
+          <Member Name="UserMode03Request" Datatype="Bool" />
+          <Member Name="UserMode04Request" Datatype="Bool" />
+          <Member Name="UserMode05Request" Datatype="Bool" />
+          <Member Name="ResetCmdRequest" Datatype="Bool" />
+          <Member Name="StartCmdRequest" Datatype="Bool" />
+          <Member Name="StopCmdRequest" Datatype="Bool" />
+          <Member Name="HoldCmdRequest" Datatype="Bool" />
+          <Member Name="UnholdCmdRequest" Datatype="Bool" />
+          <Member Name="SuspendCmdRequest" Datatype="Bool" />
+          <Member Name="UnsuspendCmdRequest" Datatype="Bool" />
+          <Member Name="AbortCmdRequest" Datatype="Bool" />
+          <Member Name="ClearCmdRequest" Datatype="Bool" />
+          <Member Name="CompleteCmdRequest" Datatype="Bool" />
+          <Member Name="SC" Datatype="Struct">
+            <Member Name="UNDEFINED" Datatype="Bool" />
+            <Member Name="CLEARING" Datatype="Bool" />
+            <Member Name="STOPPED" Datatype="Bool" />
+            <Member Name="STARTING" Datatype="Bool" />
+            <Member Name="IDLE" Datatype="Bool" />
+            <Member Name="SUSPENDED" Datatype="Bool" />
+            <Member Name="EXECUTE" Datatype="Bool" />
+            <Member Name="STOPPING" Datatype="Bool" />
+            <Member Name="ABORTING" Datatype="Bool" />
+            <Member Name="ABORTED" Datatype="Bool" />
+            <Member Name="HOLDING" Datatype="Bool" />
+            <Member Name="HELD" Datatype="Bool" />
+            <Member Name="UNHOLDING" Datatype="Bool" />
+            <Member Name="SUSPENDING" Datatype="Bool" />
+            <Member Name="UNSUSPENDING" Datatype="Bool" />
+            <Member Name="RESETTING" Datatype="Bool" />
+            <Member Name="COMPLETING" Datatype="Bool" />
+            <Member Name="COMPLETE" Datatype="Bool" />
+          </Member>
+          <Member Name="configuration" Datatype="&quot;UDT_OMAC_Configuration&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="DisabledUnitModes" Datatype="Array[0..31] of Bool" />
+                <Member Name="DisabledStatesInUnitModes" Datatype="Array[0..31] of DInt" />
+                <Member Name="PackMLVersion" Datatype="Int" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="UnitModeCurrent" Datatype="DInt" />
+          <Member Name="UnitModeRequested" Datatype="DInt" />
+          <Member Name="UnitModeChangeInProcess" Datatype="Bool" />
+          <Member Name="StateCurrent" Datatype="DInt" />
+          <Member Name="StateRequested" Datatype="DInt" />
+          <Member Name="StateChangeInProcess" Datatype="Bool" />
+          <Member Name="ProductionModeActive" Datatype="Bool" />
+          <Member Name="MaintenanceModeActive" Datatype="Bool" />
+          <Member Name="ManualModeActive" Datatype="Bool" />
+          <Member Name="ChangeOverModeActive" Datatype="Bool" />
+          <Member Name="CleanModeRequestActive" Datatype="Bool" />
+          <Member Name="SetUpModeRequestActive" Datatype="Bool" />
+          <Member Name="EmptyOutModeRequestActive" Datatype="Bool" />
+          <Member Name="OEMSpecificModeRequestActive" Datatype="Bool" />
+          <Member Name="SpareModeActive" Datatype="Bool" />
+          <Member Name="UserMode01Active" Datatype="Bool" />
+          <Member Name="UserMode02Active" Datatype="Bool" />
+          <Member Name="UserMode03Active" Datatype="Bool" />
+          <Member Name="UserMode04Active" Datatype="Bool" />
+          <Member Name="UserMode05Active" Datatype="Bool" />
+          <Member Name="ClearingStateActive" Datatype="Bool" />
+          <Member Name="StoppedStateActive" Datatype="Bool" />
+          <Member Name="StartingStateActive" Datatype="Bool" />
+          <Member Name="IdleStateActive" Datatype="Bool" />
+          <Member Name="SuspendedStateActive" Datatype="Bool" />
+          <Member Name="ExecuteStateActive" Datatype="Bool" />
+          <Member Name="StoppingStateActive" Datatype="Bool" />
+          <Member Name="AbortingStateActive" Datatype="Bool" />
+          <Member Name="AbortedStateActive" Datatype="Bool" />
+          <Member Name="HoldingStateActive" Datatype="Bool" />
+          <Member Name="HeldStateActive" Datatype="Bool" />
+          <Member Name="UnholdingStateActive" Datatype="Bool" />
+          <Member Name="SuspendingStateActive" Datatype="Bool" />
+          <Member Name="UnsuspendingStateActive" Datatype="Bool" />
+          <Member Name="ResettingStateActive" Datatype="Bool" />
+          <Member Name="CompletingStateActive" Datatype="Bool" />
+          <Member Name="CompleteStateActive" Datatype="Bool" />
+          <Member Name="StatesDisabled" Datatype="DInt" />
+          <Member Name="Diagnostics" Datatype="&quot;UDT_OMAC_Diagnostics&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="BufferIndex" Datatype="Int" />
+                <Member Name="Buffer" Datatype="Array[0..15] of &quot;UDT_OMAC_DiagnosticsEntry&quot;">
+                  <Sections>
+                    <Section Name="None">
+                      <Member Name="Timestamp" Datatype="DTL" Version="1.0" />
+                      <Member Name="UnitModeCurrent" Datatype="Byte" />
+                      <Member Name="StateCurrent" Datatype="Byte" />
+                      <Member Name="UnitMode" Datatype="Byte" />
+                      <Member Name="CntrlCmd" Datatype="Byte" />
+                      <Member Name="SC" Datatype="Bool" />
+                      <Member Name="Message" Datatype="Byte" />
+                    </Section>
+                  </Sections>
+                </Member>
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="DiagnosticsBufferIndexForHMI" Datatype="Int" />
+          <Member Name="DiagnosticsBufferEntryForHMI" Datatype="&quot;UDT_OMAC_DiagnosticsEntry&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="Timestamp" Datatype="DTL" Version="1.0" />
+                <Member Name="UnitModeCurrent" Datatype="Byte" />
+                <Member Name="StateCurrent" Datatype="Byte" />
+                <Member Name="UnitMode" Datatype="Byte" />
+                <Member Name="CntrlCmd" Datatype="Byte" />
+                <Member Name="SC" Datatype="Bool" />
+                <Member Name="Message" Datatype="Byte" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="NamesConfiguration" Datatype="&quot;UDT_OMAC_NamesConfiguration&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="UnitModesNames" Datatype="Array[0..1, 0..11] of String[18]" />
+                <Member Name="StatesNames" Datatype="Array[0..1, 0..17] of String[16]" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="Language" Datatype="Int" />
+          <Member Name="UnitModeCurrentName" Datatype="String[18]" />
+          <Member Name="StateCurrentName" Datatype="String[16]" />
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="stat_InformationMessages" Datatype="&quot;UDT_Messages&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="E-StopRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" /><Member Name="FaultCommunication" Datatype="Bool" /><Member Name="PressureAirMonitor" Datatype="Bool" /><Member Name="24VFuseTripped" Datatype="Bool" /><Member Name="SmartlineModulFault" Datatype="Bool" /><Member Name="SmartlineModulWarning" Datatype="Bool" /><Member Name="GlueingNotReady" Datatype="Bool" /><Member Name="GlueingMinimumFillLevel" Datatype="Bool" /><Member Name="CodingNotReady" Datatype="Bool" /><Member Name="CodingMinimumFillLevel" Datatype="Bool" /><Member Name="CheckweigherNotReady" Datatype="Bool" /><Member Name="MetalDetectorNotReady" Datatype="Bool" /><Member Name="FollowingMachineNotReady" Datatype="Bool" /><Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" /><Member Name="MaindriveBlocked" Datatype="Bool" /><Member Name="VirtualMaster" Datatype="Bool" /><Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" /><Member Name="FaultMotor30M1" Datatype="Bool" /><Member Name="FaultMotor31M1" Datatype="Bool" /><Member Name="FaultMotor32M1" Datatype="Bool" /><Member Name="FaultMotor33M1" Datatype="Bool" /><Member Name="FaultMotor34M1" Datatype="Bool" /><Member Name="FaultMotor35M1" Datatype="Bool" /><Member Name="FaultMotor36M1" Datatype="Bool" /><Member Name="FaultMotor37M1" Datatype="Bool" /><Member Name="FaultMotor38M1" Datatype="Bool" /><Member Name="FaultMotor39M1" Datatype="Bool" /><Member Name="FaultMotor40M1" Datatype="Bool" /><Member Name="FaultMotor41M1" Datatype="Bool" /><Member Name="FaultMotor42M1" Datatype="Bool" /><Member Name="FaultMotor43M1" Datatype="Bool" /><Member Name="FaultMotor44M1" Datatype="Bool" /><Member Name="FaultMotor45M1" Datatype="Bool" /><Member Name="FaultMotor46M1" Datatype="Bool" /><Member Name="FaultMotor47M1" Datatype="Bool" /><Member Name="FaultMotor48M1" Datatype="Bool" /><Member Name="FaultMotor49M1" Datatype="Bool" /><Member Name="FaultMotor50M1" Datatype="Bool" /><Member Name="FaultMotor51M1" Datatype="Bool" /><Member Name="FaultMotor52M1" Datatype="Bool" /><Member Name="FaultMotor53M1" Datatype="Bool" /><Member Name="FaultMotor54M1" Datatype="Bool" /><Member Name="FaultMotor55M1" Datatype="Bool" /><Member Name="FaultMotor56M1" Datatype="Bool" /><Member Name="FaultMotor57M1" Datatype="Bool" /><Member Name="FaultMotor58M1" Datatype="Bool" /><Member Name="FaultMotor59M1" Datatype="Bool" /><Member Name="FaultMotor60M1" Datatype="Bool" /><Member Name="FaultMotor61M1" Datatype="Bool" /><Member Name="FaultMotor62M1" Datatype="Bool" /><Member Name="FaultMotor63M1" Datatype="Bool" /><Member Name="FaultMotor64M1" Datatype="Bool" /><Member Name="FaultMotor65M1" Datatype="Bool" /><Member Name="FaultMotor66M1" Datatype="Bool" /><Member Name="FaultMotor67M1" Datatype="Bool" /><Member Name="FaultMotor68M1" Datatype="Bool" /><Member Name="FaultMotor69M1" Datatype="Bool" /><Member Name="FaultMotor70M1" Datatype="Bool" /><Member Name="FaultMotor71M1" Datatype="Bool" /><Member Name="FaultMotor72M1" Datatype="Bool" /><Member Name="FaultMotor73M1" Datatype="Bool" /><Member Name="FaultMotor74M1" Datatype="Bool" /><Member Name="FaultMotor75M1" Datatype="Bool" /><Member Name="FaultMotor76M1" Datatype="Bool" /><Member Name="FaultMotor77M1" Datatype="Bool" /><Member Name="FaultMotor78M1" Datatype="Bool" /><Member Name="FaultMotor79M1" Datatype="Bool" /><Member Name="FaultMotor80M1" Datatype="Bool" /><Member Name="FaultMotor81M1" Datatype="Bool" /><Member Name="FaultMotor82M1" Datatype="Bool" /><Member Name="FaultMotor83M1" Datatype="Bool" /><Member Name="FaultMotor84M1" Datatype="Bool" /><Member Name="FaultMotor85M1" Datatype="Bool" /><Member Name="FaultMotor86M1" Datatype="Bool" /><Member Name="FaultMotor87M1" Datatype="Bool" /><Member Name="FaultMotor88M1" Datatype="Bool" /><Member Name="FaultMotor89M1" Datatype="Bool" /><Member Name="FaultMotor90M1" Datatype="Bool" /><Member Name="FaultMotor91M1" Datatype="Bool" /><Member Name="FaultMotor92M1" Datatype="Bool" /><Member Name="FaultMotor93M1" Datatype="Bool" /><Member Name="FaultMotor94M1" Datatype="Bool" /><Member Name="FaultMotor95M1" Datatype="Bool" /><Member Name="FaultMotor96M1" Datatype="Bool" /><Member Name="FaultMotor97M1" Datatype="Bool" /><Member Name="FaultMotor98M1" Datatype="Bool" /><Member Name="FaultMotor99M1" Datatype="Bool" /><Member Name="E-StopOperatorPanel" Datatype="Bool" /><Member Name="E-StopExternalOperatorPanel" Datatype="Bool" /><Member Name="E-StopLeft" Datatype="Bool" /><Member Name="E-StopRight" Datatype="Bool" /><Member Name="E-StopProductionLine" Datatype="Bool" /><Member Name="E-StopOutfeed" Datatype="Bool" /><Member Name="E-StopReserve_105" Datatype="Bool" /><Member Name="E-StopReserve_106" Datatype="Bool" /><Member Name="E-StopReserve_107" Datatype="Bool" /><Member Name="E-StopReserve_108" Datatype="Bool" /><Member Name="E-StopReserve_109" Datatype="Bool" /><Member Name="E-StopReserve_110" Datatype="Bool" /><Member Name="E-StopReserve_111" Datatype="Bool" /><Member Name="E-StopReserve_112" Datatype="Bool" /><Member Name="E-StopReserve_113" Datatype="Bool" /><Member Name="E-StopReserve_114" Datatype="Bool" /><Member Name="E-StopReserve_115" Datatype="Bool" /><Member Name="E-StopReserve_116" Datatype="Bool" /><Member Name="E-StopReserve_117" Datatype="Bool" /><Member Name="E-StopReserve_118" Datatype="Bool" /><Member Name="E-StopReserve_119" Datatype="Bool" /><Member Name="GuardDoor1" Datatype="Bool" /><Member Name="GuardDoor2" Datatype="Bool" /><Member Name="GuardDoor3" Datatype="Bool" /><Member Name="GuardDoor4" Datatype="Bool" /><Member Name="GuardDoor5" Datatype="Bool" /><Member Name="GuardDoor6" Datatype="Bool" /><Member Name="GuardDoorReserve_126" Datatype="Bool" /><Member Name="GuardDoorReserve_127" Datatype="Bool" /><Member Name="GuardDoorReserve_128" Datatype="Bool" /><Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" /><Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" /><Member Name="TemperatureLoweringActive" Datatype="Bool" /><Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" /><Member Name="MonitoringWatercooling" Datatype="Bool" /><Member Name="RecoolingFaulted" Datatype="Bool" /><Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" /><Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" /><Member Name="AutomaticStartUp" Datatype="Bool" /><Member Name="FollowingmachineIsForced" Datatype="Bool" /><Member Name="FormatSelectionLocked" Datatype="Bool" /><Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" /><Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" /><Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" /><Member Name="StopTheMachineAccumulation" Datatype="Bool" /><Member Name="RunTheMachineEmpty" Datatype="Bool" /><Member Name="CodingIsForced" Datatype="Bool" /><Member Name="CheckweigherIsForced" Datatype="Bool" /><Member Name="MetadetectorIsForced" Datatype="Bool" /><Member Name="SikoMonitoringForced" Datatype="Bool" /><Member Name="FaultedHotAirBlower" Datatype="Bool" /><Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleFuseTripped" Datatype="Bool" /><Member Name="MonitoringAngleTransfer" Datatype="Bool" /><Member Name="MonitoringRotationStation" Datatype="Bool" /><Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" /><Member Name="MonitoringSikoDisplays" Datatype="Bool" /><Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" /><Member Name="AccumulationHotAirFronflap" Datatype="Bool" /><Member Name="AccumulationHotAirSideflap" Datatype="Bool" /><Member Name="FaultTechnologyObject" Datatype="Bool" /><Member Name="FaultEncoder" Datatype="Bool" /><Member Name="ToManyNoksInARow" Datatype="Bool" /><Member Name="InfeedMachineNotReady" Datatype="Bool" /><Member Name="Reserve_172" Datatype="Bool" /><Member Name="Reserve_173" Datatype="Bool" /><Member Name="Reserve_174" Datatype="Bool" /><Member Name="Reserve_175" Datatype="Bool" /><Member Name="Reserve_176" Datatype="Bool" /><Member Name="Reserve_177" Datatype="Bool" /><Member Name="Reserve_178" Datatype="Bool" /><Member Name="Reserve_179" Datatype="Bool" /><Member Name="Reserve_180" Datatype="Bool" /><Member Name="Reserve_181" Datatype="Bool" /><Member Name="Reserve_182" Datatype="Bool" /><Member Name="Reserve_183" Datatype="Bool" /><Member Name="Reserve_184" Datatype="Bool" /><Member Name="Reserve_185" Datatype="Bool" /><Member Name="Reserve_186" Datatype="Bool" /><Member Name="Reserve_187" Datatype="Bool" /><Member Name="Reserve_188" Datatype="Bool" /><Member Name="Reserve_189" Datatype="Bool" /><Member Name="Reserve_190" Datatype="Bool" /><Member Name="Reserve_191" Datatype="Bool" /><Member Name="Reserve_192" Datatype="Bool" /><Member Name="Reserve_193" Datatype="Bool" /><Member Name="Reserve_194" Datatype="Bool" /><Member Name="Reserve_195" Datatype="Bool" /><Member Name="Reserve_196" Datatype="Bool" /><Member Name="Reserve_197" Datatype="Bool" /><Member Name="Reserve_198" Datatype="Bool" /><Member Name="Reserve_199" Datatype="Bool" /><Member Name="Reserve_200" Datatype="Bool" /><Member Name="Reserve_201" Datatype="Bool" /><Member Name="Reserve_202" Datatype="Bool" /><Member Name="Reserve_203" Datatype="Bool" /><Member Name="Reserve_204" Datatype="Bool" /><Member Name="Reserve_205" Datatype="Bool" /><Member Name="Reserve_206" Datatype="Bool" /><Member Name="Reserve_207" Datatype="Bool" /><Member Name="Reserve_208" Datatype="Bool" /><Member Name="Reserve_209" Datatype="Bool" /><Member Name="Reserve_210" Datatype="Bool" /><Member Name="Reserve_211" Datatype="Bool" /><Member Name="Reserve_212" Datatype="Bool" /><Member Name="Reserve_213" Datatype="Bool" /><Member Name="Reserve_214" Datatype="Bool" /><Member Name="Reserve_215" Datatype="Bool" /><Member Name="Reserve_216" Datatype="Bool" /><Member Name="Reserve_217" Datatype="Bool" /><Member Name="Reserve_218" Datatype="Bool" /><Member Name="Reserve_219" Datatype="Bool" /><Member Name="Reserve_220" Datatype="Bool" /><Member Name="Reserve_221" Datatype="Bool" /><Member Name="Reserve_222" Datatype="Bool" /><Member Name="Reserve_223" Datatype="Bool" /><Member Name="Reserve_224" Datatype="Bool" /><Member Name="Reserve_225" Datatype="Bool" /><Member Name="Reserve_226" Datatype="Bool" /><Member Name="Reserve_227" Datatype="Bool" /><Member Name="Reserve_228" Datatype="Bool" /><Member Name="Reserve_229" Datatype="Bool" /><Member Name="Reserve_230" Datatype="Bool" /><Member Name="Reserve_231" Datatype="Bool" /><Member Name="Reserve_232" Datatype="Bool" /><Member Name="Reserve_233" Datatype="Bool" /><Member Name="Reserve_234" Datatype="Bool" /><Member Name="Reserve_235" Datatype="Bool" /><Member Name="Reserve_236" Datatype="Bool" /><Member Name="Reserve_237" Datatype="Bool" /><Member Name="Reserve_238" Datatype="Bool" /><Member Name="Reserve_239" Datatype="Bool" /><Member Name="Reserve_240" Datatype="Bool" /><Member Name="Reserve_241" Datatype="Bool" /><Member Name="Reserve_242" Datatype="Bool" /><Member Name="Reserve_243" Datatype="Bool" /><Member Name="Reserve_244" Datatype="Bool" /><Member Name="Reserve_245" Datatype="Bool" /><Member Name="Reserve_246" Datatype="Bool" /><Member Name="Reserve_247" Datatype="Bool" /><Member Name="Reserve_248" Datatype="Bool" /><Member Name="Reserve_249" Datatype="Bool" /><Member Name="Reserve_250" Datatype="Bool" /><Member Name="Reserve_251" Datatype="Bool" /><Member Name="Reserve_252" Datatype="Bool" /><Member Name="Reserve_253" Datatype="Bool" /><Member Name="Reserve_254" Datatype="Bool" /><Member Name="Reserve_255" Datatype="Bool" /><Member Name="Reserve_256" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_OperateMessages" Datatype="&quot;UDT_Messages&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="E-StopRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" /><Member Name="FaultCommunication" Datatype="Bool" /><Member Name="PressureAirMonitor" Datatype="Bool" /><Member Name="24VFuseTripped" Datatype="Bool" /><Member Name="SmartlineModulFault" Datatype="Bool" /><Member Name="SmartlineModulWarning" Datatype="Bool" /><Member Name="GlueingNotReady" Datatype="Bool" /><Member Name="GlueingMinimumFillLevel" Datatype="Bool" /><Member Name="CodingNotReady" Datatype="Bool" /><Member Name="CodingMinimumFillLevel" Datatype="Bool" /><Member Name="CheckweigherNotReady" Datatype="Bool" /><Member Name="MetalDetectorNotReady" Datatype="Bool" /><Member Name="FollowingMachineNotReady" Datatype="Bool" /><Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" /><Member Name="MaindriveBlocked" Datatype="Bool" /><Member Name="VirtualMaster" Datatype="Bool" /><Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" /><Member Name="FaultMotor30M1" Datatype="Bool" /><Member Name="FaultMotor31M1" Datatype="Bool" /><Member Name="FaultMotor32M1" Datatype="Bool" /><Member Name="FaultMotor33M1" Datatype="Bool" /><Member Name="FaultMotor34M1" Datatype="Bool" /><Member Name="FaultMotor35M1" Datatype="Bool" /><Member Name="FaultMotor36M1" Datatype="Bool" /><Member Name="FaultMotor37M1" Datatype="Bool" /><Member Name="FaultMotor38M1" Datatype="Bool" /><Member Name="FaultMotor39M1" Datatype="Bool" /><Member Name="FaultMotor40M1" Datatype="Bool" /><Member Name="FaultMotor41M1" Datatype="Bool" /><Member Name="FaultMotor42M1" Datatype="Bool" /><Member Name="FaultMotor43M1" Datatype="Bool" /><Member Name="FaultMotor44M1" Datatype="Bool" /><Member Name="FaultMotor45M1" Datatype="Bool" /><Member Name="FaultMotor46M1" Datatype="Bool" /><Member Name="FaultMotor47M1" Datatype="Bool" /><Member Name="FaultMotor48M1" Datatype="Bool" /><Member Name="FaultMotor49M1" Datatype="Bool" /><Member Name="FaultMotor50M1" Datatype="Bool" /><Member Name="FaultMotor51M1" Datatype="Bool" /><Member Name="FaultMotor52M1" Datatype="Bool" /><Member Name="FaultMotor53M1" Datatype="Bool" /><Member Name="FaultMotor54M1" Datatype="Bool" /><Member Name="FaultMotor55M1" Datatype="Bool" /><Member Name="FaultMotor56M1" Datatype="Bool" /><Member Name="FaultMotor57M1" Datatype="Bool" /><Member Name="FaultMotor58M1" Datatype="Bool" /><Member Name="FaultMotor59M1" Datatype="Bool" /><Member Name="FaultMotor60M1" Datatype="Bool" /><Member Name="FaultMotor61M1" Datatype="Bool" /><Member Name="FaultMotor62M1" Datatype="Bool" /><Member Name="FaultMotor63M1" Datatype="Bool" /><Member Name="FaultMotor64M1" Datatype="Bool" /><Member Name="FaultMotor65M1" Datatype="Bool" /><Member Name="FaultMotor66M1" Datatype="Bool" /><Member Name="FaultMotor67M1" Datatype="Bool" /><Member Name="FaultMotor68M1" Datatype="Bool" /><Member Name="FaultMotor69M1" Datatype="Bool" /><Member Name="FaultMotor70M1" Datatype="Bool" /><Member Name="FaultMotor71M1" Datatype="Bool" /><Member Name="FaultMotor72M1" Datatype="Bool" /><Member Name="FaultMotor73M1" Datatype="Bool" /><Member Name="FaultMotor74M1" Datatype="Bool" /><Member Name="FaultMotor75M1" Datatype="Bool" /><Member Name="FaultMotor76M1" Datatype="Bool" /><Member Name="FaultMotor77M1" Datatype="Bool" /><Member Name="FaultMotor78M1" Datatype="Bool" /><Member Name="FaultMotor79M1" Datatype="Bool" /><Member Name="FaultMotor80M1" Datatype="Bool" /><Member Name="FaultMotor81M1" Datatype="Bool" /><Member Name="FaultMotor82M1" Datatype="Bool" /><Member Name="FaultMotor83M1" Datatype="Bool" /><Member Name="FaultMotor84M1" Datatype="Bool" /><Member Name="FaultMotor85M1" Datatype="Bool" /><Member Name="FaultMotor86M1" Datatype="Bool" /><Member Name="FaultMotor87M1" Datatype="Bool" /><Member Name="FaultMotor88M1" Datatype="Bool" /><Member Name="FaultMotor89M1" Datatype="Bool" /><Member Name="FaultMotor90M1" Datatype="Bool" /><Member Name="FaultMotor91M1" Datatype="Bool" /><Member Name="FaultMotor92M1" Datatype="Bool" /><Member Name="FaultMotor93M1" Datatype="Bool" /><Member Name="FaultMotor94M1" Datatype="Bool" /><Member Name="FaultMotor95M1" Datatype="Bool" /><Member Name="FaultMotor96M1" Datatype="Bool" /><Member Name="FaultMotor97M1" Datatype="Bool" /><Member Name="FaultMotor98M1" Datatype="Bool" /><Member Name="FaultMotor99M1" Datatype="Bool" /><Member Name="E-StopOperatorPanel" Datatype="Bool" /><Member Name="E-StopExternalOperatorPanel" Datatype="Bool" /><Member Name="E-StopLeft" Datatype="Bool" /><Member Name="E-StopRight" Datatype="Bool" /><Member Name="E-StopProductionLine" Datatype="Bool" /><Member Name="E-StopOutfeed" Datatype="Bool" /><Member Name="E-StopReserve_105" Datatype="Bool" /><Member Name="E-StopReserve_106" Datatype="Bool" /><Member Name="E-StopReserve_107" Datatype="Bool" /><Member Name="E-StopReserve_108" Datatype="Bool" /><Member Name="E-StopReserve_109" Datatype="Bool" /><Member Name="E-StopReserve_110" Datatype="Bool" /><Member Name="E-StopReserve_111" Datatype="Bool" /><Member Name="E-StopReserve_112" Datatype="Bool" /><Member Name="E-StopReserve_113" Datatype="Bool" /><Member Name="E-StopReserve_114" Datatype="Bool" /><Member Name="E-StopReserve_115" Datatype="Bool" /><Member Name="E-StopReserve_116" Datatype="Bool" /><Member Name="E-StopReserve_117" Datatype="Bool" /><Member Name="E-StopReserve_118" Datatype="Bool" /><Member Name="E-StopReserve_119" Datatype="Bool" /><Member Name="GuardDoor1" Datatype="Bool" /><Member Name="GuardDoor2" Datatype="Bool" /><Member Name="GuardDoor3" Datatype="Bool" /><Member Name="GuardDoor4" Datatype="Bool" /><Member Name="GuardDoor5" Datatype="Bool" /><Member Name="GuardDoor6" Datatype="Bool" /><Member Name="GuardDoorReserve_126" Datatype="Bool" /><Member Name="GuardDoorReserve_127" Datatype="Bool" /><Member Name="GuardDoorReserve_128" Datatype="Bool" /><Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" /><Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" /><Member Name="TemperatureLoweringActive" Datatype="Bool" /><Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" /><Member Name="MonitoringWatercooling" Datatype="Bool" /><Member Name="RecoolingFaulted" Datatype="Bool" /><Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" /><Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" /><Member Name="AutomaticStartUp" Datatype="Bool" /><Member Name="FollowingmachineIsForced" Datatype="Bool" /><Member Name="FormatSelectionLocked" Datatype="Bool" /><Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" /><Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" /><Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" /><Member Name="StopTheMachineAccumulation" Datatype="Bool" /><Member Name="RunTheMachineEmpty" Datatype="Bool" /><Member Name="CodingIsForced" Datatype="Bool" /><Member Name="CheckweigherIsForced" Datatype="Bool" /><Member Name="MetadetectorIsForced" Datatype="Bool" /><Member Name="SikoMonitoringForced" Datatype="Bool" /><Member Name="FaultedHotAirBlower" Datatype="Bool" /><Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleFuseTripped" Datatype="Bool" /><Member Name="MonitoringAngleTransfer" Datatype="Bool" /><Member Name="MonitoringRotationStation" Datatype="Bool" /><Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" /><Member Name="MonitoringSikoDisplays" Datatype="Bool" /><Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" /><Member Name="AccumulationHotAirFronflap" Datatype="Bool" /><Member Name="AccumulationHotAirSideflap" Datatype="Bool" /><Member Name="FaultTechnologyObject" Datatype="Bool" /><Member Name="FaultEncoder" Datatype="Bool" /><Member Name="ToManyNoksInARow" Datatype="Bool" /><Member Name="InfeedMachineNotReady" Datatype="Bool" /><Member Name="Reserve_172" Datatype="Bool" /><Member Name="Reserve_173" Datatype="Bool" /><Member Name="Reserve_174" Datatype="Bool" /><Member Name="Reserve_175" Datatype="Bool" /><Member Name="Reserve_176" Datatype="Bool" /><Member Name="Reserve_177" Datatype="Bool" /><Member Name="Reserve_178" Datatype="Bool" /><Member Name="Reserve_179" Datatype="Bool" /><Member Name="Reserve_180" Datatype="Bool" /><Member Name="Reserve_181" Datatype="Bool" /><Member Name="Reserve_182" Datatype="Bool" /><Member Name="Reserve_183" Datatype="Bool" /><Member Name="Reserve_184" Datatype="Bool" /><Member Name="Reserve_185" Datatype="Bool" /><Member Name="Reserve_186" Datatype="Bool" /><Member Name="Reserve_187" Datatype="Bool" /><Member Name="Reserve_188" Datatype="Bool" /><Member Name="Reserve_189" Datatype="Bool" /><Member Name="Reserve_190" Datatype="Bool" /><Member Name="Reserve_191" Datatype="Bool" /><Member Name="Reserve_192" Datatype="Bool" /><Member Name="Reserve_193" Datatype="Bool" /><Member Name="Reserve_194" Datatype="Bool" /><Member Name="Reserve_195" Datatype="Bool" /><Member Name="Reserve_196" Datatype="Bool" /><Member Name="Reserve_197" Datatype="Bool" /><Member Name="Reserve_198" Datatype="Bool" /><Member Name="Reserve_199" Datatype="Bool" /><Member Name="Reserve_200" Datatype="Bool" /><Member Name="Reserve_201" Datatype="Bool" /><Member Name="Reserve_202" Datatype="Bool" /><Member Name="Reserve_203" Datatype="Bool" /><Member Name="Reserve_204" Datatype="Bool" /><Member Name="Reserve_205" Datatype="Bool" /><Member Name="Reserve_206" Datatype="Bool" /><Member Name="Reserve_207" Datatype="Bool" /><Member Name="Reserve_208" Datatype="Bool" /><Member Name="Reserve_209" Datatype="Bool" /><Member Name="Reserve_210" Datatype="Bool" /><Member Name="Reserve_211" Datatype="Bool" /><Member Name="Reserve_212" Datatype="Bool" /><Member Name="Reserve_213" Datatype="Bool" /><Member Name="Reserve_214" Datatype="Bool" /><Member Name="Reserve_215" Datatype="Bool" /><Member Name="Reserve_216" Datatype="Bool" /><Member Name="Reserve_217" Datatype="Bool" /><Member Name="Reserve_218" Datatype="Bool" /><Member Name="Reserve_219" Datatype="Bool" /><Member Name="Reserve_220" Datatype="Bool" /><Member Name="Reserve_221" Datatype="Bool" /><Member Name="Reserve_222" Datatype="Bool" /><Member Name="Reserve_223" Datatype="Bool" /><Member Name="Reserve_224" Datatype="Bool" /><Member Name="Reserve_225" Datatype="Bool" /><Member Name="Reserve_226" Datatype="Bool" /><Member Name="Reserve_227" Datatype="Bool" /><Member Name="Reserve_228" Datatype="Bool" /><Member Name="Reserve_229" Datatype="Bool" /><Member Name="Reserve_230" Datatype="Bool" /><Member Name="Reserve_231" Datatype="Bool" /><Member Name="Reserve_232" Datatype="Bool" /><Member Name="Reserve_233" Datatype="Bool" /><Member Name="Reserve_234" Datatype="Bool" /><Member Name="Reserve_235" Datatype="Bool" /><Member Name="Reserve_236" Datatype="Bool" /><Member Name="Reserve_237" Datatype="Bool" /><Member Name="Reserve_238" Datatype="Bool" /><Member Name="Reserve_239" Datatype="Bool" /><Member Name="Reserve_240" Datatype="Bool" /><Member Name="Reserve_241" Datatype="Bool" /><Member Name="Reserve_242" Datatype="Bool" /><Member Name="Reserve_243" Datatype="Bool" /><Member Name="Reserve_244" Datatype="Bool" /><Member Name="Reserve_245" Datatype="Bool" /><Member Name="Reserve_246" Datatype="Bool" /><Member Name="Reserve_247" Datatype="Bool" /><Member Name="Reserve_248" Datatype="Bool" /><Member Name="Reserve_249" Datatype="Bool" /><Member Name="Reserve_250" Datatype="Bool" /><Member Name="Reserve_251" Datatype="Bool" /><Member Name="Reserve_252" Datatype="Bool" /><Member Name="Reserve_253" Datatype="Bool" /><Member Name="Reserve_254" Datatype="Bool" /><Member Name="Reserve_255" Datatype="Bool" /><Member Name="Reserve_256" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_FaultMessagesAbsolut" Datatype="&quot;UDT_Messages&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="E-StopRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" /><Member Name="FaultCommunication" Datatype="Bool" /><Member Name="PressureAirMonitor" Datatype="Bool" /><Member Name="24VFuseTripped" Datatype="Bool" /><Member Name="SmartlineModulFault" Datatype="Bool" /><Member Name="SmartlineModulWarning" Datatype="Bool" /><Member Name="GlueingNotReady" Datatype="Bool" /><Member Name="GlueingMinimumFillLevel" Datatype="Bool" /><Member Name="CodingNotReady" Datatype="Bool" /><Member Name="CodingMinimumFillLevel" Datatype="Bool" /><Member Name="CheckweigherNotReady" Datatype="Bool" /><Member Name="MetalDetectorNotReady" Datatype="Bool" /><Member Name="FollowingMachineNotReady" Datatype="Bool" /><Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" /><Member Name="MaindriveBlocked" Datatype="Bool" /><Member Name="VirtualMaster" Datatype="Bool" /><Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" /><Member Name="FaultMotor30M1" Datatype="Bool" /><Member Name="FaultMotor31M1" Datatype="Bool" /><Member Name="FaultMotor32M1" Datatype="Bool" /><Member Name="FaultMotor33M1" Datatype="Bool" /><Member Name="FaultMotor34M1" Datatype="Bool" /><Member Name="FaultMotor35M1" Datatype="Bool" /><Member Name="FaultMotor36M1" Datatype="Bool" /><Member Name="FaultMotor37M1" Datatype="Bool" /><Member Name="FaultMotor38M1" Datatype="Bool" /><Member Name="FaultMotor39M1" Datatype="Bool" /><Member Name="FaultMotor40M1" Datatype="Bool" /><Member Name="FaultMotor41M1" Datatype="Bool" /><Member Name="FaultMotor42M1" Datatype="Bool" /><Member Name="FaultMotor43M1" Datatype="Bool" /><Member Name="FaultMotor44M1" Datatype="Bool" /><Member Name="FaultMotor45M1" Datatype="Bool" /><Member Name="FaultMotor46M1" Datatype="Bool" /><Member Name="FaultMotor47M1" Datatype="Bool" /><Member Name="FaultMotor48M1" Datatype="Bool" /><Member Name="FaultMotor49M1" Datatype="Bool" /><Member Name="FaultMotor50M1" Datatype="Bool" /><Member Name="FaultMotor51M1" Datatype="Bool" /><Member Name="FaultMotor52M1" Datatype="Bool" /><Member Name="FaultMotor53M1" Datatype="Bool" /><Member Name="FaultMotor54M1" Datatype="Bool" /><Member Name="FaultMotor55M1" Datatype="Bool" /><Member Name="FaultMotor56M1" Datatype="Bool" /><Member Name="FaultMotor57M1" Datatype="Bool" /><Member Name="FaultMotor58M1" Datatype="Bool" /><Member Name="FaultMotor59M1" Datatype="Bool" /><Member Name="FaultMotor60M1" Datatype="Bool" /><Member Name="FaultMotor61M1" Datatype="Bool" /><Member Name="FaultMotor62M1" Datatype="Bool" /><Member Name="FaultMotor63M1" Datatype="Bool" /><Member Name="FaultMotor64M1" Datatype="Bool" /><Member Name="FaultMotor65M1" Datatype="Bool" /><Member Name="FaultMotor66M1" Datatype="Bool" /><Member Name="FaultMotor67M1" Datatype="Bool" /><Member Name="FaultMotor68M1" Datatype="Bool" /><Member Name="FaultMotor69M1" Datatype="Bool" /><Member Name="FaultMotor70M1" Datatype="Bool" /><Member Name="FaultMotor71M1" Datatype="Bool" /><Member Name="FaultMotor72M1" Datatype="Bool" /><Member Name="FaultMotor73M1" Datatype="Bool" /><Member Name="FaultMotor74M1" Datatype="Bool" /><Member Name="FaultMotor75M1" Datatype="Bool" /><Member Name="FaultMotor76M1" Datatype="Bool" /><Member Name="FaultMotor77M1" Datatype="Bool" /><Member Name="FaultMotor78M1" Datatype="Bool" /><Member Name="FaultMotor79M1" Datatype="Bool" /><Member Name="FaultMotor80M1" Datatype="Bool" /><Member Name="FaultMotor81M1" Datatype="Bool" /><Member Name="FaultMotor82M1" Datatype="Bool" /><Member Name="FaultMotor83M1" Datatype="Bool" /><Member Name="FaultMotor84M1" Datatype="Bool" /><Member Name="FaultMotor85M1" Datatype="Bool" /><Member Name="FaultMotor86M1" Datatype="Bool" /><Member Name="FaultMotor87M1" Datatype="Bool" /><Member Name="FaultMotor88M1" Datatype="Bool" /><Member Name="FaultMotor89M1" Datatype="Bool" /><Member Name="FaultMotor90M1" Datatype="Bool" /><Member Name="FaultMotor91M1" Datatype="Bool" /><Member Name="FaultMotor92M1" Datatype="Bool" /><Member Name="FaultMotor93M1" Datatype="Bool" /><Member Name="FaultMotor94M1" Datatype="Bool" /><Member Name="FaultMotor95M1" Datatype="Bool" /><Member Name="FaultMotor96M1" Datatype="Bool" /><Member Name="FaultMotor97M1" Datatype="Bool" /><Member Name="FaultMotor98M1" Datatype="Bool" /><Member Name="FaultMotor99M1" Datatype="Bool" /><Member Name="E-StopOperatorPanel" Datatype="Bool" /><Member Name="E-StopExternalOperatorPanel" Datatype="Bool" /><Member Name="E-StopLeft" Datatype="Bool" /><Member Name="E-StopRight" Datatype="Bool" /><Member Name="E-StopProductionLine" Datatype="Bool" /><Member Name="E-StopOutfeed" Datatype="Bool" /><Member Name="E-StopReserve_105" Datatype="Bool" /><Member Name="E-StopReserve_106" Datatype="Bool" /><Member Name="E-StopReserve_107" Datatype="Bool" /><Member Name="E-StopReserve_108" Datatype="Bool" /><Member Name="E-StopReserve_109" Datatype="Bool" /><Member Name="E-StopReserve_110" Datatype="Bool" /><Member Name="E-StopReserve_111" Datatype="Bool" /><Member Name="E-StopReserve_112" Datatype="Bool" /><Member Name="E-StopReserve_113" Datatype="Bool" /><Member Name="E-StopReserve_114" Datatype="Bool" /><Member Name="E-StopReserve_115" Datatype="Bool" /><Member Name="E-StopReserve_116" Datatype="Bool" /><Member Name="E-StopReserve_117" Datatype="Bool" /><Member Name="E-StopReserve_118" Datatype="Bool" /><Member Name="E-StopReserve_119" Datatype="Bool" /><Member Name="GuardDoor1" Datatype="Bool" /><Member Name="GuardDoor2" Datatype="Bool" /><Member Name="GuardDoor3" Datatype="Bool" /><Member Name="GuardDoor4" Datatype="Bool" /><Member Name="GuardDoor5" Datatype="Bool" /><Member Name="GuardDoor6" Datatype="Bool" /><Member Name="GuardDoorReserve_126" Datatype="Bool" /><Member Name="GuardDoorReserve_127" Datatype="Bool" /><Member Name="GuardDoorReserve_128" Datatype="Bool" /><Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" /><Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" /><Member Name="TemperatureLoweringActive" Datatype="Bool" /><Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" /><Member Name="MonitoringWatercooling" Datatype="Bool" /><Member Name="RecoolingFaulted" Datatype="Bool" /><Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" /><Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" /><Member Name="AutomaticStartUp" Datatype="Bool" /><Member Name="FollowingmachineIsForced" Datatype="Bool" /><Member Name="FormatSelectionLocked" Datatype="Bool" /><Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" /><Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" /><Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" /><Member Name="StopTheMachineAccumulation" Datatype="Bool" /><Member Name="RunTheMachineEmpty" Datatype="Bool" /><Member Name="CodingIsForced" Datatype="Bool" /><Member Name="CheckweigherIsForced" Datatype="Bool" /><Member Name="MetadetectorIsForced" Datatype="Bool" /><Member Name="SikoMonitoringForced" Datatype="Bool" /><Member Name="FaultedHotAirBlower" Datatype="Bool" /><Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleFuseTripped" Datatype="Bool" /><Member Name="MonitoringAngleTransfer" Datatype="Bool" /><Member Name="MonitoringRotationStation" Datatype="Bool" /><Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" /><Member Name="MonitoringSikoDisplays" Datatype="Bool" /><Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" /><Member Name="AccumulationHotAirFronflap" Datatype="Bool" /><Member Name="AccumulationHotAirSideflap" Datatype="Bool" /><Member Name="FaultTechnologyObject" Datatype="Bool" /><Member Name="FaultEncoder" Datatype="Bool" /><Member Name="ToManyNoksInARow" Datatype="Bool" /><Member Name="InfeedMachineNotReady" Datatype="Bool" /><Member Name="Reserve_172" Datatype="Bool" /><Member Name="Reserve_173" Datatype="Bool" /><Member Name="Reserve_174" Datatype="Bool" /><Member Name="Reserve_175" Datatype="Bool" /><Member Name="Reserve_176" Datatype="Bool" /><Member Name="Reserve_177" Datatype="Bool" /><Member Name="Reserve_178" Datatype="Bool" /><Member Name="Reserve_179" Datatype="Bool" /><Member Name="Reserve_180" Datatype="Bool" /><Member Name="Reserve_181" Datatype="Bool" /><Member Name="Reserve_182" Datatype="Bool" /><Member Name="Reserve_183" Datatype="Bool" /><Member Name="Reserve_184" Datatype="Bool" /><Member Name="Reserve_185" Datatype="Bool" /><Member Name="Reserve_186" Datatype="Bool" /><Member Name="Reserve_187" Datatype="Bool" /><Member Name="Reserve_188" Datatype="Bool" /><Member Name="Reserve_189" Datatype="Bool" /><Member Name="Reserve_190" Datatype="Bool" /><Member Name="Reserve_191" Datatype="Bool" /><Member Name="Reserve_192" Datatype="Bool" /><Member Name="Reserve_193" Datatype="Bool" /><Member Name="Reserve_194" Datatype="Bool" /><Member Name="Reserve_195" Datatype="Bool" /><Member Name="Reserve_196" Datatype="Bool" /><Member Name="Reserve_197" Datatype="Bool" /><Member Name="Reserve_198" Datatype="Bool" /><Member Name="Reserve_199" Datatype="Bool" /><Member Name="Reserve_200" Datatype="Bool" /><Member Name="Reserve_201" Datatype="Bool" /><Member Name="Reserve_202" Datatype="Bool" /><Member Name="Reserve_203" Datatype="Bool" /><Member Name="Reserve_204" Datatype="Bool" /><Member Name="Reserve_205" Datatype="Bool" /><Member Name="Reserve_206" Datatype="Bool" /><Member Name="Reserve_207" Datatype="Bool" /><Member Name="Reserve_208" Datatype="Bool" /><Member Name="Reserve_209" Datatype="Bool" /><Member Name="Reserve_210" Datatype="Bool" /><Member Name="Reserve_211" Datatype="Bool" /><Member Name="Reserve_212" Datatype="Bool" /><Member Name="Reserve_213" Datatype="Bool" /><Member Name="Reserve_214" Datatype="Bool" /><Member Name="Reserve_215" Datatype="Bool" /><Member Name="Reserve_216" Datatype="Bool" /><Member Name="Reserve_217" Datatype="Bool" /><Member Name="Reserve_218" Datatype="Bool" /><Member Name="Reserve_219" Datatype="Bool" /><Member Name="Reserve_220" Datatype="Bool" /><Member Name="Reserve_221" Datatype="Bool" /><Member Name="Reserve_222" Datatype="Bool" /><Member Name="Reserve_223" Datatype="Bool" /><Member Name="Reserve_224" Datatype="Bool" /><Member Name="Reserve_225" Datatype="Bool" /><Member Name="Reserve_226" Datatype="Bool" /><Member Name="Reserve_227" Datatype="Bool" /><Member Name="Reserve_228" Datatype="Bool" /><Member Name="Reserve_229" Datatype="Bool" /><Member Name="Reserve_230" Datatype="Bool" /><Member Name="Reserve_231" Datatype="Bool" /><Member Name="Reserve_232" Datatype="Bool" /><Member Name="Reserve_233" Datatype="Bool" /><Member Name="Reserve_234" Datatype="Bool" /><Member Name="Reserve_235" Datatype="Bool" /><Member Name="Reserve_236" Datatype="Bool" /><Member Name="Reserve_237" Datatype="Bool" /><Member Name="Reserve_238" Datatype="Bool" /><Member Name="Reserve_239" Datatype="Bool" /><Member Name="Reserve_240" Datatype="Bool" /><Member Name="Reserve_241" Datatype="Bool" /><Member Name="Reserve_242" Datatype="Bool" /><Member Name="Reserve_243" Datatype="Bool" /><Member Name="Reserve_244" Datatype="Bool" /><Member Name="Reserve_245" Datatype="Bool" /><Member Name="Reserve_246" Datatype="Bool" /><Member Name="Reserve_247" Datatype="Bool" /><Member Name="Reserve_248" Datatype="Bool" /><Member Name="Reserve_249" Datatype="Bool" /><Member Name="Reserve_250" Datatype="Bool" /><Member Name="Reserve_251" Datatype="Bool" /><Member Name="Reserve_252" Datatype="Bool" /><Member Name="Reserve_253" Datatype="Bool" /><Member Name="Reserve_254" Datatype="Bool" /><Member Name="Reserve_255" Datatype="Bool" /><Member Name="Reserve_256" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_FaultMessagesCycleEnd" Datatype="&quot;UDT_Messages&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="E-StopRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggered" Datatype="Bool" /><Member Name="GuardDoorRelayTriggeredReserve" Datatype="Bool" /><Member Name="FaultCommunication" Datatype="Bool" /><Member Name="PressureAirMonitor" Datatype="Bool" /><Member Name="24VFuseTripped" Datatype="Bool" /><Member Name="SmartlineModulFault" Datatype="Bool" /><Member Name="SmartlineModulWarning" Datatype="Bool" /><Member Name="GlueingNotReady" Datatype="Bool" /><Member Name="GlueingMinimumFillLevel" Datatype="Bool" /><Member Name="CodingNotReady" Datatype="Bool" /><Member Name="CodingMinimumFillLevel" Datatype="Bool" /><Member Name="CheckweigherNotReady" Datatype="Bool" /><Member Name="MetalDetectorNotReady" Datatype="Bool" /><Member Name="FollowingMachineNotReady" Datatype="Bool" /><Member Name="JogButtonPluggedInAutomaticMode" Datatype="Bool" /><Member Name="MaindriveBlocked" Datatype="Bool" /><Member Name="VirtualMaster" Datatype="Bool" /><Member Name="SensorBoxSeparatorInfeedPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionFrontflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorDetectionSidetflapSeparatorPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorBoxSeparatorInProductInsertionPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorLevelingPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorFlapMonitoringPermanentlyOccupied" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedBoxtransfer" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_26" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_27" Datatype="Bool" /><Member Name="SensorPermanentlyOccupiedReserve_28" Datatype="Bool" /><Member Name="FaultMotor30M1" Datatype="Bool" /><Member Name="FaultMotor31M1" Datatype="Bool" /><Member Name="FaultMotor32M1" Datatype="Bool" /><Member Name="FaultMotor33M1" Datatype="Bool" /><Member Name="FaultMotor34M1" Datatype="Bool" /><Member Name="FaultMotor35M1" Datatype="Bool" /><Member Name="FaultMotor36M1" Datatype="Bool" /><Member Name="FaultMotor37M1" Datatype="Bool" /><Member Name="FaultMotor38M1" Datatype="Bool" /><Member Name="FaultMotor39M1" Datatype="Bool" /><Member Name="FaultMotor40M1" Datatype="Bool" /><Member Name="FaultMotor41M1" Datatype="Bool" /><Member Name="FaultMotor42M1" Datatype="Bool" /><Member Name="FaultMotor43M1" Datatype="Bool" /><Member Name="FaultMotor44M1" Datatype="Bool" /><Member Name="FaultMotor45M1" Datatype="Bool" /><Member Name="FaultMotor46M1" Datatype="Bool" /><Member Name="FaultMotor47M1" Datatype="Bool" /><Member Name="FaultMotor48M1" Datatype="Bool" /><Member Name="FaultMotor49M1" Datatype="Bool" /><Member Name="FaultMotor50M1" Datatype="Bool" /><Member Name="FaultMotor51M1" Datatype="Bool" /><Member Name="FaultMotor52M1" Datatype="Bool" /><Member Name="FaultMotor53M1" Datatype="Bool" /><Member Name="FaultMotor54M1" Datatype="Bool" /><Member Name="FaultMotor55M1" Datatype="Bool" /><Member Name="FaultMotor56M1" Datatype="Bool" /><Member Name="FaultMotor57M1" Datatype="Bool" /><Member Name="FaultMotor58M1" Datatype="Bool" /><Member Name="FaultMotor59M1" Datatype="Bool" /><Member Name="FaultMotor60M1" Datatype="Bool" /><Member Name="FaultMotor61M1" Datatype="Bool" /><Member Name="FaultMotor62M1" Datatype="Bool" /><Member Name="FaultMotor63M1" Datatype="Bool" /><Member Name="FaultMotor64M1" Datatype="Bool" /><Member Name="FaultMotor65M1" Datatype="Bool" /><Member Name="FaultMotor66M1" Datatype="Bool" /><Member Name="FaultMotor67M1" Datatype="Bool" /><Member Name="FaultMotor68M1" Datatype="Bool" /><Member Name="FaultMotor69M1" Datatype="Bool" /><Member Name="FaultMotor70M1" Datatype="Bool" /><Member Name="FaultMotor71M1" Datatype="Bool" /><Member Name="FaultMotor72M1" Datatype="Bool" /><Member Name="FaultMotor73M1" Datatype="Bool" /><Member Name="FaultMotor74M1" Datatype="Bool" /><Member Name="FaultMotor75M1" Datatype="Bool" /><Member Name="FaultMotor76M1" Datatype="Bool" /><Member Name="FaultMotor77M1" Datatype="Bool" /><Member Name="FaultMotor78M1" Datatype="Bool" /><Member Name="FaultMotor79M1" Datatype="Bool" /><Member Name="FaultMotor80M1" Datatype="Bool" /><Member Name="FaultMotor81M1" Datatype="Bool" /><Member Name="FaultMotor82M1" Datatype="Bool" /><Member Name="FaultMotor83M1" Datatype="Bool" /><Member Name="FaultMotor84M1" Datatype="Bool" /><Member Name="FaultMotor85M1" Datatype="Bool" /><Member Name="FaultMotor86M1" Datatype="Bool" /><Member Name="FaultMotor87M1" Datatype="Bool" /><Member Name="FaultMotor88M1" Datatype="Bool" /><Member Name="FaultMotor89M1" Datatype="Bool" /><Member Name="FaultMotor90M1" Datatype="Bool" /><Member Name="FaultMotor91M1" Datatype="Bool" /><Member Name="FaultMotor92M1" Datatype="Bool" /><Member Name="FaultMotor93M1" Datatype="Bool" /><Member Name="FaultMotor94M1" Datatype="Bool" /><Member Name="FaultMotor95M1" Datatype="Bool" /><Member Name="FaultMotor96M1" Datatype="Bool" /><Member Name="FaultMotor97M1" Datatype="Bool" /><Member Name="FaultMotor98M1" Datatype="Bool" /><Member Name="FaultMotor99M1" Datatype="Bool" /><Member Name="E-StopOperatorPanel" Datatype="Bool" /><Member Name="E-StopExternalOperatorPanel" Datatype="Bool" /><Member Name="E-StopLeft" Datatype="Bool" /><Member Name="E-StopRight" Datatype="Bool" /><Member Name="E-StopProductionLine" Datatype="Bool" /><Member Name="E-StopOutfeed" Datatype="Bool" /><Member Name="E-StopReserve_105" Datatype="Bool" /><Member Name="E-StopReserve_106" Datatype="Bool" /><Member Name="E-StopReserve_107" Datatype="Bool" /><Member Name="E-StopReserve_108" Datatype="Bool" /><Member Name="E-StopReserve_109" Datatype="Bool" /><Member Name="E-StopReserve_110" Datatype="Bool" /><Member Name="E-StopReserve_111" Datatype="Bool" /><Member Name="E-StopReserve_112" Datatype="Bool" /><Member Name="E-StopReserve_113" Datatype="Bool" /><Member Name="E-StopReserve_114" Datatype="Bool" /><Member Name="E-StopReserve_115" Datatype="Bool" /><Member Name="E-StopReserve_116" Datatype="Bool" /><Member Name="E-StopReserve_117" Datatype="Bool" /><Member Name="E-StopReserve_118" Datatype="Bool" /><Member Name="E-StopReserve_119" Datatype="Bool" /><Member Name="GuardDoor1" Datatype="Bool" /><Member Name="GuardDoor2" Datatype="Bool" /><Member Name="GuardDoor3" Datatype="Bool" /><Member Name="GuardDoor4" Datatype="Bool" /><Member Name="GuardDoor5" Datatype="Bool" /><Member Name="GuardDoor6" Datatype="Bool" /><Member Name="GuardDoorReserve_126" Datatype="Bool" /><Member Name="GuardDoorReserve_127" Datatype="Bool" /><Member Name="GuardDoorReserve_128" Datatype="Bool" /><Member Name="CoverGuidingOutfeedLeftNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingOutfeedRightNotSwivelledIn" Datatype="Bool" /><Member Name="CoverGuidingInfeedtNotSwivelledIn" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinFrontflap" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapLeft" Datatype="Bool" /><Member Name="TemperatrueAlertGlueBasinSideflapRight" Datatype="Bool" /><Member Name="GlueBasinFrontflapNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapLeftNotReady" Datatype="Bool" /><Member Name="GlueBasinSideflapRightNotReady" Datatype="Bool" /><Member Name="TemperatureLoweringActive" Datatype="Bool" /><Member Name="WaitingTillGlueIsCompletyMelted" Datatype="Bool" /><Member Name="MonitoringWatercooling" Datatype="Bool" /><Member Name="RecoolingFaulted" Datatype="Bool" /><Member Name="DelayCoolingAirBlowerAktiv" Datatype="Bool" /><Member Name="WaitingTillAirBlowerIsCompletyHeatedUp" Datatype="Bool" /><Member Name="AutomaticStartUp" Datatype="Bool" /><Member Name="FollowingmachineIsForced" Datatype="Bool" /><Member Name="FormatSelectionLocked" Datatype="Bool" /><Member Name="FaultedFlapInfeedHotAir" Datatype="Bool" /><Member Name="FaultedFlapOutfeedHotAir" Datatype="Bool" /><Member Name="RunTheMachineEmptyAccumulation" Datatype="Bool" /><Member Name="StopTheMachineAccumulation" Datatype="Bool" /><Member Name="RunTheMachineEmpty" Datatype="Bool" /><Member Name="CodingIsForced" Datatype="Bool" /><Member Name="CheckweigherIsForced" Datatype="Bool" /><Member Name="MetadetectorIsForced" Datatype="Bool" /><Member Name="SikoMonitoringForced" Datatype="Bool" /><Member Name="FaultedHotAirBlower" Datatype="Bool" /><Member Name="HeatingNozzleFrontflapNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapLeftNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleSideflapRightNotInPos" Datatype="Bool" /><Member Name="HeatingNozzleFuseTripped" Datatype="Bool" /><Member Name="MonitoringAngleTransfer" Datatype="Bool" /><Member Name="MonitoringRotationStation" Datatype="Bool" /><Member Name="MonitoringSwitchcabinetTemperature" Datatype="Bool" /><Member Name="MonitoringSikoDisplays" Datatype="Bool" /><Member Name="TemperatureLoweringByTimerSwitch" Datatype="Bool" /><Member Name="AccumulationHotAirFronflap" Datatype="Bool" /><Member Name="AccumulationHotAirSideflap" Datatype="Bool" /><Member Name="FaultTechnologyObject" Datatype="Bool" /><Member Name="FaultEncoder" Datatype="Bool" /><Member Name="ToManyNoksInARow" Datatype="Bool" /><Member Name="InfeedMachineNotReady" Datatype="Bool" /><Member Name="Reserve_172" Datatype="Bool" /><Member Name="Reserve_173" Datatype="Bool" /><Member Name="Reserve_174" Datatype="Bool" /><Member Name="Reserve_175" Datatype="Bool" /><Member Name="Reserve_176" Datatype="Bool" /><Member Name="Reserve_177" Datatype="Bool" /><Member Name="Reserve_178" Datatype="Bool" /><Member Name="Reserve_179" Datatype="Bool" /><Member Name="Reserve_180" Datatype="Bool" /><Member Name="Reserve_181" Datatype="Bool" /><Member Name="Reserve_182" Datatype="Bool" /><Member Name="Reserve_183" Datatype="Bool" /><Member Name="Reserve_184" Datatype="Bool" /><Member Name="Reserve_185" Datatype="Bool" /><Member Name="Reserve_186" Datatype="Bool" /><Member Name="Reserve_187" Datatype="Bool" /><Member Name="Reserve_188" Datatype="Bool" /><Member Name="Reserve_189" Datatype="Bool" /><Member Name="Reserve_190" Datatype="Bool" /><Member Name="Reserve_191" Datatype="Bool" /><Member Name="Reserve_192" Datatype="Bool" /><Member Name="Reserve_193" Datatype="Bool" /><Member Name="Reserve_194" Datatype="Bool" /><Member Name="Reserve_195" Datatype="Bool" /><Member Name="Reserve_196" Datatype="Bool" /><Member Name="Reserve_197" Datatype="Bool" /><Member Name="Reserve_198" Datatype="Bool" /><Member Name="Reserve_199" Datatype="Bool" /><Member Name="Reserve_200" Datatype="Bool" /><Member Name="Reserve_201" Datatype="Bool" /><Member Name="Reserve_202" Datatype="Bool" /><Member Name="Reserve_203" Datatype="Bool" /><Member Name="Reserve_204" Datatype="Bool" /><Member Name="Reserve_205" Datatype="Bool" /><Member Name="Reserve_206" Datatype="Bool" /><Member Name="Reserve_207" Datatype="Bool" /><Member Name="Reserve_208" Datatype="Bool" /><Member Name="Reserve_209" Datatype="Bool" /><Member Name="Reserve_210" Datatype="Bool" /><Member Name="Reserve_211" Datatype="Bool" /><Member Name="Reserve_212" Datatype="Bool" /><Member Name="Reserve_213" Datatype="Bool" /><Member Name="Reserve_214" Datatype="Bool" /><Member Name="Reserve_215" Datatype="Bool" /><Member Name="Reserve_216" Datatype="Bool" /><Member Name="Reserve_217" Datatype="Bool" /><Member Name="Reserve_218" Datatype="Bool" /><Member Name="Reserve_219" Datatype="Bool" /><Member Name="Reserve_220" Datatype="Bool" /><Member Name="Reserve_221" Datatype="Bool" /><Member Name="Reserve_222" Datatype="Bool" /><Member Name="Reserve_223" Datatype="Bool" /><Member Name="Reserve_224" Datatype="Bool" /><Member Name="Reserve_225" Datatype="Bool" /><Member Name="Reserve_226" Datatype="Bool" /><Member Name="Reserve_227" Datatype="Bool" /><Member Name="Reserve_228" Datatype="Bool" /><Member Name="Reserve_229" Datatype="Bool" /><Member Name="Reserve_230" Datatype="Bool" /><Member Name="Reserve_231" Datatype="Bool" /><Member Name="Reserve_232" Datatype="Bool" /><Member Name="Reserve_233" Datatype="Bool" /><Member Name="Reserve_234" Datatype="Bool" /><Member Name="Reserve_235" Datatype="Bool" /><Member Name="Reserve_236" Datatype="Bool" /><Member Name="Reserve_237" Datatype="Bool" /><Member Name="Reserve_238" Datatype="Bool" /><Member Name="Reserve_239" Datatype="Bool" /><Member Name="Reserve_240" Datatype="Bool" /><Member Name="Reserve_241" Datatype="Bool" /><Member Name="Reserve_242" Datatype="Bool" /><Member Name="Reserve_243" Datatype="Bool" /><Member Name="Reserve_244" Datatype="Bool" /><Member Name="Reserve_245" Datatype="Bool" /><Member Name="Reserve_246" Datatype="Bool" /><Member Name="Reserve_247" Datatype="Bool" /><Member Name="Reserve_248" Datatype="Bool" /><Member Name="Reserve_249" Datatype="Bool" /><Member Name="Reserve_250" Datatype="Bool" /><Member Name="Reserve_251" Datatype="Bool" /><Member Name="Reserve_252" Datatype="Bool" /><Member Name="Reserve_253" Datatype="Bool" /><Member Name="Reserve_254" Datatype="Bool" /><Member Name="Reserve_255" Datatype="Bool" /><Member Name="Reserve_256" Datatype="Bool" /></Section></Sections></Member>
+  </Section>
+</Sections></Interface>
+      <Name>DB_BDE</Name>
+      <Number>700</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="3" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.InstanceDB>
+</Document>

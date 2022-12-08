@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T07:31:26.6765476Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.InstanceDB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <DBAccessibleFromWebserver>true</DBAccessibleFromWebserver>
+      <HeaderAuthor>EconoPak GmbH</HeaderAuthor>
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <InstanceOfName>FB_Timerswitch</InstanceOfName>
+      <InstanceOfType>FB</InstanceOfType>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Input" />
+  <Section Name="Output">
+    <Member Name="q_TimerSwitch" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="iq_TimerSwitchHMIData" Datatype="&quot;UDT_TimerSwitch&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="SelectionList" Datatype="Int" />
+          <Member Name="SelectionListWeeklyOn" Datatype="USInt" />
+          <Member Name="SelectionListWeeklyOff" Datatype="USInt" />
+          <Member Name="MoOn" Datatype="DTL" Version="1.0" />
+          <Member Name="MoOff" Datatype="DTL" Version="1.0" />
+          <Member Name="TuesOn" Datatype="DTL" Version="1.0" />
+          <Member Name="TuesOff" Datatype="DTL" Version="1.0" />
+          <Member Name="WedOn" Datatype="DTL" Version="1.0" />
+          <Member Name="WedOff" Datatype="DTL" Version="1.0" />
+          <Member Name="ThursOn" Datatype="DTL" Version="1.0" />
+          <Member Name="ThursOff" Datatype="DTL" Version="1.0" />
+          <Member Name="FriOn" Datatype="DTL" Version="1.0" />
+          <Member Name="FriOff" Datatype="DTL" Version="1.0" />
+          <Member Name="SatOn" Datatype="DTL" Version="1.0" />
+          <Member Name="SatOff" Datatype="DTL" Version="1.0" />
+          <Member Name="SunOn" Datatype="DTL" Version="1.0" />
+          <Member Name="SunOff" Datatype="DTL" Version="1.0" />
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="inst_TimerSwitch" Datatype="&quot;LGF_TimerSwitch&quot;" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="onMonth" Datatype="USInt" /><Member Name="onDay" Datatype="USInt" /><Member Name="onWeekday" Datatype="USInt" /><Member Name="onHour" Datatype="USInt" /><Member Name="onMinute" Datatype="USInt" /><Member Name="offMonth" Datatype="USInt" /><Member Name="offDay" Datatype="USInt" /><Member Name="offWeekday" Datatype="USInt" /><Member Name="offHour" Datatype="USInt" /><Member Name="offMinute" Datatype="USInt" /><Member Name="mode" Datatype="USInt" /></Section><Section Name="Output"><Member Name="signal" Datatype="Bool" /><Member Name="actLocalTime" Datatype="DTL" Version="1.0" /><Member Name="error" Datatype="Bool" /><Member Name="status" Datatype="Word" /><Member Name="subFunctionStatus" Datatype="Word" /></Section><Section Name="InOut" /><Section Name="Static" /></Sections></Member>
+  </Section>
+</Sections></Interface>
+      <Name>DB_Timerswitch</Name>
+      <Number>104</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="3" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.InstanceDB>
+</Document>

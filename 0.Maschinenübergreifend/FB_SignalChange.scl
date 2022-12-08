@@ -1,0 +1,142 @@
+﻿FUNCTION_BLOCK "FB_SignalChange"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_Reset : Bool;   // Globaler Reset durch den OMAC State Resetting/Clearing (50ms Impuls)
+      i_Sensor : Bool;   // Signal welches überprüft werden soll
+      i_Clock : Bool;   // Takt Signal welches zur Überprüfung genutz wird
+      i_MaxClocks : Int;   // Maximal zulässigen Takte ohne Signalwechsel
+   END_VAR
+
+   VAR_OUTPUT 
+      q_SignalPermanentlyOccupied : Bool;   // Signaleingang ist Dauerhaft belegt
+      q_SignalPermanentlyUnoccupied : Bool;   // Signaleingang ist Dauerhaft null
+      q_NumberOfOccupiedClocks : Int;   // Anzahl der Takte wo der Signaleingang dauerhaft belegt ist
+      q_NumberOfNoOccupiedClocks : Int;   // Anzahl der Takte wo der Signaleingang dauerhaft 0 ist
+   END_VAR
+
+   VAR 
+      stat_ChangeDetected : Bool;
+      stat_LSChangeDetected : Bool;
+      stat_StatusByClock : Bool;
+      stat_SignalPermanentlyOccupied : Bool;
+      stat_SignalPermanentlyUnoccupied : Bool;
+      stat_NumberOfOccupiedClocks : Int;
+      stat_NumberOfNOccupiedClocks : Int;
+      inst_RTrigClockChange {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_RTrigSignalChange {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_RTrigLSSignalChange {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+   END_VAR
+
+   VAR_TEMP 
+      temp_sensor : Bool;
+      temp_clock : Bool;
+      temp_reset : Bool;
+      temp_maxClocks : Int;
+   END_VAR
+
+
+BEGIN
+	//==========================================================================================
+	// Econo-PAK GmbH
+	//------------------------------------------------------------------------------------------
+	// The FB to detct a signal change over couple cycles
+	//------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   28.02.2022    EP                  First release version v1.0
+	//===========================================================================================
+	REGION MAP INPUTS
+	    #temp_sensor := #i_Sensor;
+	    #temp_reset := #i_Reset;
+	    #temp_clock := #i_Clock;
+	    #temp_maxClocks := #i_MaxClocks;
+	END_REGION
+	
+	REGION FLAG FROM CLOCK
+	    #inst_RTrigClockChange(CLK := #temp_clock);
+	END_REGION
+	
+	REGION RESET OF SIGNALS
+	    IF (#stat_SignalPermanentlyOccupied OR #stat_SignalPermanentlyUnoccupied) AND #temp_reset
+	    THEN
+	        #stat_StatusByClock := FALSE;
+	        #stat_SignalPermanentlyOccupied := FALSE;
+	        #stat_SignalPermanentlyUnoccupied := FALSE;
+	        #stat_ChangeDetected := TRUE;
+	        #stat_LSChangeDetected := TRUE;
+	        #stat_NumberOfNOccupiedClocks := 0;
+	        #stat_NumberOfOccupiedClocks := 0;
+	    END_IF;
+	END_REGION
+	
+	REGION PERMANENTLY OCCUPIED
+	    IF #inst_RTrigClockChange.Q
+	        AND NOT #stat_ChangeDetected
+	        AND #temp_sensor
+	    THEN
+	        #stat_NumberOfOccupiedClocks += 1;
+	    END_IF;
+	    (/*Zähler zurücksetzen, wenn es eine Änderung gibt*/)
+	    IF NOT #temp_sensor
+	    THEN
+	        #stat_NumberOfOccupiedClocks := 0;
+	    END_IF;
+	    
+	    (/*Fehler bei Erreichen des Grenzwertes*/) 
+	    IF #stat_NumberOfOccupiedClocks >= #temp_maxClocks
+	    THEN
+	        #stat_SignalPermanentlyOccupied := TRUE;
+	    END_IF;
+	END_REGION
+	
+	REGION PERMANENTLY UNOCCUPIED
+	    IF #inst_RTrigClockChange.Q
+	        AND NOT #stat_LSChangeDetected
+	        AND NOT #temp_sensor
+	    THEN
+	        #stat_NumberOfNOccupiedClocks += 1;
+	    END_IF;
+	    
+	    (/*Zähler zurücksetzen, wenn es eine Änderung gibt*/)
+	    IF #temp_sensor
+	    THEN
+	        #stat_NumberOfNOccupiedClocks := 0;
+	    END_IF;
+	    
+	    (/*Fehler bei Erreichen des Grenzwertes*/) 
+	    IF #stat_NumberOfNOccupiedClocks >= #temp_maxClocks THEN
+	        #stat_SignalPermanentlyUnoccupied := TRUE;
+	    END_IF;
+	END_REGION
+	
+	REGION SIGNAL GENERATION
+	    IF #inst_RTrigClockChange.Q
+	    THEN
+	        #stat_StatusByClock := #temp_sensor;
+	        #stat_ChangeDetected := FALSE;
+	        #stat_LSChangeDetected := FALSE;
+	    END_IF;
+	    
+	    #inst_RTrigSignalChange(CLK := #stat_StatusByClock XOR #temp_sensor);
+	    #inst_RTrigLSSignalChange(CLK := #stat_StatusByClock XOR NOT #temp_sensor);
+	    
+	    IF #inst_RTrigSignalChange.Q THEN
+	        #stat_ChangeDetected := TRUE;
+	    END_IF;
+	    
+	    IF #inst_RTrigLSSignalChange.Q
+	    THEN
+	        #stat_LSChangeDetected := TRUE;
+	    END_IF;
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_NumberOfOccupiedClocks := #stat_NumberOfOccupiedClocks;
+	    #q_NumberOfNoOccupiedClocks := #stat_NumberOfNOccupiedClocks;
+	    #q_SignalPermanentlyOccupied := #stat_SignalPermanentlyOccupied;
+	    #q_SignalPermanentlyUnoccupied := #stat_SignalPermanentlyUnoccupied;
+	END_REGION
+END_FUNCTION_BLOCK
+

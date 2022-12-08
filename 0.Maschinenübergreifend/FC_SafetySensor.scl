@@ -1,0 +1,75 @@
+﻿FUNCTION "FC_SafetySensor" : Void
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_Type : Int;   // 0 - Schmersal; 1 - Pilz; 2
+      i_Sensor : Bool;   // Rückmeldeausgang des jeweiligen Sicherheitssensors
+      i_Safetyrelay : Bool;   // Rückmeldeausgang des jeweiligen Sicherheitsrelais
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_SensorIsTriggered : Bool;   // Fehlermeldung des jeweiligen Sensors "ist betätigt"
+      iq_SensorWasTriggered : Bool;   // Betriebsmeldung des jeweiligen Sensors "war betätigt"
+   END_VAR
+
+   VAR_TEMP 
+      temp_Type : Int;
+      temp_Sensor : Bool;
+      temp_Safetyrelay : Bool;
+   END_VAR
+
+   VAR CONSTANT 
+      SCHMERSAL : Int := 0;
+      PILZ : Int := 1;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FC set some bools to monitor the safety devices if there are open/closed
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   11.03.2022    EP                  First release version v1.0
+	// 01.00.01   14.03.2022    SK                  Add a CASE OF and switch the language to english  
+	//===============================================================================================
+	REGION MAP INPUTS
+	    #temp_Type          := #i_Type;
+	    
+	    CASE #temp_Type OF
+	        #SCHMERSAL:
+	            #temp_Sensor := #i_Sensor;
+	            #temp_Safetyrelay := #i_Safetyrelay;
+	        #PILZ:
+	            #temp_Sensor := NOT #i_Sensor;
+	            #temp_Safetyrelay := NOT #i_Safetyrelay;
+	        ELSE
+	            #temp_Sensor := #i_Sensor;
+	            #temp_Safetyrelay := #i_Safetyrelay;
+	    END_CASE;
+	END_REGION
+	
+	REGION LOGIC
+	    (/*Sicherheitssensor ist ausgelöst*/)
+	    IF NOT #temp_Sensor AND NOT #temp_Safetyrelay THEN
+	        #iq_SensorIsTriggered := TRUE;
+	        #iq_SensorWasTriggered := FALSE;
+	    END_IF;
+	    
+	    (/*Sicherheitssensor war ausgelöst*/)
+	    IF #iq_SensorIsTriggered AND #temp_Sensor THEN
+	        #iq_SensorIsTriggered := FALSE;
+	        #iq_SensorWasTriggered := TRUE;
+	    END_IF;
+	    
+	    (/*Sicherheitssensor und Relais sind nicht ausgelöst*/)
+	    IF #temp_Safetyrelay AND #temp_Sensor THEN
+	        #iq_SensorWasTriggered := FALSE;
+	        #iq_SensorIsTriggered := FALSE;
+	    END_IF;
+	END_REGION
+END_FUNCTION
+

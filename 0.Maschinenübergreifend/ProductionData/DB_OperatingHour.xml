@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T07:31:26.4010087Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.InstanceDB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <DBAccessibleFromWebserver>true</DBAccessibleFromWebserver>
+      <HeaderAuthor>EconoPak GmbH</HeaderAuthor>
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <InstanceOfName>FB_OperatingHour</InstanceOfName>
+      <InstanceOfType>FB</InstanceOfType>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Input">
+    <Member Name="i_BtnReset" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_SafetyOk" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="i_Clock1Hz" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="Output">
+    <Member Name="q_OperatingHoursList" Datatype="&quot;UDT_OperatingHoursList&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PowerOn" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member><Member Name="Idle" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member><Member Name="Production" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member><Member Name="Maintenance" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member><Member Name="Manual" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member><Member Name="Error" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member><Member Name="EStop" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member></Section></Sections></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="iq_OMACGlobalData" Datatype="&quot;UDT_OMAC_GlobalData&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="FirstCycle" Datatype="Bool" />
+          <Member Name="UnitMode" Datatype="DInt" />
+          <Member Name="UnitModeChangeRequest" Datatype="Bool" />
+          <Member Name="CntrlCmd" Datatype="DInt" />
+          <Member Name="CmdChangeRequest" Datatype="Bool" />
+          <Member Name="EnableBooleanInterface" Datatype="Bool" />
+          <Member Name="ProductionModeRequest" Datatype="Bool" />
+          <Member Name="MaintenanceModeRequest" Datatype="Bool" />
+          <Member Name="ManualModeRequest" Datatype="Bool" />
+          <Member Name="ChangeOverModeRequest" Datatype="Bool" />
+          <Member Name="CleanModeRequest" Datatype="Bool" />
+          <Member Name="SetUpModeRequest" Datatype="Bool" />
+          <Member Name="EmptyOutModeRequest" Datatype="Bool" />
+          <Member Name="OEMSpecificModeRequest" Datatype="Bool" />
+          <Member Name="UserMode01Request" Datatype="Bool" />
+          <Member Name="UserMode02Request" Datatype="Bool" />
+          <Member Name="UserMode03Request" Datatype="Bool" />
+          <Member Name="UserMode04Request" Datatype="Bool" />
+          <Member Name="UserMode05Request" Datatype="Bool" />
+          <Member Name="ResetCmdRequest" Datatype="Bool" />
+          <Member Name="StartCmdRequest" Datatype="Bool" />
+          <Member Name="StopCmdRequest" Datatype="Bool" />
+          <Member Name="HoldCmdRequest" Datatype="Bool" />
+          <Member Name="UnholdCmdRequest" Datatype="Bool" />
+          <Member Name="SuspendCmdRequest" Datatype="Bool" />
+          <Member Name="UnsuspendCmdRequest" Datatype="Bool" />
+          <Member Name="AbortCmdRequest" Datatype="Bool" />
+          <Member Name="ClearCmdRequest" Datatype="Bool" />
+          <Member Name="CompleteCmdRequest" Datatype="Bool" />
+          <Member Name="SC" Datatype="Struct">
+            <Member Name="UNDEFINED" Datatype="Bool" />
+            <Member Name="CLEARING" Datatype="Bool" />
+            <Member Name="STOPPED" Datatype="Bool" />
+            <Member Name="STARTING" Datatype="Bool" />
+            <Member Name="IDLE" Datatype="Bool" />
+            <Member Name="SUSPENDED" Datatype="Bool" />
+            <Member Name="EXECUTE" Datatype="Bool" />
+            <Member Name="STOPPING" Datatype="Bool" />
+            <Member Name="ABORTING" Datatype="Bool" />
+            <Member Name="ABORTED" Datatype="Bool" />
+            <Member Name="HOLDING" Datatype="Bool" />
+            <Member Name="HELD" Datatype="Bool" />
+            <Member Name="UNHOLDING" Datatype="Bool" />
+            <Member Name="SUSPENDING" Datatype="Bool" />
+            <Member Name="UNSUSPENDING" Datatype="Bool" />
+            <Member Name="RESETTING" Datatype="Bool" />
+            <Member Name="COMPLETING" Datatype="Bool" />
+            <Member Name="COMPLETE" Datatype="Bool" />
+          </Member>
+          <Member Name="configuration" Datatype="&quot;UDT_OMAC_Configuration&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="DisabledUnitModes" Datatype="Array[0..31] of Bool" />
+                <Member Name="DisabledStatesInUnitModes" Datatype="Array[0..31] of DInt" />
+                <Member Name="PackMLVersion" Datatype="Int" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="UnitModeCurrent" Datatype="DInt" />
+          <Member Name="UnitModeRequested" Datatype="DInt" />
+          <Member Name="UnitModeChangeInProcess" Datatype="Bool" />
+          <Member Name="StateCurrent" Datatype="DInt" />
+          <Member Name="StateRequested" Datatype="DInt" />
+          <Member Name="StateChangeInProcess" Datatype="Bool" />
+          <Member Name="ProductionModeActive" Datatype="Bool" />
+          <Member Name="MaintenanceModeActive" Datatype="Bool" />
+          <Member Name="ManualModeActive" Datatype="Bool" />
+          <Member Name="ChangeOverModeActive" Datatype="Bool" />
+          <Member Name="CleanModeRequestActive" Datatype="Bool" />
+          <Member Name="SetUpModeRequestActive" Datatype="Bool" />
+          <Member Name="EmptyOutModeRequestActive" Datatype="Bool" />
+          <Member Name="OEMSpecificModeRequestActive" Datatype="Bool" />
+          <Member Name="SpareModeActive" Datatype="Bool" />
+          <Member Name="UserMode01Active" Datatype="Bool" />
+          <Member Name="UserMode02Active" Datatype="Bool" />
+          <Member Name="UserMode03Active" Datatype="Bool" />
+          <Member Name="UserMode04Active" Datatype="Bool" />
+          <Member Name="UserMode05Active" Datatype="Bool" />
+          <Member Name="ClearingStateActive" Datatype="Bool" />
+          <Member Name="StoppedStateActive" Datatype="Bool" />
+          <Member Name="StartingStateActive" Datatype="Bool" />
+          <Member Name="IdleStateActive" Datatype="Bool" />
+          <Member Name="SuspendedStateActive" Datatype="Bool" />
+          <Member Name="ExecuteStateActive" Datatype="Bool" />
+          <Member Name="StoppingStateActive" Datatype="Bool" />
+          <Member Name="AbortingStateActive" Datatype="Bool" />
+          <Member Name="AbortedStateActive" Datatype="Bool" />
+          <Member Name="HoldingStateActive" Datatype="Bool" />
+          <Member Name="HeldStateActive" Datatype="Bool" />
+          <Member Name="UnholdingStateActive" Datatype="Bool" />
+          <Member Name="SuspendingStateActive" Datatype="Bool" />
+          <Member Name="UnsuspendingStateActive" Datatype="Bool" />
+          <Member Name="ResettingStateActive" Datatype="Bool" />
+          <Member Name="CompletingStateActive" Datatype="Bool" />
+          <Member Name="CompleteStateActive" Datatype="Bool" />
+          <Member Name="StatesDisabled" Datatype="DInt" />
+          <Member Name="Diagnostics" Datatype="&quot;UDT_OMAC_Diagnostics&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="BufferIndex" Datatype="Int" />
+                <Member Name="Buffer" Datatype="Array[0..15] of &quot;UDT_OMAC_DiagnosticsEntry&quot;">
+                  <Sections>
+                    <Section Name="None">
+                      <Member Name="Timestamp" Datatype="DTL" Version="1.0" />
+                      <Member Name="UnitModeCurrent" Datatype="Byte" />
+                      <Member Name="StateCurrent" Datatype="Byte" />
+                      <Member Name="UnitMode" Datatype="Byte" />
+                      <Member Name="CntrlCmd" Datatype="Byte" />
+                      <Member Name="SC" Datatype="Bool" />
+                      <Member Name="Message" Datatype="Byte" />
+                    </Section>
+                  </Sections>
+                </Member>
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="DiagnosticsBufferIndexForHMI" Datatype="Int" />
+          <Member Name="DiagnosticsBufferEntryForHMI" Datatype="&quot;UDT_OMAC_DiagnosticsEntry&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="Timestamp" Datatype="DTL" Version="1.0" />
+                <Member Name="UnitModeCurrent" Datatype="Byte" />
+                <Member Name="StateCurrent" Datatype="Byte" />
+                <Member Name="UnitMode" Datatype="Byte" />
+                <Member Name="CntrlCmd" Datatype="Byte" />
+                <Member Name="SC" Datatype="Bool" />
+                <Member Name="Message" Datatype="Byte" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="NamesConfiguration" Datatype="&quot;UDT_OMAC_NamesConfiguration&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="UnitModesNames" Datatype="Array[0..1, 0..11] of String[18]" />
+                <Member Name="StatesNames" Datatype="Array[0..1, 0..17] of String[16]" />
+              </Section>
+            </Sections>
+          </Member>
+          <Member Name="Language" Datatype="Int" />
+          <Member Name="UnitModeCurrentName" Datatype="String[18]" />
+          <Member Name="StateCurrentName" Datatype="String[16]" />
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="inst_OperationCounter" Datatype="Array[0..6] of &quot;FB_OperatingHoursCounter&quot;" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="Input"><Member Name="i_Start" Datatype="Bool" /><Member Name="i_Reset" Datatype="Bool" /><Member Name="i_Clock1Hz" Datatype="Bool" /></Section><Section Name="Output"><Member Name="q_OperatingHours" Datatype="&quot;UDT_OperatingHours&quot;"><Sections><Section Name="None"><Member Name="Hours" Datatype="DInt" /><Member Name="Minutes" Datatype="DInt" /><Member Name="Seconds" Datatype="DInt" /></Section></Sections></Member></Section><Section Name="InOut" /><Section Name="Static"><Member Name="stat_CounterValue" Datatype="DInt" /><Member Name="inst_RTrigOneSecond" Datatype="R_TRIG" Version="1.0"><Sections><Section Name="Input"><Member Name="CLK" Datatype="Bool" /></Section><Section Name="Output"><Member Name="Q" Datatype="Bool" /></Section><Section Name="InOut" /><Section Name="Static"><Member Name="Stat_Bit" Datatype="Bool" /></Section></Sections></Member></Section></Sections></Member>
+  </Section>
+</Sections></Interface>
+      <Name>DB_OperatingHour</Name>
+      <Number>105</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="3" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.InstanceDB>
+</Document>

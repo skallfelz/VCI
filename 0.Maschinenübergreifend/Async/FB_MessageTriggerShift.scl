@@ -1,0 +1,70 @@
+﻿FUNCTION_BLOCK "FB_MessageTriggerShift"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_OperateMessages { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : "UDT_Messages";
+      i_FaultMessagesAbsolut { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : "UDT_Messages";
+   END_VAR
+
+   VAR_OUTPUT 
+      q_WarnCodeTrigger : Array[0..4] of Word;   // Trigger Adresse der Warn Codes für das HMI Panel
+      q_ErrorCodeTrigger : Array[0..4] of Word;   // Trigger Adresse der Stör Codes für das HMI Panel
+   END_VAR
+
+   VAR DB_SPECIFIC
+      stat_OperateMessages { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : "UDT_Messages";
+      "stat_AT OperateMessages" { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} AT stat_OperateMessages : Array[0..254] of Bool;
+      stat_FaultMessagesAbsolut { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : "UDT_Messages";
+      "stat_AT FaultMessagesAbsolut" { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} AT stat_FaultMessagesAbsolut : Array[0..254] of Bool;
+   END_VAR
+
+   VAR_TEMP 
+      temp_SourceArrayBoolOperateMessages : Array[0..254] of Bool;
+      temp_DestinationArrayWordOperateMessages : Array[0..4] of Word;
+      temp_SourceArrayBoolFaultMessages : Array[0..254] of Bool;
+      temp_DestinationArrayWordFaultMessages : Array[0..4] of Word;
+      temp_i_Offset : Int;
+      arrayalt : Array[0..150] of Bool;
+      arraykoipiert : Array[0..150] of Bool;
+   END_VAR
+
+   VAR CONSTANT 
+      POSITIONSOFFSET : Int := 18;   // Offset um wie viele Meldungen die Motormeldungen versetzt sind
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB is for set an offset to the index of an array of bool and copy it to an array of word 
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   07.07.2022    MB                  First release version v1.0
+	//===============================================================================================
+	(/*Input auf Interne Variablen Mappen*/)
+	#stat_OperateMessages := #i_OperateMessages;
+	#stat_FaultMessagesAbsolut := #i_FaultMessagesAbsolut;
+	
+	(/*Array Elemente auf neues Array mit Offset verschieben*/)
+	FOR #temp_i_Offset := 0 TO 254 - #POSITIONSOFFSET DO
+	    #temp_SourceArrayBoolOperateMessages[#temp_i_Offset] := #"stat_AT OperateMessages"[#temp_i_Offset + #POSITIONSOFFSET];
+	    #temp_SourceArrayBoolFaultMessages[#temp_i_Offset] := #"stat_AT FaultMessagesAbsolut"[#temp_i_Offset + #POSITIONSOFFSET];
+	END_FOR;
+	
+	(/*Array of Bool auf Array of Word kopieren*/)
+	GATHER_BLK(IN := #temp_SourceArrayBoolOperateMessages[0],
+	           COUNT_OUT := 5,
+	           OUT => #temp_DestinationArrayWordOperateMessages[0]);
+	
+	GATHER_BLK(IN := #temp_SourceArrayBoolFaultMessages[0],
+	           COUNT_OUT := 5,
+	           OUT => #temp_DestinationArrayWordFaultMessages[0]);
+	
+	(/*Ausgänge beschreiben*/)
+	#q_WarnCodeTrigger := #temp_DestinationArrayWordOperateMessages;
+	#q_ErrorCodeTrigger := #temp_DestinationArrayWordFaultMessages;
+END_FUNCTION_BLOCK
+

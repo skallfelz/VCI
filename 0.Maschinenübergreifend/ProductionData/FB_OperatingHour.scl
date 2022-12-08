@@ -1,0 +1,102 @@
+﻿FUNCTION_BLOCK "FB_OperatingHour"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_BtnReset : Bool;   // Schaltfläche Betriebsdaten zurücksetzen
+      i_SafetyOk : Bool;   // Sicherheitskreis ohne Fehler
+      i_Clock1Hz : Bool;   // Taktmerker 1Hz
+   END_VAR
+
+   VAR_OUTPUT 
+      q_OperatingHoursList { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : "UDT_OperatingHoursList";
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_OMACGlobalData : "UDT_OMAC_GlobalData";
+   END_VAR
+
+   VAR 
+      inst_OperationCounter { S7_SetPoint := 'False'} : Array[0..6] of "FB_OperatingHoursCounter";
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB  calculate the Operation hours of every used state
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   14.04.2022    EP                  First release version v1.0
+	// 01.00.01   14.04.2022    MB                  Chance to SCL and optimised Error Mode
+	//===============================================================================================
+	REGION Power ON
+	    #inst_OperationCounter[0](i_Start := True,
+	                              i_Reset := False,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.PowerOn);
+	END_REGION 
+	
+	REGION Production
+	    #inst_OperationCounter[1](i_Start := #iq_OMACGlobalData.ProductionModeActive
+	                              AND (#iq_OMACGlobalData.StartingStateActive
+	                              OR #iq_OMACGlobalData.ExecuteStateActive
+	                              OR #iq_OMACGlobalData.HoldingStateActive
+	                              OR #iq_OMACGlobalData.HeldStateActive
+	                              OR #iq_OMACGlobalData.UnholdingStateActive
+	                              OR #iq_OMACGlobalData.SuspendingStateActive
+	                              OR #iq_OMACGlobalData.UnsuspendingStateActive
+	                              OR #iq_OMACGlobalData.CompletingStateActive
+	                              OR #iq_OMACGlobalData.StoppingStateActive),
+	                              i_Reset := #i_BtnReset,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.Production);
+	END_REGION
+	
+	REGION Maintenance
+	    #inst_OperationCounter[2](i_Start := #iq_OMACGlobalData.MaintenanceModeActive AND
+	                              (#iq_OMACGlobalData.ExecuteStateActive
+	                              OR #iq_OMACGlobalData.HoldingStateActive
+	                              OR #iq_OMACGlobalData.HeldStateActive
+	                              OR #iq_OMACGlobalData.UnholdingStateActive),
+	                              i_Reset := #i_BtnReset,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.Maintenance);
+	END_REGION
+	
+	REGION Manual
+	    #inst_OperationCounter[3](i_Start := #iq_OMACGlobalData.ManualModeActive AND
+	                              #iq_OMACGlobalData.ExecuteStateActive,
+	                              i_Reset := #i_BtnReset,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.Manual);
+	END_REGION
+	
+	REGION Idle
+	    #inst_OperationCounter[4](i_Start := #iq_OMACGlobalData.IdleStateActive,
+	                              i_Reset := #i_BtnReset,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.Idle);
+	END_REGION
+	
+	REGION Error
+	    #inst_OperationCounter[5](i_Start :=
+	                              (#iq_OMACGlobalData.StoppedStateActive
+	                              OR #iq_OMACGlobalData.AbortedStateActive) AND #i_SafetyOk,
+	                              i_Reset := #i_BtnReset,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.Error);
+	END_REGION
+	
+	REGION E-Stop
+	    #inst_OperationCounter[6](i_Start := NOT #i_SafetyOk
+	                              AND (#iq_OMACGlobalData.AbortedStateActive
+	                              OR #iq_OMACGlobalData.AbortingStateActive),
+	                              i_Reset := #i_BtnReset,
+	                              i_Clock1Hz := #i_Clock1Hz,
+	                              q_OperatingHours => #q_OperatingHoursList.EStop);
+	END_REGION
+END_FUNCTION_BLOCK
+

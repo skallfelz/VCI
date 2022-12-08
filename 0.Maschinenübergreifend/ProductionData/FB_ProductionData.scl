@@ -1,0 +1,206 @@
+﻿FUNCTION_BLOCK "FB_ProductionData"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : 'EconoPak GmbH'
+VERSION : 0.1
+   VAR_INPUT 
+      i_Count1 : Bool;   // Zähleingang 1
+      i_Count2 { S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;   // Zähleingang 2
+      i_Count3 { S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;   // Zähleingang 3
+      i_Count4 { S7_HiddenAssignment := 'HideIfNoParamAssigned'} : Bool;   // Zähleingang 4
+      i_CountNOK : Bool;   // Zähleingang Nicht OK
+      i_ResetCounter : Bool;   // Schaltfläche Produktionsdaten zurücksetzen
+   END_VAR
+
+   VAR_IN_OUT RETAIN
+      iq_TotalOK : DInt;
+      iq_TotalNOK : DInt;
+   END_VAR
+   VAR_IN_OUT 
+      iq_Total : DInt;
+      iq_CurrentMinute : DInt;
+      iq_LastMinute : DInt;
+      iq_CurrentHour : DInt;
+      iq_LastHour : DInt;
+   END_VAR
+
+   VAR 
+      inst_Rtrig_Count1 {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_Rtrig_Count2 {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_Rtrig_Count3 {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_Rtrig_Count4 {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_Rtrig_CountNOK {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_Rtrig_OneMinute {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_Rtrig_OneHour {InstructionName := 'R_TRIG'; LibVersion := '1.0'; S7_SetPoint := 'False'} : R_TRIG;
+      inst_TON_Minute {InstructionName := 'TON_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TON_TIME;
+      inst_TON_Hour {InstructionName := 'TON_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TON_TIME;
+   END_VAR
+
+   VAR CONSTANT 
+      MINUTE : Time := t#60s;
+      HOUR : Time := t#60M;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB is to be evaluated for production data
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   16.12.2021    EP                  First release version v1.0
+	// 01.00.01   16.08.2022    MB                  Switch to SCL and add Comments
+	//===============================================================================================
+	REGION Flag detetection from every counter input signal
+	    (/*Zähleingang 1*/)
+	    #inst_Rtrig_Count1(CLK := #i_Count1);
+	    
+	    (/*Zähleingang 2*/)
+	    #inst_Rtrig_Count2(CLK := #i_Count2);
+	    
+	    (/*Zähleingang 3*/)
+	    #inst_Rtrig_Count3(CLK := #i_Count3);
+	    
+	    (/*Zähleingang 4*/)
+	    #inst_Rtrig_Count4(CLK := #i_Count4);
+	    
+	    (/*Zähleingang Nicht OK*/)
+	    #inst_Rtrig_CountNOK(CLK := #i_CountNOK);
+	END_REGION
+	
+	REGION Productioncounters of every state in total
+	        (/*Zähler Gesamt mit Zähleingang eins um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count1.Q THEN
+	        #iq_TotalOK += 1;
+	    END_IF;
+	    
+	    (/*Zähler Gesamt mit Zähleingang zwei um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count2.Q THEN
+	        #iq_TotalOK += 1;
+	    END_IF;
+	    
+	    (/*Zähler Gesamt mit Zähleingang drei um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count3.Q THEN
+	        #iq_TotalOK += 1;
+	    END_IF;
+	    
+	    (/*Zähler Gesamt mit Zähleingang vier um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count4.Q THEN
+	        #iq_TotalOK += 1;
+	    END_IF;
+	    
+	    (/*Zähler nicht Ok mit Zähleingang nicht Ok um 1 erhöhen und Total OK um eins reduzieren*/)
+	    IF #inst_Rtrig_CountNOK.Q THEN
+	        #iq_TotalNOK += 1;
+	        #iq_TotalOK -= 1;
+	    END_IF;
+	    
+	    (/*Gesamtproduktivität der Anlage ausgeben
+	       Wenn Zähler kleiner 0 dann auf null schreiben an sonsten "Gesamt = OK+NOK"*/)    
+	    IF #iq_TotalOK < 0 THEN
+	        #iq_TotalOK := 0;
+	    ELSE
+	        #iq_Total := #iq_TotalOK + #iq_TotalNOK;
+	    END_IF;
+	    
+	END_REGION
+	
+	REGION Time Impulse minute and hour
+	    (/*Minute
+	       Zähler letze Minute mit Zähleingang eins um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count1.Q THEN
+	        #iq_CurrentMinute += 1;
+	    END_IF;
+	    
+	    (/*Zähler letze Minute mit Zähleingang zwei um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count2.Q THEN
+	        #iq_CurrentMinute += 1;
+	    END_IF;
+	    
+	    (/*Zähler letze Minute mit Zähleingang drei um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count3.Q THEN
+	        #iq_CurrentMinute += 1;
+	    END_IF;
+	    
+	    (/*Zähler letze Minute mit Zähleingang vier um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count4.Q THEN
+	        #iq_CurrentMinute += 1;
+	    END_IF;
+	    
+	    (/*Stunde
+	       Zähler letze Minute mit Zähleingang eins um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count1.Q THEN
+	        #iq_CurrentHour += 1;
+	    END_IF;
+	    
+	    (/*Zähler letze Minute mit Zähleingang zwei um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count2.Q THEN
+	        #iq_CurrentHour += 1;
+	    END_IF;
+	    
+	    (/*Zähler letze Minute mit Zähleingang drei um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count3.Q THEN
+	        #iq_CurrentHour += 1;
+	    END_IF;
+	    
+	    (/*Zähler letze Minute mit Zähleingang vier um 1 erhöhen*/)
+	    IF #inst_Rtrig_Count4.Q THEN
+	        #iq_CurrentHour += 1;
+	    END_IF;
+	END_REGION
+	
+	REGION Productioncounters of every state in total actual minute hour
+	    (/*Minute*/)
+	    #inst_TON_Minute(IN := NOT #inst_Rtrig_OneMinute.Q AND NOT #i_ResetCounter,
+	                     PT := #MINUTE);
+	    #inst_Rtrig_OneMinute(CLK := #inst_TON_Minute.Q);
+	    
+	    (/*Stunde*/)
+	    #inst_TON_Hour(IN := NOT #inst_Rtrig_OneHour.Q AND NOT #i_ResetCounter,
+	                   PT := #HOUR);
+	    #inst_Rtrig_OneHour(CLK := #inst_TON_Hour.Q);
+	END_REGION
+	
+	REGION Copy actual values in to last values
+	    //Minute
+	    IF #inst_Rtrig_OneMinute.Q THEN
+	        #iq_LastMinute := #iq_CurrentMinute;
+	    END_IF;
+	    
+	    (/*Stunde*/)
+	    IF #inst_Rtrig_OneHour.Q THEN
+	        #iq_LastHour := #iq_CurrentHour;
+	    END_IF;
+	END_REGION
+	    
+	REGION Reset counters
+	    (/*Zähler OK und nicht Ok bei Überlauf Gesamtproduktivität zurücksetzen*/)
+	    IF #iq_Total >= 2147483647 THEN
+	        #iq_TotalOK := 0;
+	        #iq_TotalNOK := 0;
+	    END_IF;
+	    
+	    (/*Zähler Aktuelle Minute nach einer Minute zurücksetzten*/)
+	    IF #inst_Rtrig_OneMinute.Q THEN
+	        #iq_CurrentMinute := 0;
+	    END_IF;
+	    
+	    (/*Zähler Aktuelle Stunde nach einer Stunde zurücksetzten*/)
+	    IF #inst_Rtrig_OneHour.Q THEN
+	        #iq_CurrentHour := 0;
+	    END_IF;
+	    
+	    (/*Alle Zähler mit dem Resetbutton zurücksetzten*/)
+	    IF #i_ResetCounter THEN
+	        #iq_TotalOK := 0;
+	        #iq_TotalNOK := 0;
+	        #iq_Total := 0;
+	        #iq_CurrentMinute := 0;
+	        #iq_LastMinute := 0;
+	        #iq_CurrentHour := 0;
+	        #iq_LastHour := 0;
+	    END_IF;
+	END_REGION
+END_FUNCTION_BLOCK
+
