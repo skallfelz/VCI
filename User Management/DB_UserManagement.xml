@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-08T10:17:24.4855331Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Blocks.InstanceDB ID="0">
+    <AttributeList>
+      <AutoNumber>true</AutoNumber>
+      <DBAccessibleFromOPCUA>true</DBAccessibleFromOPCUA>
+      <DBAccessibleFromWebserver>true</DBAccessibleFromWebserver>
+      <HeaderAuthor />
+      <HeaderFamily />
+      <HeaderName />
+      <HeaderVersion>0.1</HeaderVersion>
+      <InstanceOfName>FB_UserManagement</InstanceOfName>
+      <InstanceOfType>FB</InstanceOfType>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="Input">
+    <Member Name="i_PictureNumber" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="Output">
+    <Member Name="q_ActiveUser" Datatype="&quot;UDT_UserManagement&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="Valid" Datatype="Bool" /><Member Name="UserName" Datatype="String" /><Member Name="Password" Datatype="String" /><Member Name="LogOff-Time" Datatype="DInt" /><Member Name="AuthorisationGroup" Datatype="Int" /><Member Name="Authorisation" Datatype="&quot;UDT_UserAuthorisation&quot;"><Sections><Section Name="None"><Member Name="Benutzerverwaltung" Datatype="Bool" /><Member Name="Überwachen" Datatype="Bool" /><Member Name="Bedienen" Datatype="Bool" /><Member Name="Asynchronantriebe" Datatype="Bool" /><Member Name="Formatfunktionen" Datatype="Bool" /><Member Name="Handfunktionen" Datatype="Bool" /><Member Name="Homing" Datatype="Bool" /><Member Name="Kurvenscheibe" Datatype="Bool" /><Member Name="Leimnocken" Datatype="Bool" /><Member Name="Nocken" Datatype="Bool" /><Member Name="Positionen" Datatype="Bool" /><Member Name="System" Datatype="Bool" /><Member Name="Taktzahl" Datatype="Bool" /><Member Name="Zähler" Datatype="Bool" /><Member Name="Zeiten" Datatype="Bool" /><Member Name="Ein_Ausschaltfunktionen" Datatype="Bool" /><Member Name="Format wechseln" Datatype="Bool" /><Member Name="Format kopieren" Datatype="Bool" /><Member Name="Zeitschaltuhr" Datatype="Bool" /><Member Name="Servomotoren" Datatype="Bool" /><Member Name="Menü" Datatype="Bool" /></Section></Sections></Member></Section></Sections></Member>
+    <Member Name="q_NoUserFound" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="q_UserAlreadyAdded" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="q_NewUserAdded" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+    <Member Name="q_UserDeleted" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute></AttributeList></Member>
+  </Section>
+  <Section Name="InOut">
+    <Member Name="iq_HMIUserManagement" Datatype="&quot;UDT_HMIUserManagement&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="NewUser" Datatype="Struct">
+            <Member Name="SetUser" Datatype="Bool" />
+            <Member Name="UserName" Datatype="String" />
+            <Member Name="Password" Datatype="String" />
+            <Member Name="AuthorisationLevel" Datatype="Int" />
+          </Member>
+          <Member Name="DeleteUser" Datatype="Struct">
+            <Member Name="DeleteUser" Datatype="Bool" />
+            <Member Name="Password" Datatype="String" />
+          </Member>
+          <Member Name="LogIn aktivieren" Datatype="Bool" />
+          <Member Name="LogOff aktivieren" Datatype="Bool" />
+          <Member Name="Show PopUp" Datatype="Bool" />
+          <Member Name="Passwort" Datatype="String" />
+          <Member Name="ActiveUser" Datatype="&quot;UDT_UserManagement&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="Valid" Datatype="Bool" />
+                <Member Name="UserName" Datatype="String" />
+                <Member Name="Password" Datatype="String" />
+                <Member Name="LogOff-Time" Datatype="DInt" />
+                <Member Name="AuthorisationGroup" Datatype="Int" />
+                <Member Name="Authorisation" Datatype="&quot;UDT_UserAuthorisation&quot;">
+                  <Sections>
+                    <Section Name="None">
+                      <Member Name="Benutzerverwaltung" Datatype="Bool" />
+                      <Member Name="Überwachen" Datatype="Bool" />
+                      <Member Name="Bedienen" Datatype="Bool" />
+                      <Member Name="Asynchronantriebe" Datatype="Bool" />
+                      <Member Name="Formatfunktionen" Datatype="Bool" />
+                      <Member Name="Handfunktionen" Datatype="Bool" />
+                      <Member Name="Homing" Datatype="Bool" />
+                      <Member Name="Kurvenscheibe" Datatype="Bool" />
+                      <Member Name="Leimnocken" Datatype="Bool" />
+                      <Member Name="Nocken" Datatype="Bool" />
+                      <Member Name="Positionen" Datatype="Bool" />
+                      <Member Name="System" Datatype="Bool" />
+                      <Member Name="Taktzahl" Datatype="Bool" />
+                      <Member Name="Zähler" Datatype="Bool" />
+                      <Member Name="Zeiten" Datatype="Bool" />
+                      <Member Name="Ein_Ausschaltfunktionen" Datatype="Bool" />
+                      <Member Name="Format wechseln" Datatype="Bool" />
+                      <Member Name="Format kopieren" Datatype="Bool" />
+                      <Member Name="Zeitschaltuhr" Datatype="Bool" />
+                      <Member Name="Servomotoren" Datatype="Bool" />
+                      <Member Name="Menü" Datatype="Bool" />
+                    </Section>
+                  </Sections>
+                </Member>
+              </Section>
+            </Sections>
+          </Member>
+        </Section>
+      </Sections>
+    </Member>
+    <Member Name="iq_User" Datatype="Array[0..&quot;UPPERUSERNUMBER&quot;] of &quot;UDT_UserManagement&quot;" Accessibility="Public">
+      <Sections>
+        <Section Name="None">
+          <Member Name="Valid" Datatype="Bool" />
+          <Member Name="UserName" Datatype="String" />
+          <Member Name="Password" Datatype="String" />
+          <Member Name="LogOff-Time" Datatype="DInt" />
+          <Member Name="AuthorisationGroup" Datatype="Int" />
+          <Member Name="Authorisation" Datatype="&quot;UDT_UserAuthorisation&quot;">
+            <Sections>
+              <Section Name="None">
+                <Member Name="Benutzerverwaltung" Datatype="Bool" />
+                <Member Name="Überwachen" Datatype="Bool" />
+                <Member Name="Bedienen" Datatype="Bool" />
+                <Member Name="Asynchronantriebe" Datatype="Bool" />
+                <Member Name="Formatfunktionen" Datatype="Bool" />
+                <Member Name="Handfunktionen" Datatype="Bool" />
+                <Member Name="Homing" Datatype="Bool" />
+                <Member Name="Kurvenscheibe" Datatype="Bool" />
+                <Member Name="Leimnocken" Datatype="Bool" />
+                <Member Name="Nocken" Datatype="Bool" />
+                <Member Name="Positionen" Datatype="Bool" />
+                <Member Name="System" Datatype="Bool" />
+                <Member Name="Taktzahl" Datatype="Bool" />
+                <Member Name="Zähler" Datatype="Bool" />
+                <Member Name="Zeiten" Datatype="Bool" />
+                <Member Name="Ein_Ausschaltfunktionen" Datatype="Bool" />
+                <Member Name="Format wechseln" Datatype="Bool" />
+                <Member Name="Format kopieren" Datatype="Bool" />
+                <Member Name="Zeitschaltuhr" Datatype="Bool" />
+                <Member Name="Servomotoren" Datatype="Bool" />
+                <Member Name="Menü" Datatype="Bool" />
+              </Section>
+            </Sections>
+          </Member>
+        </Section>
+      </Sections>
+    </Member>
+  </Section>
+  <Section Name="Static">
+    <Member Name="stat_FirstScan" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_TONLogOff" Datatype="TON_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_TONNoUserFound" Datatype="TON_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_TONUserAlreadyAdded" Datatype="TON_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_TONNewUserAdded" Datatype="TON_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_TONUserDeleted" Datatype="TON_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="PT" Datatype="Time" /><Member Name="ET" Datatype="Time" /><Member Name="IN" Datatype="Bool" /><Member Name="Q" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_ActiveUser" Datatype="&quot;UDT_UserManagement&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="Valid" Datatype="Bool" /><Member Name="UserName" Datatype="String" /><Member Name="Password" Datatype="String" /><Member Name="LogOff-Time" Datatype="DInt" /><Member Name="AuthorisationGroup" Datatype="Int" /><Member Name="Authorisation" Datatype="&quot;UDT_UserAuthorisation&quot;"><Sections><Section Name="None"><Member Name="Benutzerverwaltung" Datatype="Bool" /><Member Name="Überwachen" Datatype="Bool" /><Member Name="Bedienen" Datatype="Bool" /><Member Name="Asynchronantriebe" Datatype="Bool" /><Member Name="Formatfunktionen" Datatype="Bool" /><Member Name="Handfunktionen" Datatype="Bool" /><Member Name="Homing" Datatype="Bool" /><Member Name="Kurvenscheibe" Datatype="Bool" /><Member Name="Leimnocken" Datatype="Bool" /><Member Name="Nocken" Datatype="Bool" /><Member Name="Positionen" Datatype="Bool" /><Member Name="System" Datatype="Bool" /><Member Name="Taktzahl" Datatype="Bool" /><Member Name="Zähler" Datatype="Bool" /><Member Name="Zeiten" Datatype="Bool" /><Member Name="Ein_Ausschaltfunktionen" Datatype="Bool" /><Member Name="Format wechseln" Datatype="Bool" /><Member Name="Format kopieren" Datatype="Bool" /><Member Name="Zeitschaltuhr" Datatype="Bool" /><Member Name="Servomotoren" Datatype="Bool" /><Member Name="Menü" Datatype="Bool" /></Section></Sections></Member></Section></Sections></Member>
+    <Member Name="stat_UserLevel" Datatype="Array[0..4] of &quot;UDT_UserAuthorisation&quot;" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">false</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="Benutzerverwaltung" Datatype="Bool" /><Member Name="Überwachen" Datatype="Bool" /><Member Name="Bedienen" Datatype="Bool" /><Member Name="Asynchronantriebe" Datatype="Bool" /><Member Name="Formatfunktionen" Datatype="Bool" /><Member Name="Handfunktionen" Datatype="Bool" /><Member Name="Homing" Datatype="Bool" /><Member Name="Kurvenscheibe" Datatype="Bool" /><Member Name="Leimnocken" Datatype="Bool" /><Member Name="Nocken" Datatype="Bool" /><Member Name="Positionen" Datatype="Bool" /><Member Name="System" Datatype="Bool" /><Member Name="Taktzahl" Datatype="Bool" /><Member Name="Zähler" Datatype="Bool" /><Member Name="Zeiten" Datatype="Bool" /><Member Name="Ein_Ausschaltfunktionen" Datatype="Bool" /><Member Name="Format wechseln" Datatype="Bool" /><Member Name="Format kopieren" Datatype="Bool" /><Member Name="Zeitschaltuhr" Datatype="Bool" /><Member Name="Servomotoren" Datatype="Bool" /><Member Name="Menü" Datatype="Bool" /></Section></Sections></Member>
+    <Member Name="stat_NoUserFound" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_UserAlreadyAdded" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_NewUserAdded" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_UserDeleted" Datatype="Bool" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+    <Member Name="stat_OldPictureNumber" Datatype="Int" Remanence="NonRetain" Accessibility="Public"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList></Member>
+  </Section>
+</Sections></Interface>
+      <Name>DB_UserManagement</Name>
+      <Number>28</Number>
+      <ProgrammingLanguage>DB</ProgrammingLanguage>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="5" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="6" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="7" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="8" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Blocks.InstanceDB>
+</Document>

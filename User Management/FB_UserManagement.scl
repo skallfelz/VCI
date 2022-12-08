@@ -1,0 +1,441 @@
+﻿FUNCTION_BLOCK "FB_UserManagement"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      i_PictureNumber : Int;
+   END_VAR
+
+   VAR_OUTPUT 
+      q_ActiveUser : "UDT_UserManagement";
+      q_NoUserFound : Bool;   // Message for No User Found
+      q_UserAlreadyAdded : Bool;   // Message for User already added
+      q_NewUserAdded : Bool;   // Message for New Use added
+      q_UserDeleted : Bool;   // Messer for User deleted
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_HMIUserManagement : "UDT_HMIUserManagement";
+      iq_User : Array[0.."UPPERUSERNUMBER"] of "UDT_UserManagement";
+   END_VAR
+
+   VAR 
+      stat_FirstScan : Bool := TRUE;
+      stat_TONLogOff {InstructionName := 'TON_TIME'; LibVersion := '1.0'; S7_SetPoint := 'False'} : TON_TIME;
+      stat_TONNoUserFound {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONUserAlreadyAdded {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONNewUserAdded {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_TONUserDeleted {InstructionName := 'TON_TIME'; LibVersion := '1.0'} : TON_TIME;
+      stat_ActiveUser : "UDT_UserManagement";
+      stat_UserLevel { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : Array[0..4] of "UDT_UserAuthorisation";
+      stat_NoUserFound : Bool;
+      stat_UserAlreadyAdded : Bool;
+      stat_NewUserAdded : Bool;
+      stat_UserDeleted : Bool;
+      stat_OldPictureNumber : Int;
+   END_VAR
+
+   VAR_TEMP 
+      temp_EmptyUser : "UDT_UserManagement";
+      temp_counter : Int;
+      temp_PictureNumber : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      START_COUNTER_USER : Int := 4;
+   END_VAR
+
+
+BEGIN
+	//===============================================================================================
+	// Econo-PAK GmbH
+	//-----------------------------------------------------------------------------------------------
+	// The FB is doing the User Management (Login - Logout - New User - Delete User)
+	//-----------------------------------------------------------------------------------------------
+	// Change log table:
+	// Version    Date          Expert in charge    Changes applied
+	// 01.00.00   27.07.2022    SK                  First release version v1.0
+	// 01.00.10   28.07.2022    SK                  Added statics and outputs for messages
+	// 01.00.20   28.07.2022    SK                  Added PictureNumber (Automatic logoff resetted after Change of PictureNumber
+	// 01.00.30   01.08.2022    SK                  Added Delete User Funktion
+	//===============================================================================================
+	
+	REGION INITIATE
+	    IF #stat_FirstScan THEN
+	        //Unauthorised User
+	        #temp_EmptyUser.Valid := FALSE;
+	        #temp_EmptyUser.UserName := '';
+	        #temp_EmptyUser.Password := '';
+	        #temp_EmptyUser."LogOff-Time" := 10;
+	        #temp_EmptyUser.Authorisation := #stat_UserLevel[0];
+	        
+	        REGION INITIATE AUTHORISATION       
+	            //Level 0 - Unauthorised
+	            #stat_UserLevel[0].Benutzerverwaltung := FALSE;
+	            #stat_UserLevel[0].Überwachen := FALSE;
+	            #stat_UserLevel[0].Bedienen := TRUE;
+	            #stat_UserLevel[0].Asynchronantriebe := FALSE;
+	            #stat_UserLevel[0].Formatfunktionen := FALSE;
+	            #stat_UserLevel[0].Handfunktionen := FALSE;
+	            #stat_UserLevel[0].Homing := FALSE;
+	            #stat_UserLevel[0].Kurvenscheibe := FALSE;
+	            #stat_UserLevel[0].Leimnocken := FALSE;
+	            #stat_UserLevel[0].Nocken := FALSE;
+	            #stat_UserLevel[0].Positionen := FALSE;
+	            #stat_UserLevel[0].System := FALSE;
+	            #stat_UserLevel[0].Taktzahl := TRUE;
+	            #stat_UserLevel[0].Zähler := FALSE;
+	            #stat_UserLevel[0].Zeiten := FALSE;
+	            #stat_UserLevel[0].Ein_Ausschaltfunktionen := FALSE;
+	            #stat_UserLevel[0]."Format wechseln" := TRUE;
+	            #stat_UserLevel[0]."Format kopieren" := FALSE;
+	            #stat_UserLevel[0].Zeitschaltuhr := FALSE;
+	            #stat_UserLevel[0].Servomotoren := FALSE;
+	            #stat_UserLevel[0].Menü := TRUE;
+	            
+	            //Level 1 - 
+	            #stat_UserLevel[1].Benutzerverwaltung := FALSE;
+	            #stat_UserLevel[1].Überwachen := FALSE;
+	            #stat_UserLevel[1].Bedienen := TRUE;
+	            #stat_UserLevel[1].Asynchronantriebe := FALSE;
+	            #stat_UserLevel[1].Formatfunktionen := FALSE;
+	            #stat_UserLevel[1].Handfunktionen := FALSE;
+	            #stat_UserLevel[1].Homing := FALSE;
+	            #stat_UserLevel[1].Kurvenscheibe := FALSE;
+	            #stat_UserLevel[1].Leimnocken := FALSE;
+	            #stat_UserLevel[1].Nocken := FALSE;
+	            #stat_UserLevel[1].Positionen := FALSE;
+	            #stat_UserLevel[1].System := FALSE;
+	            #stat_UserLevel[1].Taktzahl := TRUE;
+	            #stat_UserLevel[1].Zähler := FALSE;
+	            #stat_UserLevel[1].Zeiten := FALSE;
+	            #stat_UserLevel[1].Ein_Ausschaltfunktionen := FALSE;
+	            #stat_UserLevel[1]."Format wechseln" := TRUE;
+	            #stat_UserLevel[1]."Format kopieren" := FALSE;
+	            #stat_UserLevel[1].Zeitschaltuhr := FALSE;
+	            #stat_UserLevel[1].Servomotoren := FALSE;
+	            #stat_UserLevel[1].Menü := TRUE;
+	            
+	            //Level 2 -
+	            #stat_UserLevel[2].Benutzerverwaltung := TRUE;
+	            #stat_UserLevel[2].Überwachen := TRUE;
+	            #stat_UserLevel[2].Bedienen := TRUE;
+	            #stat_UserLevel[2].Asynchronantriebe := TRUE;
+	            #stat_UserLevel[2].Formatfunktionen := TRUE;
+	            #stat_UserLevel[2].Handfunktionen := TRUE;
+	            #stat_UserLevel[2].Homing := TRUE;
+	            #stat_UserLevel[2].Kurvenscheibe := TRUE;
+	            #stat_UserLevel[2].Leimnocken := TRUE;
+	            #stat_UserLevel[2].Nocken := TRUE;
+	            #stat_UserLevel[2].Positionen := TRUE;
+	            #stat_UserLevel[2].System := TRUE;
+	            #stat_UserLevel[2].Taktzahl := TRUE;
+	            #stat_UserLevel[2].Zähler := TRUE;
+	            #stat_UserLevel[2].Zeiten := TRUE;
+	            #stat_UserLevel[2].Ein_Ausschaltfunktionen := TRUE;
+	            #stat_UserLevel[2]."Format wechseln" := TRUE;
+	            #stat_UserLevel[2]."Format kopieren" := TRUE;
+	            #stat_UserLevel[2].Zeitschaltuhr := TRUE;
+	            #stat_UserLevel[2].Servomotoren := TRUE;
+	            #stat_UserLevel[2].Menü := TRUE;
+	            
+	            //Level 3 - 
+	            #stat_UserLevel[3].Benutzerverwaltung := TRUE;
+	            #stat_UserLevel[3].Überwachen := TRUE;
+	            #stat_UserLevel[3].Bedienen := TRUE;
+	            #stat_UserLevel[3].Asynchronantriebe := TRUE;
+	            #stat_UserLevel[3].Formatfunktionen := TRUE;
+	            #stat_UserLevel[3].Handfunktionen := TRUE;
+	            #stat_UserLevel[3].Homing := TRUE;
+	            #stat_UserLevel[3].Kurvenscheibe := TRUE;
+	            #stat_UserLevel[3].Leimnocken := TRUE;
+	            #stat_UserLevel[3].Nocken := TRUE;
+	            #stat_UserLevel[3].Positionen := TRUE;
+	            #stat_UserLevel[3].System := TRUE;
+	            #stat_UserLevel[3].Taktzahl := TRUE;
+	            #stat_UserLevel[3].Zähler := TRUE;
+	            #stat_UserLevel[3].Zeiten := TRUE;
+	            #stat_UserLevel[3].Ein_Ausschaltfunktionen := TRUE;
+	            #stat_UserLevel[3]."Format wechseln" := TRUE;
+	            #stat_UserLevel[3]."Format kopieren" := TRUE;
+	            #stat_UserLevel[3].Zeitschaltuhr := TRUE;
+	            #stat_UserLevel[3].Servomotoren := TRUE;
+	            #stat_UserLevel[3].Menü := TRUE;
+	            
+	            //Level 4 - 
+	            #stat_UserLevel[4].Benutzerverwaltung := TRUE;
+	            #stat_UserLevel[4].Überwachen := TRUE;
+	            #stat_UserLevel[4].Bedienen := TRUE;
+	            #stat_UserLevel[4].Asynchronantriebe := TRUE;
+	            #stat_UserLevel[4].Formatfunktionen := TRUE;
+	            #stat_UserLevel[4].Handfunktionen := TRUE;
+	            #stat_UserLevel[4].Homing := TRUE;
+	            #stat_UserLevel[4].Kurvenscheibe := TRUE;
+	            #stat_UserLevel[4].Leimnocken := TRUE;
+	            #stat_UserLevel[4].Nocken := TRUE;
+	            #stat_UserLevel[4].Positionen := TRUE;
+	            #stat_UserLevel[4].System := TRUE;
+	            #stat_UserLevel[4].Taktzahl := TRUE;
+	            #stat_UserLevel[4].Zähler := TRUE;
+	            #stat_UserLevel[4].Zeiten := TRUE;
+	            #stat_UserLevel[4].Ein_Ausschaltfunktionen := TRUE;
+	            #stat_UserLevel[4]."Format wechseln" := TRUE;
+	            #stat_UserLevel[4]."Format kopieren" := TRUE;
+	            #stat_UserLevel[4].Zeitschaltuhr := TRUE;
+	            #stat_UserLevel[4].Servomotoren := TRUE;
+	            #stat_UserLevel[4].Menü := TRUE;
+	        END_REGION
+	        
+	        //Econo-PAK User
+	        #iq_User[1].Authorisation.Benutzerverwaltung := TRUE;
+	        #iq_User[1].Authorisation.Überwachen := TRUE;
+	        #iq_User[1].Authorisation.Bedienen := TRUE;
+	        #iq_User[1].Authorisation.Asynchronantriebe := TRUE;
+	        #iq_User[1].Authorisation.Formatfunktionen := TRUE;
+	        #iq_User[1].Authorisation.Handfunktionen := TRUE;
+	        #iq_User[1].Authorisation.Homing := TRUE;
+	        #iq_User[1].Authorisation.Kurvenscheibe := TRUE;
+	        #iq_User[1].Authorisation.Leimnocken := TRUE;
+	        #iq_User[1].Authorisation.Nocken := TRUE;
+	        #iq_User[1].Authorisation.Positionen := TRUE;
+	        #iq_User[1].Authorisation.System := TRUE;
+	        #iq_User[1].Authorisation.Taktzahl := TRUE;
+	        #iq_User[1].Authorisation.Zähler := TRUE;
+	        #iq_User[1].Authorisation.Zeiten := TRUE;
+	        #iq_User[1].Authorisation.Ein_Ausschaltfunktionen := TRUE;
+	        #iq_User[1].Authorisation."Format wechseln" := TRUE;
+	        #iq_User[1].Authorisation."Format kopieren" := TRUE;
+	        #iq_User[1].Authorisation.Zeitschaltuhr := TRUE;
+	        #iq_User[1].Authorisation.Servomotoren := TRUE;
+	        #iq_User[1].Authorisation.Menü := TRUE;
+	        
+	        //Werkstatt User
+	        #iq_User[2].Authorisation.Benutzerverwaltung := FALSE;
+	        #iq_User[2].Authorisation.Überwachen := TRUE;
+	        #iq_User[2].Authorisation.Bedienen := TRUE;
+	        #iq_User[2].Authorisation.Asynchronantriebe := TRUE;
+	        #iq_User[2].Authorisation.Formatfunktionen := TRUE;
+	        #iq_User[2].Authorisation.Handfunktionen := TRUE;
+	        #iq_User[2].Authorisation.Homing := TRUE;
+	        #iq_User[2].Authorisation.Kurvenscheibe := TRUE;
+	        #iq_User[2].Authorisation.Leimnocken := TRUE;
+	        #iq_User[2].Authorisation.Nocken := TRUE;
+	        #iq_User[2].Authorisation.Positionen := TRUE;
+	        #iq_User[2].Authorisation.System := TRUE;
+	        #iq_User[2].Authorisation.Taktzahl := TRUE;
+	        #iq_User[2].Authorisation.Zähler := TRUE;
+	        #iq_User[2].Authorisation.Zeiten := TRUE;
+	        #iq_User[2].Authorisation.Ein_Ausschaltfunktionen := TRUE;
+	        #iq_User[2].Authorisation."Format wechseln" := TRUE;
+	        #iq_User[2].Authorisation."Format kopieren" := TRUE;
+	        #iq_User[2].Authorisation.Zeitschaltuhr := TRUE;
+	        #iq_User[2].Authorisation.Servomotoren := TRUE;
+	        #iq_User[2].Authorisation.Menü := TRUE;
+	        
+	        //Admin User
+	        #iq_User[3].Authorisation.Benutzerverwaltung := TRUE;
+	        #iq_User[3].Authorisation.Überwachen := TRUE;
+	        #iq_User[3].Authorisation.Bedienen := TRUE;
+	        #iq_User[3].Authorisation.Asynchronantriebe := TRUE;
+	        #iq_User[3].Authorisation.Formatfunktionen := TRUE;
+	        #iq_User[3].Authorisation.Handfunktionen := TRUE;
+	        #iq_User[3].Authorisation.Homing := TRUE;
+	        #iq_User[3].Authorisation.Kurvenscheibe := TRUE;
+	        #iq_User[3].Authorisation.Leimnocken := TRUE;
+	        #iq_User[3].Authorisation.Nocken := TRUE;
+	        #iq_User[3].Authorisation.Positionen := TRUE;
+	        #iq_User[3].Authorisation.System := TRUE;
+	        #iq_User[3].Authorisation.Taktzahl := TRUE;
+	        #iq_User[3].Authorisation.Zähler := TRUE;
+	        #iq_User[3].Authorisation.Zeiten := TRUE;
+	        #iq_User[3].Authorisation.Ein_Ausschaltfunktionen := TRUE;
+	        #iq_User[3].Authorisation."Format wechseln" := TRUE;
+	        #iq_User[3].Authorisation."Format kopieren" := TRUE;
+	        #iq_User[3].Authorisation.Zeitschaltuhr := TRUE;
+	        #iq_User[3].Authorisation.Servomotoren := TRUE;
+	        #iq_User[3].Authorisation.Menü := TRUE;
+	        
+	        #stat_ActiveUser := #temp_EmptyUser;
+	        #stat_ActiveUser.Authorisation := #stat_UserLevel[0];
+	        
+	        #stat_NoUserFound := FALSE;
+	        #stat_UserAlreadyAdded := FALSE;
+	        #stat_NewUserAdded := FALSE;
+	        #stat_UserDeleted := FALSE;
+	        
+	        #stat_FirstScan := FALSE;
+	    END_IF;
+	END_REGION
+	
+	REGION MAP INPUTS
+	    #temp_PictureNumber := #i_PictureNumber;
+	END_REGION
+	
+	REGION USER MANAGEMENT
+	    REGION SET VALID
+	        FOR #temp_counter := #START_COUNTER_USER TO "UPPERUSERNUMBER" BY 1 DO
+	            IF #iq_User[#temp_counter].Password <> ''
+	                AND #iq_User[#temp_counter].UserName <> ''
+	            THEN
+	                #iq_User[#temp_counter].Valid := TRUE;
+	            ELSE
+	                #iq_User[#temp_counter].Valid := FALSE;
+	            END_IF;
+	        END_FOR;
+	    END_REGION
+	    REGION PRESET AUTHORISATION
+	        FOR #temp_counter := #START_COUNTER_USER TO "UPPERUSERNUMBER" BY 1 DO
+	            #iq_User[#temp_counter].Authorisation := #stat_UserLevel[#iq_User[#temp_counter].AuthorisationGroup];
+	        END_FOR;
+	    END_REGION
+	    REGION NEW USER
+	        IF #stat_ActiveUser.Authorisation.Benutzerverwaltung
+	            AND #iq_HMIUserManagement.NewUser.SetUser
+	            AND #iq_HMIUserManagement.NewUser.UserName <> ''
+	            AND #iq_HMIUserManagement.NewUser.Password <> ''
+	        THEN
+	            FOR #temp_counter := #START_COUNTER_USER TO "UPPERUSERNUMBER" BY 1 DO
+	                //Check if user is already added
+	                IF #iq_User[#temp_counter].Valid = TRUE
+	                    AND #iq_User[#temp_counter].Password = #iq_HMIUserManagement.NewUser.Password
+	                THEN
+	                    #stat_UserAlreadyAdded := TRUE;
+	                    #iq_HMIUserManagement.NewUser.UserName := '';
+	                    #iq_HMIUserManagement.NewUser.Password := '';
+	                    #iq_HMIUserManagement.NewUser.AuthorisationLevel := 0;
+	                    #iq_HMIUserManagement.NewUser.SetUser := FALSE;
+	                    EXIT;
+	                END_IF;
+	                
+	                //Add new user
+	                IF #iq_User[#temp_counter].Valid = FALSE THEN
+	                    #iq_User[#temp_counter].UserName := #iq_HMIUserManagement.NewUser.UserName;
+	                    #iq_User[#temp_counter].Password := #iq_HMIUserManagement.NewUser.Password;
+	                    #iq_User[#temp_counter].AuthorisationGroup := #iq_HMIUserManagement.NewUser.AuthorisationLevel;
+	                    #iq_User[#temp_counter].Authorisation := #stat_UserLevel[#iq_HMIUserManagement.NewUser.AuthorisationLevel];
+	                    #iq_User[#temp_counter].Valid := TRUE;
+	                    
+	                    #iq_HMIUserManagement.NewUser.UserName := '';
+	                    #iq_HMIUserManagement.NewUser.Password := '';
+	                    #iq_HMIUserManagement.NewUser.AuthorisationLevel := 0;
+	                    #iq_HMIUserManagement.NewUser.SetUser := FALSE;
+	                    #stat_NewUserAdded := TRUE;
+	                    EXIT;
+	                END_IF;
+	            END_FOR;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION LOGIN
+	        IF #iq_HMIUserManagement."LogIn aktivieren" THEN
+	            IF #iq_HMIUserManagement.Passwort <> '' THEN
+	                #stat_NoUserFound := TRUE; //set static to true, if user is found it will be reseted
+	                FOR #temp_counter := 1 TO "UPPERUSERNUMBER" BY 1 DO
+	                    IF #iq_User[#temp_counter].Password = #iq_HMIUserManagement.Passwort THEN
+	                        IF #iq_User[#temp_counter]."LogOff-Time" <= 0 THEN
+	                            #iq_User[#temp_counter]."LogOff-Time" := 10;
+	                        END_IF;
+	                        #stat_ActiveUser := #iq_User[#temp_counter];
+	                        
+	                        #iq_HMIUserManagement."LogIn aktivieren" := FALSE;
+	                        #iq_HMIUserManagement.Passwort := '';
+	                        
+	                        #stat_NoUserFound := FALSE;
+	                        EXIT;
+	                    END_IF;
+	                END_FOR;
+	            END_IF;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION DELETE USER
+	        IF #iq_HMIUserManagement.DeleteUser.DeleteUser
+	            AND #iq_HMIUserManagement.DeleteUser.Password <> ''
+	        THEN
+	            FOR #temp_counter := #START_COUNTER_USER TO "UPPERUSERNUMBER" BY 1 DO
+	                IF #iq_User[#temp_counter].Password = #iq_HMIUserManagement.DeleteUser.Password
+	                THEN
+	                    #iq_User[#temp_counter] := #temp_EmptyUser;
+	                    #stat_UserDeleted := TRUE;
+	                END_IF;
+	            END_FOR;
+	            
+	            #iq_HMIUserManagement.DeleteUser.DeleteUser := FALSE;
+	            #iq_HMIUserManagement.DeleteUser.Password := '';
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION LOGOFF
+	    REGION MANUAL LOGOFF
+	        IF #iq_HMIUserManagement."LogOff aktivieren" THEN
+	            #stat_ActiveUser := #temp_EmptyUser;
+	            #stat_ActiveUser.Authorisation := #stat_UserLevel[0];
+	            #iq_HMIUserManagement."LogOff aktivieren" := FALSE;
+	        END_IF;
+	    END_REGION
+	    
+	    REGION AUTOMATIC LOGOFF        
+	        IF #temp_PictureNumber <> #stat_OldPictureNumber
+	        THEN
+	            #stat_OldPictureNumber := #temp_PictureNumber;
+	        END_IF;
+	        
+	        #stat_TONLogOff.PT := #stat_ActiveUser."LogOff-Time" * 60000;
+	        #stat_TONLogOff(IN := #stat_ActiveUser.Valid AND (#temp_PictureNumber = #stat_OldPictureNumber),
+	                        PT := #stat_TONLogOff.PT);
+	        
+	        IF #stat_TONLogOff.Q THEN
+	            #stat_ActiveUser := #temp_EmptyUser;
+	            #stat_ActiveUser.Authorisation := #stat_UserLevel[0];
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION TIMES
+	    REGION NO USER FOUND
+	        #stat_TONNoUserFound(IN := #stat_NoUserFound,
+	                             PT := T#2s);
+	        
+	        IF #stat_TONNoUserFound.Q
+	        THEN
+	            #stat_NoUserFound := FALSE;
+	        END_IF;
+	    END_REGION
+	    REGION USER ALREADY ADDED
+	        #stat_TONUserAlreadyAdded(IN := #stat_UserAlreadyAdded,
+	                                  PT := T#2s);
+	        
+	        IF #stat_TONUserAlreadyAdded.Q
+	        THEN
+	            #stat_UserAlreadyAdded := FALSE;
+	        END_IF;
+	    END_REGION
+	    REGION NEW USER ADDED
+	        #stat_TONNewUserAdded(IN := #stat_NewUserAdded,
+	                              PT := T#2s);
+	        
+	        IF #stat_TONNewUserAdded.Q
+	        THEN
+	            #stat_NewUserAdded := FALSE;
+	        END_IF;
+	    END_REGION
+	    REGION USER DELETED
+	        #stat_TONUserDeleted(IN := #stat_UserDeleted,
+	                             PT := T#2s);
+	        
+	        IF #stat_TONUserDeleted.Q
+	        THEN
+	            #stat_UserDeleted := FALSE;
+	        END_IF;
+	    END_REGION
+	END_REGION
+	
+	REGION OUTPUTS
+	    #q_ActiveUser := #stat_ActiveUser;
+	    #q_NoUserFound := #stat_NoUserFound;
+	    #q_UserAlreadyAdded := #stat_UserAlreadyAdded;
+	    #q_NewUserAdded := #stat_NewUserAdded;
+	    #q_UserDeleted := #stat_UserDeleted;
+	END_REGION
+END_FUNCTION_BLOCK
+
