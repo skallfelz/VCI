@@ -1,0 +1,114 @@
+﻿FUNCTION "FC_MLG" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      Slot0 : HW_SUBMODULE;
+      Slot1 : HW_SUBMODULE;
+      Slot2 : HW_SUBMODULE;
+   END_VAR
+
+   VAR_IN_OUT 
+      iq_GemesseneHoehe : Real;
+   END_VAR
+
+   VAR_TEMP 
+      temp_Slot1 : Array[0..1] of Byte;
+      temp_Slot2 : Byte;
+      temp_Slot0 : Array[0..3] of Byte;
+      temp_RetVal : Int;
+      temp_GemesseneHoehe : Real;
+   END_VAR
+
+
+BEGIN
+	#temp_RetVal := DPRD_DAT(LADDR := #Slot0, RECORD => #temp_Slot0);
+	#temp_RetVal := DPRD_DAT(LADDR := #Slot1, RECORD => #temp_Slot1);
+	#temp_RetVal := DPRD_DAT(LADDR := #Slot2, RECORD => #temp_Slot2);
+	
+	// Abfragen welcher Strahl belegt ist und somit von unten Messen - der höchst belegte Strahl gibt Höhe aus
+	
+	    //Slot 2
+	IF #temp_Slot2.%X0
+	THEN
+	    #temp_GemesseneHoehe := 120.0;
+	ELSIF #temp_Slot2.%X1
+	THEN
+	    #temp_GemesseneHoehe := 115.0;
+	ELSIF #temp_Slot2.%X2
+	THEN
+	    #temp_GemesseneHoehe := 110.0;
+	ELSIF #temp_Slot2.%X3
+	THEN
+	    #temp_GemesseneHoehe := 105.0;
+	ELSIF #temp_Slot2.%X4
+	THEN
+	    #temp_GemesseneHoehe := 100.0;
+	ELSIF #temp_Slot2.%X5
+	THEN
+	    #temp_GemesseneHoehe := 95.0;
+	ELSIF #temp_Slot2.%X6
+	THEN
+	    #temp_GemesseneHoehe := 90.0;
+	ELSIF #temp_Slot2.%X7
+	THEN
+	    #temp_GemesseneHoehe := 85.0;
+	    //Slot 1 [1]
+	ELSIF #temp_Slot1[1].%X0
+	THEN
+	    #temp_GemesseneHoehe := 80.0;
+	ELSIF #temp_Slot1[1].%X1
+	THEN
+	    #temp_GemesseneHoehe := 75.0;
+	ELSIF #temp_Slot1[1].%X2
+	THEN
+	    #temp_GemesseneHoehe := 70.0;
+	ELSIF #temp_Slot1[1].%X3
+	THEN
+	    #temp_GemesseneHoehe := 65.0;
+	ELSIF #temp_Slot1[1].%X4
+	THEN
+	    #temp_GemesseneHoehe := 60.0;
+	ELSIF #temp_Slot1[1].%X5
+	THEN
+	    #temp_GemesseneHoehe := 55.0;
+	ELSIF #temp_Slot1[1].%X6
+	THEN
+	    #temp_GemesseneHoehe := 50.0;
+	ELSIF #temp_Slot1[1].%X7
+	THEN
+	    #temp_GemesseneHoehe := 45.0;
+	    //Slot 1{0]
+	ELSIF #temp_Slot1[0].%X0
+	THEN
+	    #temp_GemesseneHoehe := 40.0;
+	ELSIF #temp_Slot1[0].%X1
+	THEN
+	    #temp_GemesseneHoehe := 35.0;
+	ELSIF #temp_Slot1[0].%X2
+	THEN
+	    #temp_GemesseneHoehe := 30.0;
+	ELSIF #temp_Slot1[0].%X3
+	THEN
+	    #temp_GemesseneHoehe := 25.0;
+	ELSIF #temp_Slot1[0].%X4
+	THEN
+	    #temp_GemesseneHoehe := 20.0;
+	ELSIF #temp_Slot1[0].%X5
+	THEN
+	    #temp_GemesseneHoehe := 15.0;
+	ELSIF #temp_Slot1[0].%X6
+	THEN
+	    #temp_GemesseneHoehe := 10.0;
+	ELSIF #temp_Slot1[0].%X7
+	THEN
+	    #temp_GemesseneHoehe := 5.0;
+	    
+	ELSE
+	    #temp_GemesseneHoehe := 0.0;
+	END_IF;
+	
+	#iq_GemesseneHoehe := #temp_GemesseneHoehe;
+	
+	
+END_FUNCTION
+
