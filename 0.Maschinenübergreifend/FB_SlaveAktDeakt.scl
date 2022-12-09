@@ -1,0 +1,204 @@
+﻿FUNCTION_BLOCK "FB_SlaveAktDeakt"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      LADDR : HW_DEVICE;
+      Deactivate : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      "Device deactivated" : Bool;
+      Done : Bool;
+      Busy : Bool;
+      Error : Bool;
+      Status : Word;
+   END_VAR
+
+   VAR 
+      statFirstCall { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool := true;
+      statLADDR { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : HW_DEVICE;
+      statDeaktivieren { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statState { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : DInt;
+      statMode { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : USInt;
+      statRetVal { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Int;
+      statREQ { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statBusy { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statDone { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statError { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statStatus { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Word;
+      statBusyFunction { ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'} : Bool;
+      statTONDone {InstructionName := 'TON_TIME'; LibVersion := '1.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : TON_TIME;
+      statTONError {InstructionName := 'TON_TIME'; LibVersion := '1.0'; ExternalAccessible := 'False'; ExternalVisible := 'False'; ExternalWritable := 'False'; S7_SetPoint := 'False'} : TON_TIME;
+   END_VAR
+
+   VAR CONSTANT 
+      STATE_IDLE : DInt := 0;
+      STATE_READ_STATUS : DInt := 1;
+      STATE_ACTIVATE : DInt := 2;
+      STATE_DEACTIVATE : DInt := 3;
+      STATE_CALL_FUNCTION : DInt := 4;
+      STATE_DONE : DInt := 5;
+      STATE_ERROR : DInt := 10;
+      STATUS_IDLE : Word := 16#0000;
+      STATUS_READ_STATUS : Word := 16#6000;
+      STATUS_ACTIVATE : Word := 16#6001;
+      STATUS_DEACTIVATE : Word := 16#6002;
+      STATUS_CALL_FUNCTION : Word := 16#6003;
+      STATUS_DONE : Word := 16#6004;
+      ERR_INVALID_STATE : Word := 16#8601;
+   END_VAR
+
+
+BEGIN
+	(*
+	//Statusbits
+	//Busy ist 1 solange die Funktion versucht den Slave zu aktivieren oder zu deaktivieren
+	//Done ist für 2 Sekunden 1 wenn das aktiveieren oder deaktivieren funktioniert hat
+	//Error ist für 2 Sekunden 1 und der Fehlercode wird am Status ausgegeben
+	//
+	//Der Baustein liest dauerhaft den Status des Slaves und führt das aktivieren bzw. deaktivieren
+	//nur aus wenn die Anforderung da ist
+	//
+	//Bausteininformationen
+	//Erstellt am 28.09.2020
+	//Erstellt von: SKAL (Econo-PAK GmbH)
+	//
+	//Änderungshistorie
+	//28.09.2020 Programm erstellt
+	//
+	*)
+	
+	REGION Inputs mapping
+	    #statLADDR := #LADDR;
+	    #statDeaktivieren := #Deactivate;
+	END_REGION
+	
+	REGION Timer
+	    #statTONDone(IN := #statState = #STATE_DONE,
+	                 PT := t#2s);
+	    #statTONError(IN := #statState = #STATE_ERROR,
+	                 PT := t#2s);
+	END_REGION
+	
+	CASE #statState OF
+	    #STATE_IDLE:
+	        #statREQ := false;
+	        #statBusy := false;
+	        #statDone := false;
+	        #statError := false;
+	        #statState := #STATE_READ_STATUS;
+	        
+	    #STATE_READ_STATUS:
+	        REGION Parameter ReadStatus
+	            #statMode := 0;
+	            #statREQ := true;
+	            
+	            //Auswahl ob aktiviert oder deaktivert werden soll
+	            //ansonsten wird der Status gelesen
+	            IF #statRetVal = 16#0001 AND #statDeaktivieren
+	            THEN
+	                #statState := #STATE_DEACTIVATE;
+	            ELSIF #statRetVal = 16#0002 AND NOT #statDeaktivieren
+	            THEN
+	                #statState := #STATE_ACTIVATE;
+	            ELSE
+	                #statState := #STATE_CALL_FUNCTION;
+	            END_IF;
+	            
+	            #statStatus := #STATUS_READ_STATUS;
+	        END_REGION
+	        
+	    #STATE_ACTIVATE:
+	        REGION Parameter Activate
+	            #statMode := 1;
+	            #statDone := false;
+	            #statBusy := true;
+	            #statREQ := true;
+	            
+	            #statState := #STATE_CALL_FUNCTION;
+	            #statStatus := #STATUS_ACTIVATE;
+	        END_REGION
+	        
+	    #STATE_DEACTIVATE:
+	        REGION Parameter Deactivate           
+	            #statMode := 2;
+	            #statDone := false;
+	            #statBusy := true;
+	            #statREQ := true;
+	            
+	            #statState := #STATE_CALL_FUNCTION;
+	            #statStatus := #STATUS_DEACTIVATE;
+	        END_REGION
+	        
+	    #STATE_CALL_FUNCTION:
+	        REGION Call Function  
+	            //Funktionsaufrauf D_ACT_DP
+	            #statRetVal := D_ACT_DP(REQ := #statREQ,
+	                                    MODE := #statMode,
+	                                    LADDR := #statLADDR,
+	                                    BUSY => #statBusyFunction);
+	            //Wenn alles statRetVal = 0 dann status Done
+	            IF (#statMode = 1 OR #statMode = 2)
+	                AND #statRetVal = 0
+	            THEN
+	                #statREQ := false;
+	                #statBusy := false;
+	                #statDone := true;
+	                #statState := #STATE_DONE;
+	            END_IF;
+	            
+	            //Wenn kein aktiven oder deaktivieren dann nur Status lesen
+	            IF #statMode = 0
+	            THEN
+	                #statREQ := false;
+	                #statState := #STATE_READ_STATUS;
+	            END_IF;
+	            
+	            IF INT_TO_WORD(#statRetVal) >= 16#8090
+	            THEN
+	                #statState := #STATE_ERROR;
+	            END_IF;
+	        END_REGION
+	        
+	    #STATE_DONE:
+	        #statStatus := #STATUS_DONE;
+	        IF #statTONDone.Q
+	        THEN
+	            #statState := #STATE_IDLE;
+	        END_IF;
+	        
+	    #STATE_ERROR:
+	        #statREQ := false;
+	        #statBusy := false;
+	        #statDone := false;
+	        #statError := true;
+	        #statStatus := INT_TO_WORD(#statRetVal);
+	        
+	        IF #statTONError.Q
+	        THEN
+	            #statState := #STATE_IDLE;
+	        END_IF;
+	    ELSE
+	        ;
+	END_CASE;
+	
+	REGION Outputs
+	    //Status Bits
+	    #Done := #statDone;
+	    #Busy := #statBusy;
+	    #Error := #statError;
+	    #Status := #statStatus;
+	    
+	    //Status Device deactivated ausgeben
+	    IF (#statRetVal = 2 AND #statMode = 0)
+	        OR (#statMode = 2 AND #statStatus = #STATUS_DONE)
+	    THEN
+	        #"Device deactivated" := true;
+	    ELSIF (#statMode = 0 AND #statRetVal <> 2)
+	        OR (#statMode = 1 AND #statStatus = #STATUS_DONE)
+	    THEN
+	        #"Device deactivated" := false;
+	    END_IF;
+	END_REGION
+END_FUNCTION_BLOCK
+
