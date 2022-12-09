@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-09T10:51:17.0895066Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Types.PlcStruct ID="0">
+    <AttributeList>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="None">
+    <Member Name="NDSN_ST_ADI_List" Datatype="Array[0..49] of &quot;NDSN_ST_ADI&quot;"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute></AttributeList><Sections><Section Name="None"><Member Name="i_ADI" Datatype="Int"><Subelement Path="0"><StartValue>11682</StartValue></Subelement><Subelement Path="1"><StartValue>11683</StartValue></Subelement><Subelement Path="2"><StartValue>10853</StartValue></Subelement><Subelement Path="3"><StartValue>10855</StartValue></Subelement><Subelement Path="4"><StartValue>10858</StartValue></Subelement><Subelement Path="5"><StartValue>10859</StartValue></Subelement><Subelement Path="6"><StartValue>10860</StartValue></Subelement><Subelement Path="7"><StartValue>11376</StartValue></Subelement><Subelement Path="8"><StartValue>11378</StartValue></Subelement><Subelement Path="9"><StartValue>10002</StartValue></Subelement><Subelement Path="10"><StartValue>10547</StartValue></Subelement><Subelement Path="11"><StartValue>10549</StartValue></Subelement><Subelement Path="12"><StartValue>10548</StartValue></Subelement><Subelement Path="13"><StartValue>6203</StartValue></Subelement><Subelement Path="14"><StartValue>6102</StartValue></Subelement><Subelement Path="15"><StartValue>6946</StartValue></Subelement><Subelement Path="16"><StartValue>7046</StartValue></Subelement><Subelement Path="17"><StartValue>7146</StartValue></Subelement><Subelement Path="18"><StartValue>7147</StartValue></Subelement><Subelement Path="19"><StartValue>7148</StartValue></Subelement><Subelement Path="20"><StartValue>7248</StartValue></Subelement><Subelement Path="21"><StartValue>13017</StartValue></Subelement><Subelement Path="22"><StartValue>13003</StartValue></Subelement><Subelement Path="23"><StartValue>13008</StartValue></Subelement><Subelement Path="24"><StartValue>13009</StartValue></Subelement><Subelement Path="25"><StartValue>13012</StartValue></Subelement><Subelement Path="26"><StartValue>801</StartValue></Subelement><Subelement Path="27"><StartValue>19</StartValue></Subelement><Subelement Path="28"><StartValue>22</StartValue></Subelement><Subelement Path="29"><StartValue>11681</StartValue></Subelement><Subelement Path="30"><StartValue>11685</StartValue></Subelement><Subelement Path="31"><StartValue>6103</StartValue></Subelement><Subelement Path="32"><StartValue>6002</StartValue></Subelement><Subelement Path="33"><StartValue>13002</StartValue></Subelement><Subelement Path="34"><StartValue>13</StartValue></Subelement><Subelement Path="35"><StartValue>16</StartValue></Subelement><Subelement Path="36"><StartValue>29</StartValue></Subelement><Subelement Path="37"><StartValue>30</StartValue></Subelement></Member><Member Name="i_Size" Datatype="UInt"><Subelement Path="0"><StartValue>36</StartValue></Subelement><Subelement Path="1"><StartValue>36</StartValue></Subelement><Subelement Path="2"><StartValue>2</StartValue></Subelement><Subelement Path="3"><StartValue>2</StartValue></Subelement><Subelement Path="4"><StartValue>2</StartValue></Subelement><Subelement Path="5"><StartValue>2</StartValue></Subelement><Subelement Path="6"><StartValue>2</StartValue></Subelement><Subelement Path="7"><StartValue>2</StartValue></Subelement><Subelement Path="8"><StartValue>2</StartValue></Subelement><Subelement Path="9"><StartValue>2</StartValue></Subelement><Subelement Path="10"><StartValue>2</StartValue></Subelement><Subelement Path="11"><StartValue>2</StartValue></Subelement><Subelement Path="12"><StartValue>2</StartValue></Subelement><Subelement Path="13"><StartValue>4</StartValue></Subelement><Subelement Path="14"><StartValue>2</StartValue></Subelement><Subelement Path="15"><StartValue>4</StartValue></Subelement><Subelement Path="16"><StartValue>4</StartValue></Subelement><Subelement Path="17"><StartValue>2</StartValue></Subelement><Subelement Path="18"><StartValue>2</StartValue></Subelement><Subelement Path="19"><StartValue>4</StartValue></Subelement><Subelement Path="20"><StartValue>4</StartValue></Subelement><Subelement Path="21"><StartValue>2</StartValue></Subelement><Subelement Path="22"><StartValue>2</StartValue></Subelement><Subelement Path="23"><StartValue>2</StartValue></Subelement><Subelement Path="24"><StartValue>2</StartValue></Subelement><Subelement Path="25"><StartValue>2</StartValue></Subelement><Subelement Path="26"><StartValue>2</StartValue></Subelement><Subelement Path="27"><StartValue>2</StartValue></Subelement><Subelement Path="28"><StartValue>2</StartValue></Subelement><Subelement Path="29"><StartValue>36</StartValue></Subelement><Subelement Path="30"><StartValue>36</StartValue></Subelement><Subelement Path="31"><StartValue>4</StartValue></Subelement><Subelement Path="32"><StartValue>2</StartValue></Subelement><Subelement Path="33"><StartValue>2</StartValue></Subelement><Subelement Path="34"><StartValue>2</StartValue></Subelement><Subelement Path="35"><StartValue>4</StartValue></Subelement><Subelement Path="36"><StartValue>2</StartValue></Subelement><Subelement Path="37"><StartValue>8</StartValue></Subelement></Member></Section></Sections></Member>
+  </Section>
+</Sections></Interface>
+      <IsFailsafeCompliant>false</IsFailsafeCompliant>
+      <Name>NDSN_ST_ADIList</Name>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="5" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="6" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="7" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="8" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Types.PlcStruct>
+</Document>

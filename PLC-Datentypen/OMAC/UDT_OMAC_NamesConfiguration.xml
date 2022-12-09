@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V17" />
+  <DocumentInfo>
+    <Created>2022-12-09T10:51:17.2356961Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>Simotion SCOUT TIA</DisplayName>
+        <DisplayVersion>5.4.3.0</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V17 SP1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V17</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Advanced</DisplayName>
+        <DisplayVersion>V17 Update 5</DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+  <SW.Types.PlcStruct ID="0">
+    <AttributeList>
+      <Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">
+  <Section Name="None">
+    <Member Name="unitModesNames" Datatype="Array[0..&quot;OMAC_LANGUAGES_UPPER_LIM&quot;, 0..&quot;OMAC_MODES_UPPER_LIM&quot;] of String[18]"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-US">Names of unit modes [First index language, Second unit mode no]</MultiLanguageText><MultiLanguageText Lang="de-DE">'UserModeXX'</MultiLanguageText></Comment><Subelement Path="0,0"><StartValue>'Invalid'</StartValue></Subelement><Subelement Path="0,1"><StartValue>'Production'</StartValue></Subelement><Subelement Path="0,2"><StartValue>'Maintenance'</StartValue></Subelement><Subelement Path="0,3"><StartValue>'Manual'</StartValue></Subelement><Subelement Path="0,4"><StartValue>'Change over'</StartValue></Subelement><Subelement Path="0,5"><StartValue>'Clean'</StartValue></Subelement><Subelement Path="0,6"><StartValue>'Set up'</StartValue></Subelement><Subelement Path="0,7"><StartValue>'Empty out'</StartValue></Subelement><Subelement Path="0,8"><StartValue>'OEM specific'</StartValue></Subelement><Subelement Path="0,9"><StartValue>'Spare'</StartValue></Subelement><Subelement Path="0,10"><StartValue>'User Mode 01'</StartValue></Subelement><Subelement Path="0,11"><StartValue>'User Mode 02'</StartValue></Subelement><Subelement Path="0,12"><StartValue>'User Mode 03'</StartValue></Subelement><Subelement Path="0,13"><StartValue>'User Mode 04'</StartValue></Subelement><Subelement Path="0,14"><StartValue>'User Mode 05'</StartValue></Subelement><Subelement Path="1,0"><StartValue>'Invalid'</StartValue></Subelement><Subelement Path="1,1"><StartValue>'Production'</StartValue></Subelement><Subelement Path="1,2"><StartValue>'Maintenance'</StartValue></Subelement><Subelement Path="1,3"><StartValue>'Manual'</StartValue></Subelement><Subelement Path="1,4"><StartValue>'Change over'</StartValue></Subelement><Subelement Path="1,5"><StartValue>'Clean'</StartValue></Subelement><Subelement Path="1,6"><StartValue>'Set up'</StartValue></Subelement><Subelement Path="1,7"><StartValue>'Empty out'</StartValue></Subelement><Subelement Path="1,8"><StartValue>'OEM specific'</StartValue></Subelement><Subelement Path="1,9"><StartValue>'Spare'</StartValue></Subelement><Subelement Path="1,10"><StartValue>'User Mode 01'</StartValue></Subelement><Subelement Path="1,11"><StartValue>'User Mode 02'</StartValue></Subelement><Subelement Path="1,12"><StartValue>'User Mode 03'</StartValue></Subelement><Subelement Path="1,13"><StartValue>'User Mode 04'</StartValue></Subelement><Subelement Path="1,14"><StartValue>'User Mode 05'</StartValue></Subelement></Member>
+    <Member Name="statesNames" Datatype="Array[0..&quot;OMAC_LANGUAGES_UPPER_LIM&quot;, 0..&quot;OMAC_STATES_UPPER_LIM&quot;] of String[16]"><AttributeList><BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute><BooleanAttribute Name="SetPoint" SystemDefined="true">false</BooleanAttribute></AttributeList><Comment><MultiLanguageText Lang="en-US">Names of states [First index language, Second state no]</MultiLanguageText><MultiLanguageText Lang="de-DE">Names of states for [First index language, Second state no]</MultiLanguageText></Comment><Subelement Path="0,0"><StartValue>'Undefined'</StartValue></Subelement><Subelement Path="0,1"><StartValue>'Clearing'</StartValue></Subelement><Subelement Path="0,2"><StartValue>'Stopped'</StartValue></Subelement><Subelement Path="0,3"><StartValue>'Starting'</StartValue></Subelement><Subelement Path="0,4"><StartValue>'Idle'</StartValue></Subelement><Subelement Path="0,5"><StartValue>'Suspended'</StartValue></Subelement><Subelement Path="0,6"><StartValue>'Execute'</StartValue></Subelement><Subelement Path="0,7"><StartValue>'Stopping'</StartValue></Subelement><Subelement Path="0,8"><StartValue>'Aborting'</StartValue></Subelement><Subelement Path="0,9"><StartValue>'Aborted'</StartValue></Subelement><Subelement Path="0,10"><StartValue>'Holding'</StartValue></Subelement><Subelement Path="0,11"><StartValue>'Held'</StartValue></Subelement><Subelement Path="0,12"><StartValue>'UnHolding'</StartValue></Subelement><Subelement Path="0,13"><StartValue>'Suspending'</StartValue></Subelement><Subelement Path="0,14"><StartValue>'UnSuspending'</StartValue></Subelement><Subelement Path="0,15"><StartValue>'Resetting'</StartValue></Subelement><Subelement Path="0,16"><StartValue>'Completing'</StartValue></Subelement><Subelement Path="0,17"><StartValue>'Complete'</StartValue></Subelement><Subelement Path="1,0"><StartValue>'Undefiniert'</StartValue></Subelement><Subelement Path="1,1"><StartValue>'Clearing'</StartValue></Subelement><Subelement Path="1,2"><StartValue>'Stopped'</StartValue></Subelement><Subelement Path="1,3"><StartValue>'Starting'</StartValue></Subelement><Subelement Path="1,4"><StartValue>'Idle'</StartValue></Subelement><Subelement Path="1,5"><StartValue>'Suspended'</StartValue></Subelement><Subelement Path="1,6"><StartValue>'Execute'</StartValue></Subelement><Subelement Path="1,7"><StartValue>'Stopping'</StartValue></Subelement><Subelement Path="1,8"><StartValue>'Aborting'</StartValue></Subelement><Subelement Path="1,9"><StartValue>'Aborted'</StartValue></Subelement><Subelement Path="1,10"><StartValue>'Holding'</StartValue></Subelement><Subelement Path="1,11"><StartValue>'Held'</StartValue></Subelement><Subelement Path="1,12"><StartValue>'UnHolding'</StartValue></Subelement><Subelement Path="1,13"><StartValue>'Suspending'</StartValue></Subelement><Subelement Path="1,14"><StartValue>'UnSuspending'</StartValue></Subelement><Subelement Path="1,15"><StartValue>'Resetting'</StartValue></Subelement><Subelement Path="1,16"><StartValue>'Completing'</StartValue></Subelement><Subelement Path="1,17"><StartValue>'Complete'</StartValue></Subelement></Member>
+  </Section>
+</Sections></Interface>
+      <IsFailsafeCompliant>false</IsFailsafeCompliant>
+      <Name>UDT_OMAC_NamesConfiguration</Name>
+    </AttributeList>
+    <ObjectList>
+      <MultilingualText ID="1" CompositionName="Comment">
+        <ObjectList>
+          <MultilingualTextItem ID="2" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="3" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="4" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+      <MultilingualText ID="5" CompositionName="Title">
+        <ObjectList>
+          <MultilingualTextItem ID="6" CompositionName="Items">
+            <AttributeList>
+              <Culture>de-DE</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="7" CompositionName="Items">
+            <AttributeList>
+              <Culture>fr-FR</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+          <MultilingualTextItem ID="8" CompositionName="Items">
+            <AttributeList>
+              <Culture>en-GB</Culture>
+              <Text />
+            </AttributeList>
+          </MultilingualTextItem>
+        </ObjectList>
+      </MultilingualText>
+    </ObjectList>
+  </SW.Types.PlcStruct>
+</Document>
