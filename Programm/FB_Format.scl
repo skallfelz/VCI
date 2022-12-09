@@ -20,7 +20,7 @@ VERSION : 0.1
    END_VAR
 
    VAR_IN_OUT 
-      iq_FormatData : Array[0..30] of "UDT_Formatdata";
+      iq_FormatData : Array[0.."UPPERFORMATNUMBER"] of "UDT_Formatdata";
       iq_CurrentFormatNumber : Int;
       iq_SetFormatNumber : Int;
    END_VAR

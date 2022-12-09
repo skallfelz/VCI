@@ -39,6 +39,9 @@ BEGIN
 	        //Kurvenpunkte einmalig an HMI senden
 	        "HMI".Multiplex.AchsData := "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr];
 	        
+	        //Positionen einmalig an HMI senden
+	        "HMI".Multiplex.Positions := "FORMAT".FORMAT[0].Position["HMI".Multiplex.ServoNr, "HMI".Multiplex.ServoPosition];
+	        
 	        //Drehmomente einmalig an HMI senden
 	        "HMI".Multiplex.AchsMoment := "SERVO".AchsMoment["HMI".Multiplex.ServoNr];
 	    END_IF;
@@ -79,8 +82,11 @@ BEGIN
 	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Offset_HMI (Phasing)" := "HMI".Multiplex.AchsData."Offset_HMI (Phasing)";
 	        "FORMAT".FORMAT[0].AchsData["HMI".Multiplex.ServoNr]."Offset_HMI (Offset)" := "HMI".Multiplex.AchsData."Offset_HMI (Offset)";
 	        
-	        
-	        
+	        //Positionen von HMI in DB schreiben
+	        IF "HMI".Multiplex.ServoPosition <> 0
+	        THEN
+	            "FORMAT".FORMAT[0].Position["HMI".Multiplex.ServoNr, "HMI".Multiplex.ServoPosition] := "HMI".Multiplex.Positions;
+	        END_IF;
 	        
 	        //Drehmomente von HMI in DB schreiben
 	        "SERVO".AchsMoment["HMI".Multiplex.ServoNr]."Max Drehmoment Soll" := "HMI".Multiplex."AchsMoment"."Max Drehmoment Soll";
