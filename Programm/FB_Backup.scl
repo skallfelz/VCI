@@ -105,7 +105,7 @@ VERSION : 0.1
       SA : USInt := 7;
       SU : USInt := 1;
       MANUAL : USInt := 8;
-      STATUS_NOCALL : Word := 16#0;
+      STATUS_NOCALL : Word := 16#0000;
       STATUS_START_PROCESS : Word := 16#7000;
       STATUS_BUSY : Word := 16#7001;
       STATUS_DONE : Word := 16#7002;
@@ -123,8 +123,9 @@ BEGIN
 	// Change log table:
 	// Version    Date          Expert in charge    Changes applied
 	// 01.00.00   21.03.2022    SK                  First release version v1.0
-	// 01.00.1    01.10.2022    SK                  Add limiting to temp_ImportWeekdayManual
+	// 01.00.10   01.10.2022    SK                  Add limiting to temp_ImportWeekdayManual
 	// 01.01.00   07.12.2022    SK                  Add Delete function (all backups will be deleted)
+	// 01.01.10   15.12.2022    SK                  Changend Delete function (manual backup will not be deleted)
 	//===============================================================================================
 	REGION MAP INPUTS
 	    #temp_Time := #i_LocalTime;
@@ -140,7 +141,7 @@ BEGIN
 	REGION TRIGGER DELETE
 	    #inst_RTrigDelete(CLK := #temp_BtnDelete);
 	END_REGION
-	    
+	
 	REGION STATE MACHINE
 	    CASE #stat_FBStateMachine OF
 	        #FB_STATE_IDLE:
@@ -278,7 +279,7 @@ BEGIN
 	        #FB_STATE_DELETE:
 	            REGION STATE_DELETE
 	                #temp_DeleteName := CONCAT(IN1 := 'UserFiles/', IN2 := #temp_Name);
-	                #stat_CounterDelete := LIMIT(MN := 1, IN := #stat_CounterDelete, MX := 8);
+	                #stat_CounterDelete := LIMIT(MN := 1, IN := #stat_CounterDelete, MX := 7);
 	                
 	                CASE #stat_CounterDelete OF
 	                    #MO:
@@ -309,7 +310,7 @@ BEGIN
 	                    #stat_CounterDelete += 1;
 	                END_IF;
 	                
-	                IF #stat_CounterDelete > 8 THEN
+	                IF #stat_CounterDelete > 7 THEN
 	                    #stat_CounterDelete := 1;
 	                    #stat_FBStateMachine := #FB_STATE_IDLE;
 	                END_IF;
@@ -365,7 +366,7 @@ BEGIN
 	                        Data := #stat_DestImport);
 	    END_REGION
 	    REGION FILEDELETE
-	        #inst_FileDelete(REQ:=#stat_TriggerDelete);
+	        #inst_FileDelete(REQ := #stat_TriggerDelete);
 	    END_REGION
 	END_REGION
 	
@@ -380,7 +381,7 @@ BEGIN
 	        END_IF;
 	        
 	        #inst_TON_ExportDone(IN := #stat_StatusExportHMI >= 2,
-	                            PT := t#5s);
+	                             PT := t#5s);
 	        IF #inst_TON_ExportDone.Q THEN
 	            #stat_StatusExportHMI := 0;
 	        END_IF;
@@ -399,7 +400,7 @@ BEGIN
 	        END_IF;
 	        
 	        #inst_TON_ImportDone(IN := #stat_StatusImportHMI >= 2 AND #stat_StatusImportHMI < 4,
-	                            PT := t#5s);
+	                             PT := t#5s);
 	        IF #inst_TON_ImportDone.Q THEN
 	            #stat_StatusImportHMI := 0;
 	        END_IF;
@@ -410,13 +411,13 @@ BEGIN
 	
 	REGION RELOAD
 	    #inst_TP_Reload(IN := #stat_StatusImportHMI = 2,
-	                   PT := t#500ms);
+	                    PT := t#500ms);
 	    
 	    #stat_ReloadData := #inst_TP_Reload.Q;
 	END_REGION
 	
 	REGION OUTPUTS
-	    IF #stat_Status = #STATUS_DONE AND (#stat_Done = FALSE)THEN
+	    IF #stat_Status = #STATUS_DONE AND (#stat_Done = FALSE) THEN
 	        #stat_Done := TRUE;
 	        #stat_Busy := FALSE;
 	        #stat_Error := FALSE;
